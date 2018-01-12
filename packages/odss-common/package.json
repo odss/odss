@@ -1,0 +1,18 @@
+{
+  "name": "odss-common",
+  "version": "1.0.0",
+  "description": "ODSS Commons",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "odss"
+  ],
+  "author": "smialy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/sdss/common"
+  }
+}

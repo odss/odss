@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "importHelpers": false,
+    "experimentalDecorators": true,
+    "noImplicitUseStrict": true,
+    "noEmitOnError": false,
+    "preserveConstEnums": true, 
+    "allowUnusedLabels": true,
+    "outDir":"./src",
+    "baseUrl": ".",
+    "paths":{
+      "odss-common": ["../odss-common/ts"],
+      "odss-query": ["../odss-query"]
+    }
+  },
+  "files": [
+    "ts/bundle.ts",
+    "ts/context.ts",
+    "ts/events.ts",
+    "ts/framework.ts",
+    "ts/index.ts",
+    "ts/loader.ts",
+    "ts/service.ts",
+    "ts/utils.ts"
+  ]
+}

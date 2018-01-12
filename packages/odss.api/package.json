@@ -1,0 +1,16 @@
+{
+  "name": "odss.api",
+  "version": "1.0.0",
+  "description": "ODSS API",
+  "keywords": [
+    "www"
+  ],
+  "homepage": "",
+  "license": "MIT",
+  "author": "smialy",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/odss/api"
+  },
+  "main": "src/index.js"
+}

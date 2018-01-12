@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>odss</title>
+        <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
+        <script src="../node_modules/systemjs/dist/system.src.js"></script>
+        <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+        <script src="vendor/sinon-1.5.2.js"></script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <script>
+        System.config({
+            defaultJSExtensions: true,
+            transpiler: 'babel-plugin',
+            paths: {
+                "odss-framework.test/": "test/",
+                "odss-framework/": "src/"
+            },
+            map: {
+                "babel-plugin": '../node_modules/systemjs-plugin-babel/plugin-babel.js',
+                "systemjs-babel-build": '../node_modules/systemjs-plugin-babel/systemjs-babel-browser.js',
+                'odss-query': '../node_modules/odss-query/src/index.js',
+                'odss-common': '../node_modules/odss-common/src/index.js'
+            },
+            packages: {
+                "odss-framework.test": {
+                    "main": "index.js"
+                }
+            }
+        });
+        QUnit.config.autostart = false;
+        System.import('odss-framework.test').then(() => QUnit.start());
+        </script>
+    </body>
+</html>

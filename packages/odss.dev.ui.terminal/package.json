@@ -1,0 +1,16 @@
+{
+  "name": "odss.dev.ui.terminal",
+  "version": "0.0.1",
+  "description": "sOSGi Dev Terminal",
+  "license": "MIT",
+  "author": "smialy",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/odss/dev.ui.terminal"
+  },
+  "main": "src/index.js",
+  "dependencies": {
+    "odss.api": "github:odss/api",
+    "odss.dev.ui.api": "github:odss/dev.ui.api"
+  }
+}

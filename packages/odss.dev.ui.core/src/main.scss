@@ -1,0 +1,27 @@
+#odss-dev-toolbar {
+    position: fixed;
+    font: 16px/1em Helvetica Neue,Helvetica,Arial,sans-serif;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 100%;
+    padding:4px;
+    color: #fff;
+    user-select: none;
+    background: rgba(0, 0, 0, 0.8);
+    > .logo{
+        padding: 8px;
+        
+    }
+    .panel-list{
+        .panel{
+            padding: 8px;
+            text-align: center;
+            border: solid 1px transparent;
+            cursor: pointer;
+            &.active{
+                border-color: #fff;
+            }
+        }
+    }
+}

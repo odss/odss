@@ -1,0 +1,19 @@
+{
+  "name": "odss.shell",
+  "version": "1.0.0",
+  "description": "ODSS Shell",
+  "keywords": [
+    "www"
+  ],
+  "homepage": "",
+  "license": "MIT",
+  "author": "smialy",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/odss/shell"
+  },
+  "dependencies": {
+    "odss.api": "github:odss/api"
+  },
+  "main": "src/index.js"
+}

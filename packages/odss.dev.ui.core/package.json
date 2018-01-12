@@ -1,0 +1,15 @@
+{
+  "name": "odss.dev.ui.core",
+  "version": "1.0.0",
+  "description": "ODSS Dev UI",
+  "license": "MIT",
+  "author": "smialy",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/odss/dev.ui.core"
+  },
+  "main": "src/index.js",
+  "dependencies": {
+    "odss.dev.ui.api": "github:odss/dev.ui.api"
+  }
+}
