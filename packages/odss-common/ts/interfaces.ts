@@ -112,9 +112,9 @@ export interface IContextEvents{
 }
 
 export interface IServiceTrackerListener {
-    addingService(reference: IServiceReference): void;
-    modifiedService(reference: IServiceReference): void;
-    removedService(reference: IServiceReference): void;
+    addingService(reference: IServiceReference): Object;
+    modifiedService(reference: IServiceReference, service: Object): void;
+    removedService(reference: IServiceReference, service: Object): void;
 }
 
 export interface IBundleTrackerListener {

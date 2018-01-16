@@ -9,7 +9,7 @@ var terminal, reg, tracker;
 
 export function start(ctx) {
     terminal = new Termial(MAIN_TEMPLATE);
-    tracker = ctx.services.tracker(IShell, {
+    tracker = ctx.serviceTracker(IShell, {
         addingService: function(reference) {
             terminal.activate((ctx.getService(reference)));
 

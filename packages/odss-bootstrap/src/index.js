@@ -17,7 +17,7 @@ function ready(){
     });
 }
 
-export default async function prepareFramewok(options = {}){
+export async function boot(options = {}){
     await ready();
     
     let framework = new Framework(options.properties);

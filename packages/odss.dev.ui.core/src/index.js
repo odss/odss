@@ -10,7 +10,7 @@ let panels, tracker;
 export function start(ctx) {
     let $dom = createView(MAIN_TEMPLATE);
     panels = new Panels($dom);
-    tracker = ctx.services.tracker(IPanel, {
+    tracker = ctx.serviceTracker(IPanel, {
         addingService: function(reference) {
             panels.addPanel(reference.id, ctx.getService(reference));
         },

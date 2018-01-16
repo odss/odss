@@ -1,53 +1,8 @@
 import { Events } from './consts';
-// type Trackable = IBundle | IServiceReference;
-class Tracked {
-    constructor() {
-        this._tracked = new Set();
-    }
-    track(item) {
-        if (this._tracked.has(item)) {
-            this.modified(item);
-        }
-        else {
-            this._tracked.add(item);
-            this.adding(item);
-        }
-    }
-    untrack(item) {
-        if (this._tracked.has(item)) {
-            this._tracked.delete(item);
-            this.removed(item);
-        }
-    }
-    close() {
-        let items = Array.from(this._tracked);
-        for (let item of items) {
-            this.untrack(item);
-        }
-    }
-    removed(item) {
-        throw new Error(`Not implemented Tracked::removed(${item})`);
-    }
-    adding(item) {
-        throw new Error(`Not implemented Tracked::adding(${item})`);
-    }
-    modified(item) {
-        throw new Error(`Not implemented Tracked::modified(${item})`);
-    }
-    size() {
-        return this._tracked.size;
-    }
-    getItems() {
-        return Array.from(this._tracked);
-    }
-}
-/**
- * @type {tracker.ServiceTracked}
- */
-class ServiceTracked extends Tracked {
-    constructor(tracker) {
-        super();
-        this.tracker = tracker;
+class ServiceTracked {
+    constructor(customizer) {
+        this.tracked = new Map();
+        this.customizer = customizer;
     }
     serviceEvent(event) {
         switch (event.type) {
@@ -60,21 +15,52 @@ class ServiceTracked extends Tracked {
                 break;
         }
     }
-    removed(reference) {
-        this.tracker.removedService(reference);
+    removed(reference, service) {
+        this.customizer.removedService(reference, service);
     }
     adding(reference) {
-        this.tracker.addingService(reference);
+        return this.customizer.addingService(reference);
     }
-    modified(reference) {
-        this.tracker.modifiedService(reference);
+    modified(reference, service) {
+        this.customizer.modifiedService(reference, service);
+    }
+    track(reference) {
+        if (this.tracked.has(reference)) {
+            const service = this.tracked.get(reference);
+            this.modified(reference, service);
+        }
+        else {
+            const service = this.adding(reference);
+            if (service) {
+                this.tracked.set(reference, service);
+            }
+        }
+    }
+    untrack(reference) {
+        if (this.tracked.has(reference)) {
+            const service = this.tracked.get(reference);
+            this.tracked.delete(reference);
+            this.removed(reference, service);
+        }
+    }
+    close() {
+        let items = Array.from(this.tracked.keys());
+        for (let item of items) {
+            this.untrack(item);
+        }
+    }
+    size() {
+        return this.tracked.size;
+    }
+    getServices() {
+        return Array.from(this.tracked.values());
+    }
+    getReferences() {
+        return Array.from(this.tracked.keys());
     }
 }
-/**
- * @type {tracker.ServiceTracker}
- */
 export class ServiceTracker {
-    constructor(ctx, filter, listener) {
+    constructor(ctx, filter, customizer = null) {
         if (!ctx) {
             throw new Error('Not set bundle context');
         }
@@ -83,12 +69,12 @@ export class ServiceTracker {
         }
         this._ctx = ctx;
         this._filter = filter;
-        this._listener = listener;
+        this._customizer = customizer || this;
         this._tracked = null;
     }
     open() {
         if (this._tracked === null) {
-            this._tracked = new ServiceTracked(this);
+            this._tracked = new ServiceTracked(this._customizer);
             this._ctx.on.service.add(this._tracked, this._filter);
             let refs = this._ctx.getServiceReferences(this._filter);
             for (let i = 0, j = refs.length; i < j; i++) {
@@ -105,70 +91,45 @@ export class ServiceTracker {
         }
         return this;
     }
-    /**
-     *
-     * @param {service.Reference} reference
-     */
     addingService(reference) {
-        if (this._listener) {
-            this._listener.addingService(reference);
-        }
+        const service = this._ctx.getService(reference);
+        this.onAddingService(reference, service);
+        return service;
     }
-    /**
-     *
-     * @param {service.Reference} reference
-     */
-    modifiedService(reference) {
-        if (this._listener) {
-            this._listener.modifiedService(reference);
-        }
+    modifiedService(reference, service) {
+        this.onModifiedService(reference, service);
     }
-    /**
-     *
-     * @param {service.Reference} reference
-     */
-    removedService(reference) {
-        if (this._listener) {
-            this._listener.removedService(reference);
-        }
+    removedService(reference, service) {
+        this.onRemovedService(reference, service);
         this._ctx.ungetService(reference);
     }
-    get size() {
+    onAddingService(reference, service) {
+    }
+    onModifiedService(reference, service) {
+    }
+    onRemovedService(reference, service) {
+    }
+    size() {
         return this._tracked !== null ? this._tracked.size() : 0;
     }
-    get reference() {
-        if (this._tracked !== null) {
-            let items = this._tracked.getItems();
-            if (items.length) {
-                return items[0];
-            }
-        }
-        return null;
+    getReference() {
+        return this.getReferences()[0];
     }
-    references() {
-        return this._tracked !== null ? this._tracked.getItems() : [];
+    getReferences() {
+        return this._tracked !== null ? this._tracked.getReferences() : [];
     }
-    get service() {
-        let ref = this.reference;
-        return ref === null ? null : this._ctx.getService(ref);
+    getService() {
+        return this.getServices()[0];
     }
-    services() {
-        let buff = [];
-        let refs = this.references();
-        for (let i = 0, j = refs.length; i < j; i++) {
-            buff.push(this._ctx.getService(refs[i]));
-        }
-        return buff;
+    getServices() {
+        return this._tracked !== null ? this._tracked.getServices() : [];
     }
 }
-/**
- * @type {tracker.BundleTracked}
- */
-class BundleTracked extends Tracked {
-    constructor(mask, listener) {
-        super();
-        this.listener = listener || null;
+class BundleTracked {
+    constructor(mask, listener = null) {
+        this.listener = listener;
         this.mask = mask;
+        this.bundles = new Set();
     }
     bundleEvent(event) {
         if (event.bundle.state & this.mask) {
@@ -177,6 +138,30 @@ class BundleTracked extends Tracked {
         else {
             this.untrack(event.bundle);
         }
+    }
+    track(bundle) {
+        if (this.bundles.has(bundle)) {
+            this.modified(bundle);
+        }
+        else {
+            this.bundles.add(bundle);
+            this.adding(bundle);
+        }
+    }
+    untrack(bundle) {
+        if (this.bundles.has(bundle)) {
+            this.bundles.delete(bundle);
+            this.removed(bundle);
+        }
+    }
+    size() {
+        return this.bundles.size;
+    }
+    close() {
+        this.bundles.clear();
+    }
+    getBundles() {
+        return Array.from(this.bundles);
     }
     removed(bundle) {
         if (this.listener !== null) {
@@ -229,11 +214,11 @@ export class BundleTracker {
         }
         return this;
     }
-    get size() {
+    size() {
         return this._tracked !== null ? this._tracked.size() : 0;
     }
     bundles() {
-        return this._tracked !== null ? this._tracked.getItems() : [];
+        return this._tracked !== null ? this._tracked.getBundles() : [];
     }
     addingBundle(bundle) {
     }

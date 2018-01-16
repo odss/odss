@@ -14,7 +14,7 @@ export function start(ctx) {
     ctx.registerService(IShell, shell);
 
     //listern for added services ICommand
-    tracker = ctx.services.tracker(ICommand, {
+    tracker = ctx.serviceTracker(ICommand, {
         addingService: function(reference) {
             shell.addCommand(ctx.getService(reference));
         },

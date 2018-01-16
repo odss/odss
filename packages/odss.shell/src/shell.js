@@ -124,7 +124,7 @@ export default class Shell{
                     err(e);
                 }
             } else {
-                err('Not found command: ' + cmdName);
+                err(`${cmdName}: command not found`);
             }
         } else {
             out('');

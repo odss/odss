@@ -7,14 +7,13 @@ export const Events = {
 export const USER_LOADED = 'user.loaded';
 
 
-export interface IAuthEvent {
-    readonly type:string;
+export class IAuthEvent {
 }
 export interface IAuthListener {
     authEvent(event: IAuthEvent);
 }
 
-export interface IAuthResult{
+export class IAuthResult{
     readonly type: string;
     readonly identity: string;
     readonly messages: string[];
@@ -47,15 +46,3 @@ export class AuthService implements IAuthService{
     }
 }
 
-export interface IUser {
-    readonly id: string;
-
-    isAnonymous(): boolean;
-}
-export interface IUserEvent {
-    readonly type: string;
-    readonly user: IUser;
-}
-export interface IUserListener {
-    userEvent(event: IUserEvent): void;
-}

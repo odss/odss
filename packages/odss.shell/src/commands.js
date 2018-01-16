@@ -53,7 +53,7 @@ COMMANDS.push({
                     return;
                 }
             }
-            this.ctx.bundles.get(sid).reload(autostart);
+            this.ctx.getBundle(sid).reload(autostart);
         } else {
             err('Expected bundle: "id" or "location"');
 
@@ -70,14 +70,14 @@ COMMANDS.push({
         if (!/([^0-9])/.test(sid)) {
             sid = parseInt(sid, 10);
         }
-        let bundle = this.ctx.bundles.get(sid);
+        let bundle = this.ctx.getBundle(sid);
         bundle.uninstall();
         out('Bundle(id=' + bundle.id + ' location=' + bundle.meta.location + ') unistalled');
     },
     complete: function(args, callback) {
         let ctx = this.ctx;
         let getNames = function() {
-            let bundles = ctx.bundles.all();
+            let bundles = ctx.getBundles();
             let buff = [];
             for (let i = 0; i < bundles.length; i++) {
                 buff.push(bundles[i].meta.location);
@@ -111,7 +111,7 @@ COMMANDS.push({
         if (!/([^0-9])/.test(sid)) {
             sid = parseInt(sid, 10);
         }
-        let bundle = this.ctx.bundles.get(sid);
+        let bundle = this.ctx.getBundle(sid);
         bundle.start();
         out('Bundle(id=' + bundle.id + ' location=' + bundle.meta.location + ') started');
     }
@@ -126,7 +126,7 @@ COMMANDS.push({
             if (!/([^0-9])/.test(bid)) {
                 bid = parseInt(bid, 10);
             }
-            let bundle = this.ctx.bundles.get(bid);
+            let bundle = this.ctx.getBundle(bid);
             bundle.stop();
             out('Bundle(id=' + bundle.id + ' location=' + bundle.meta.location + ') stopped');
         } else {
@@ -172,7 +172,7 @@ COMMANDS.push({
         let line = function(id, version, status, location) {
             return pad(id, 'id') + ' ' + pad(version, 'version') + ' ' + pad(status, 'status') + ' ' + pad(location, 'location') + '\n';
         };
-        let bundles = this.ctx.bundles.all(),
+        let bundles = this.ctx.getBundles(),
             bundle, i, j;
         for (i = 0, j = bundles.length; i < j; i++) {
             bundle = bundles[i];

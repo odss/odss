@@ -8,6 +8,9 @@
     "noImplicitUseStrict": true
   },
   "files": [
-    "ts/index.ts"
+    "ts/index.ts",
+    "ts/io.ts",
+    "ts/user.ts",
+    "ts/auth.ts",
   ]
 }

@@ -9,7 +9,7 @@ import tests from './core';
 
 
 
-QUnit.module("sosig.tracker.ServiceTracker", hook => {
+QUnit.module("sosig.tracker.getService()Tracker", hook => {
 
     const scope = {};
 
@@ -37,17 +37,18 @@ QUnit.module("sosig.tracker.ServiceTracker", hook => {
     });
     QUnit.test('register/unregister service', assert =>  {
         let counter = 0;
-        let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
-            addingService: function(/* reference */) {
+        class TestServiceTracker extends ServiceTracker{
+            onAddingService() {
                 counter |= 1;
-            },
-            removedService: function(/* reference */) {
+            }
+            onRemovedService() {
                 counter |= 2;
             }
-        });
+        }
+        let tracker = new TestServiceTracker(scope.ctx, 'test.tracker');
         tracker.open();
         let reg = scope.ctx.registerService('test.tracker', 'test');
-
+        
         reg.unregister();
 
         assert.equal(counter & 1, 1, 'Not fire ServiceTracker.addingService(ref)');
@@ -56,68 +57,64 @@ QUnit.module("sosig.tracker.ServiceTracker", hook => {
     });
     QUnit.test('tracker properties', assert =>  {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker');
-        assert.equal(tracker.size, 0, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.references().length, 0, 'Tracker references should return empty array');
-        assert.equal(tracker.reference, null, 'Tracker reference should assert.equal null');
-        assert.equal(tracker.services().length, 0, 'Tracker services should return empty array');
-        assert.equal(tracker.service, null, 'Tracker services should return empty array');
+        assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
+        assert.equal(tracker.getReferences().length, 0, 'Tracker references should return empty array');
+        assert.equal(tracker.getReference(), null, 'Tracker reference should assert.equal null');
+        assert.equal(tracker.getServices().length, 0, 'Tracker services should return empty array');
+        assert.equal(tracker.getService(), null, 'Tracker services should return empty array');
 
         tracker.open();
 
         let reg = scope.ctx.registerService('test.tracker', 'test');
 
-        assert.equal(tracker.size, 1, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.references().length, 1, 'Tracker references should return not empty array');
-        assert.deepEqual(tracker.services(), ['test'], 'Tracker services should return array: [test]');
-        assert.equal(tracker.service, 'test', 'Tracker services should return: test');
+        assert.equal(tracker.size(), 1, 'Tracker size should assert.equal 0');
+        assert.equal(tracker.getReferences().length, 1, 'Tracker references should return not empty array');
+        assert.deepEqual(tracker.getServices(), ['test'], 'Tracker services should return array: [test]');
+        assert.equal(tracker.getService(), 'test', 'Tracker services should return: test');
 
         reg.unregister();
 
-        assert.equal(tracker.size, 0, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.references().length, 0, 'Tracker references should return not empty array');
+        assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
+        assert.equal(tracker.getReferences().length, 0, 'Tracker references should return not empty array');
         assert.equal(tracker.reference, null, 'Tracker reference incorrect');
-        assert.deepEqual(tracker.services(), [], 'Tracker services should return array: [test]');
-        assert.equal(tracker.service, null, 'Tracker services should return: test');
+        assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
+        assert.equal(tracker.getService(), null, 'Tracker services should return: test');
 
 
         reg = scope.ctx.registerService('test.tracker', 'test');
 
-        assert.equal(tracker.size, 1, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.references().length, 1, 'Tracker references should return not empty array');
-        assert.deepEqual(tracker.services(), ['test'], 'Tracker services should return array: [test]');
-        assert.equal(tracker.service, 'test', 'Tracker services should return: test');
+        assert.equal(tracker.size(), 1, 'Tracker size should assert.equal 0');
+        assert.equal(tracker.getReferences().length, 1, 'Tracker references should return not empty array');
+        assert.deepEqual(tracker.getServices(), ['test'], 'Tracker services should return array: [test]');
+        assert.equal(tracker.getService(), 'test', 'Tracker services should return: test');
 
         tracker.close();
 
-        assert.equal(tracker.size, 0, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.references().length, 0, 'Tracker references should return not empty array');
+        assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
+        assert.equal(tracker.getReferences().length, 0, 'Tracker references should return not empty array');
         assert.equal(tracker.reference, null, 'Tracker reference incorrect');
-        assert.deepEqual(tracker.services(), [], 'Tracker services should return array: [test]');
-        assert.equal(tracker.service, null, 'Tracker services should return: test');
+        assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
+        assert.equal(tracker.getService(), null, 'Tracker services should return: test');
 
     });
 
     QUnit.test('stop tracker', assert =>  {
         let counter = 0;
-        let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
-            addingService: function(/* reference */) {
-                counter++;
-            },
-            removedService: function(/* reference */) {
+        class TestServiceTracker extends ServiceTracker{
+            onAddingService() {
                 counter++;
             }
-        });
-
+            onRemovedService() {
+                counter++;
+            }
+        }
+        let tracker = new TestServiceTracker(scope.ctx, 'test.tracker');
         tracker.open();
         scope.ctx.registerService('test.tracker', 'test');
+        assert.equal(counter, 1, 'Tracker should run onAddingService listener methods');
         tracker.close();
-        assert.equal(counter, 2, 'Tracker should run addingService and removedService listener methods');
-
         scope.ctx.registerService('test.tracker', 'test');
-
-        assert.equal(counter, 2, 'Tracker should find only one service');
-
-
+        assert.equal(counter, 2);
     });
 
     QUnit.test('start tracker after register service', assert =>  {
@@ -143,8 +140,8 @@ QUnit.module("sosig.tracker.ServiceTracker", hook => {
         scope.ctx.registerService('test.tracker', 'test2');
 
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker').open();
-        assert.equal(tracker.size, 2, 'Found 2 services');
-        let ref = tracker.reference;
+        assert.equal(tracker.size(), 2, 'Found 2 services');
+        let ref = tracker.getReference();
         assert.equal(ref.property(OBJECTCLASS), 'test.tracker');
     });
 
@@ -154,9 +151,9 @@ QUnit.module("sosig.tracker.ServiceTracker", hook => {
         scope.ctx.registerService('test.tracker', 'test2');
 
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker').open();
-        assert.equal(tracker.size, 2, 'Found 2 services');
+        assert.equal(tracker.size(), 2, 'Found 2 services');
 
-        let refs = tracker.references();
+        let refs = tracker.getReferences();
         assert.equal(refs[0].property(OBJECTCLASS), 'test.tracker');
 
         assert.equal(refs[1].property(OBJECTCLASS), 'test.tracker');
@@ -192,26 +189,26 @@ QUnit.module("odss.core.tracker.BundleTracker", hook => {
         let tracker = new BundleTracker(scope.ctx, Bundles.INSTALLED);
 
 
-        assert.equal(tracker.size, 0, 'Tracker size should be 0');
+        assert.equal(tracker.size(), 0, 'Tracker size should be 0');
         assert.equal(tracker.bundles().length, 0, 'Tracker bundles should return empty array');
         assert.equal(tracker.bundle, null, 'Tracker bundle should assert.equal null');
 
 
         tracker.open(); //after start shoud found bundles: system and service
 
-        assert.equal(tracker.size, 3, 'Tracker size should be 3');
+        assert.equal(tracker.size(), 3, 'Tracker size should be 3');
         assert.equal(tracker.bundles().length, 3, 'Tracker bundles should return array');
 
         tracker.close();
 
-        assert.equal(tracker.size, 0, 'Tracker size should be 0');
+        assert.equal(tracker.size(), 0, 'Tracker size should be 0');
         assert.equal(tracker.bundles().length, 0, 'Tracker bundles should return empty array');
 
         tracker.open();
 
         await bundle.uninstall();
 
-        assert.equal(tracker.size, 2, 'Tracker size should be 1');
+        assert.equal(tracker.size(), 2, 'Tracker size should be 1');
         assert.equal(tracker.bundles().length, 2, 'Tracker bundles should return not empty array');
     });
 
@@ -233,7 +230,7 @@ QUnit.module("odss.core.tracker.BundleTracker", hook => {
     QUnit.test('notify listener on close tracker', assert =>  {
         let tracker = new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener).open();
         tracker.close();
-        assert.equal(scope.listener.removedBundle.callCount, 2, 'Not fire: removeBundle after tracker close');
-        assert.equal(tracker.size, 0);
+        assert.equal(scope.listener.addingBundle.callCount, 2, 'Not fire: addingBundle after tracker close');
+        assert.equal(tracker.size(), 0);
     });
 });
