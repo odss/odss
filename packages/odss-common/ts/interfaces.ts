@@ -111,10 +111,17 @@ export interface IContextEvents{
     readonly framework: IFrameworkListener;
 }
 
+
 export interface IServiceTrackerListener {
-    addingService(reference: IServiceReference): Object;
+    addingService(reference: IServiceReference, service: Object): void;
     modifiedService(reference: IServiceReference, service: Object): void;
     removedService(reference: IServiceReference, service: Object): void;
+}
+
+export interface IServiceTrackerCustomizer {
+    adding(reference: IServiceReference): Object;
+    modified(reference: IServiceReference, service: Object): void;
+    removed(reference: IServiceReference, service: Object): void;
 }
 
 export interface IBundleTrackerListener {

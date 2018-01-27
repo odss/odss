@@ -1,5 +1,6 @@
-import {Events, ServiceEvent, IBundle, OBJECTCLASS, SERVICE_ID} from 'odss-common';
-import {functionNames, prepareFilter} from './utils';
+import {functionNames, Events, ServiceEvent, IBundle, OBJECTCLASS, SERVICE_ID} from 'odss-common';
+
+import {prepareFilter} from './utils';
 
 
 export default class Registry { 

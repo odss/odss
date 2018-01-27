@@ -1,42 +1,32 @@
-import cdi from './decorators';
+import {Component, Property, Validate, Invalidate, Bind, Unbind, Assign} from 'odss.cdi/decorators';
 
 
-@cdi('MainUI')
-
+@Component('MainUI', ['IHttpConsole'])
+// @Property('baseUrl', 'http.url2', 'http://localhost')
+// @Assign('$users', 'IUserService')
 export class MainUI{
-
-    // @cdi.assign('IUserService')
-    // $users;
 
     constructor(){
         this._apps = {};
+        this.$users = null;
     }
-
-    @cdi.activate
+    
+    @Validate
     activate(ctx) {
         console.log('MainUI::activate()');
     }
-    @cdi.deactivate
+    @Invalidate
     deactivate(ctx) {
-        console.debug('MainUI::deactivate()');
+        console.log('MainUI::deactivate()');
     }
-    @cdi.bind('IApp', '0..n')
+    @Bind('IApp', '1..n')
     addApp(ref, app){
-        console.debug('MainUI::addApp('+ref.id +','+app+')');
+        console.log('MainUI::addApp('+ref.id +','+app+')');
+        this._apps[ref.id] = app
     }
-    @cdi.unbind('IApp')
+    @Unbind('IApp')
     removeApp(ref, app){
-
+        console.log('MainUI::removeApp('+ref.id +','+app+')');
+        delete self._apps[ref.id]
     }
 }
-
-export function start(ctx) {
-    setTimeout(() => {
-        ctx.registerService('IApp', 'app test', {name:'name'});
-    }, 2000)
-}
-
-export function stop(ctx) {
-}
-
-

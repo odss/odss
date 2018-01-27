@@ -1,5 +1,5 @@
-import { Events, ServiceEvent, OBJECTCLASS, SERVICE_ID } from 'odss-common';
-import { functionNames, prepareFilter } from './utils';
+import { functionNames, Events, ServiceEvent, OBJECTCLASS, SERVICE_ID } from 'odss-common';
+import { prepareFilter } from './utils';
 export default class Registry {
     constructor(events) {
         this._services = {};

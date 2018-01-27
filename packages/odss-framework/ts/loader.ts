@@ -9,10 +9,6 @@ export default class Loader {
         return new Loader(path);
     }
 
-    constructor(path:string=''){
-
-    }
-
     async loadBundle(location: string): Promise<any> {
         let id = await System.normalize(location);
         let module = await System.import(id);
@@ -30,5 +26,10 @@ export default class Loader {
             config[name.toLowerCase()] = module[name];
         }
         return config;
+    }
+
+    async unloadBundle(location: string) {
+        let id = await System.normalize(location);
+        return System.registry.delete(id);
     }
 }

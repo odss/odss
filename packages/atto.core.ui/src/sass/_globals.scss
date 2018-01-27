@@ -1,0 +1,54 @@
+html {
+    font-size: 10px;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+body {
+    font-family: $base-font-family;
+    font-size: $base-font-size;
+    font-weight: $base-font-weight;
+    line-height: $base-line-height;
+    color: $base-font-color;
+    background-color: $body-bg-color;
+}
+
+a {
+    color: $link-font-color;
+    text-decoration: $link-text-decoration;
+
+    &:hover,
+    &:focus {
+      text-decoration: $link-text-decoration-hover;
+    }
+}
+
+p {
+    margin: 0 0 ($base-line-height-computed / 2);
+}
+
+ul,
+ol {
+    margin-top: 0;
+    margin-bottom: ($base-line-height-computed / 2);
+}
+
+hr {
+    margin-top: $base-line-height-computed;
+    margin-bottom: $base-line-height-computed;
+    border: 0;
+    height: 1px;
+    background-color: #888;
+}
+
+strong {
+    font-weight: 700;
+}
+h1, h2, h3 {
+    margin-top: $base-line-height-computed;
+    margin-bottom: ($base-line-height-computed / 2);
+}
+
+h4, h5, h6 {
+    margin-top: ($base-line-height-computed / 2);
+    margin-bottom: ($base-line-height-computed / 2);
+}

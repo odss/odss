@@ -177,8 +177,8 @@ var View = function(adapter, $dom) {
     };
     Drag.prototype = {
         onMouseUp: function(e) {
-            domEvents.off(document.body, 'mouseup', this.onMouseUp, this);
-            domEvents.off(document.body, 'mousemove', this.onMouseMove, this);
+            domEvents.off(document, 'mouseup', this.onMouseUp, this);
+            domEvents.off(document, 'mousemove', this.onMouseMove, this);
             this.pos.start.x = this.pos.move.x;
             this.pos.start.y = this.pos.move.y;
             this.$dom.classList.remove('drag');
@@ -204,8 +204,8 @@ var View = function(adapter, $dom) {
                 x: e.page.x,
                 y: e.page.y
             };
-            domEvents.on(document.body, 'mouseup', this.onMouseUp, this);
-            domEvents.on(document.body, 'mousemove', this.onMouseMove, this);
+            domEvents.on(document, 'mouseup', this.onMouseUp, this);
+            domEvents.on(document, 'mousemove', this.onMouseMove, this);
 
         }
     };

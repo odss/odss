@@ -2,7 +2,7 @@
 	"components":[
 		{
 			"name":"component.name",
-			"class":"component.impl",
+			"specifications":"component.impl",
 			"enabled":true,
 			"immediate":false,
 			"activate":"myactivate",
@@ -11,10 +11,10 @@
 			"interfaces":[
 				
 			],
-			"properties":{
-				"prop1":"value1",
-				"prop2":"value2",
-			},
+			"properties":[
+				// {"prop1":"value1",
+				// "prop2":"value2",
+			],
 			"references":[{
 				"name":"ref",
 				"assign":"assign",

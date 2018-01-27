@@ -7,7 +7,7 @@ import EventDispatcher from './events';
 
 
 export class Framework extends Bundle {
-    
+
     private _SID: number = 0;
     private _loader: Loader = null;
     private _bundles: Map<number, Bundle>;
@@ -147,7 +147,7 @@ export class Framework extends Bundle {
     }
 
     async installBundle(location: string, autostart: boolean) {
-        let config = await this.getLoader().loadBundle(location);    
+        let config = await this.getLoader().loadBundle(location);
         let bundle = new Bundle(this.nextSid(), this, config);
         this._bundles.set(bundle.id, bundle);
         this._fireBundleEvent(Events.INSTALLED, bundle);
@@ -156,7 +156,7 @@ export class Framework extends Bundle {
         }
         return bundle;
     }
-    
+
     async startBundle(bundle: Bundle) {
         if (bundle.id === 0) {
             throw new Error('Cannot start framework bundle: ' + bundle.meta.location);
@@ -233,6 +233,7 @@ export class Framework extends Bundle {
 
     }
     async uninstallBundle(bundle: Bundle) {
+        await sleep()
         if (bundle.id === 0) {
             console.error(`Cannot uninstall main bundle: ${bundle.meta.location}`);
             return false;
@@ -241,6 +242,7 @@ export class Framework extends Bundle {
             let bundles = this._bundles;
             if (bundles.has(bundle.id)) {
                 await this.stopBundle(bundle);
+                await this.getLoader().unloadBundle(bundle.meta.location);
                 bundles.delete(bundle.id);
                 this._bundles.delete(bundle.id);
                 bundle.updateState(Bundles.UNINSTALLED);
@@ -277,4 +279,11 @@ export class FrameworkFactory {
         // }
         return frame;
     }
+}
+
+
+function sleep(){
+    return new Promise(resolve => {
+        setTimeout(resolve);
+    });
 }

@@ -9,14 +9,14 @@ class OptionalCardinality{
     }
 
     addingService(reference, service) {
-        console.debug('cdi.OptionalCardinality::addingService(reference)', reference);
+        console.log('cdi.OptionalCardinality::addingService(reference)', reference);
         if (this._serviceId === null) {
             this._serviceId = reference.id;
             this._dependency.assignService(service);
         }
     }
     removedService(reference, service) {
-        console.debug('cdi.OptionalCardinality::removedService(reference)', reference);
+        console.log('cdi.OptionalCardinality::removedService(reference)', reference);
         if (this._serviceId === reference.id) {
             this._serviceId = null;
             this._dependency.unassignService();
@@ -38,14 +38,14 @@ class MandatoryCardinality{
         this._serviceId = null;
     }
     addingService(reference, service) {
-        //console.debug('cdi.SingleCardinality::addingService(reference)', reference);
+        console.log('cdi.SingleCardinality::addingService(reference)', reference);
         if (this._serviceId === null) {
             this._serviceId = reference.id;
             this._dependency.assignService(service);
         }
     }
     removedService(reference, service) {
-        //console.debug('cdi.SingleCardinality::removedService(reference)', reference);
+        console.log('cdi.SingleCardinality::removedService(reference)', reference);
         if (this._serviceId === reference.id) {
             this._serviceId = null;
             this._dependency.unassignService();
@@ -63,12 +63,12 @@ class MultipleCardinality{
         this._dependency = dependency;
     }
     addingService(reference, service) {
-        //console.debug('cdi.MultipleCardinality::addingService(reference)', reference);
+        console.log('cdi.MultipleCardinality::addingService(reference)', reference);
         this._dependency.bindService(reference, service);
     }
 
     removedService(reference, service) {
-        //console.debug('cdi.MultipleCardinality::removedService(reference)', reference);
+        console.log('cdi.MultipleCardinality::removedService(reference)', reference);
         this._dependency.unbindService(reference, service);
     }
 
@@ -85,13 +85,13 @@ class MandatoryMultipleCardinality{
         this._counter = 0;
     }
     addingService(reference, service) {
-        //console.debug('cdi.MandatoryMultipleCardinality::addingService(reference)', reference);
+        console.log('cdi.MandatoryMultipleCardinality::addingService(reference)', reference, service);
         this._counter++;
         this._dependency.bindService(reference, service);
 
     }
     removedService(reference, service) {
-        // console.debug('cdi.MandatoryMultipleCardinality::removedService(reference)', reference);
+        console.log('cdi.MandatoryMultipleCardinality::removedService(reference)', reference, service);
         this._counter--;
         this._dependency.unbindService(reference, service);
     }
@@ -124,11 +124,10 @@ function getCardinality(dependency, cardinality) {
  */
 export default class DependencyManager{
     constructor(ctx, manager, reference) {
-        //console.debug('odss.cdi.DependencyManager()');
+        //console.log('odss.cdi.DependencyManager()');
         this.manager = manager;
         this.reference = reference;
         this.cardinality = getCardinality(this, reference.cardinality);
-        debugger
         this.tracker = ctx.serviceTracker(reference.filter || reference.interface, this.cardinality);
     }
     /**

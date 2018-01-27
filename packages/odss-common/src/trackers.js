@@ -15,15 +15,6 @@ class ServiceTracked {
                 break;
         }
     }
-    removed(reference, service) {
-        this.customizer.removedService(reference, service);
-    }
-    adding(reference) {
-        return this.customizer.addingService(reference);
-    }
-    modified(reference, service) {
-        this.customizer.modifiedService(reference, service);
-    }
     track(reference) {
         if (this.tracked.has(reference)) {
             const service = this.tracked.get(reference);
@@ -49,6 +40,15 @@ class ServiceTracked {
             this.untrack(item);
         }
     }
+    adding(reference) {
+        return this.customizer.adding(reference);
+    }
+    modified(reference, service) {
+        this.customizer.modified(reference, service);
+    }
+    removed(reference, service) {
+        this.customizer.removed(reference, service);
+    }
     size() {
         return this.tracked.size;
     }
@@ -60,7 +60,7 @@ class ServiceTracked {
     }
 }
 export class ServiceTracker {
-    constructor(ctx, filter, customizer = null) {
+    constructor(ctx, filter, listener = null) {
         if (!ctx) {
             throw new Error('Not set bundle context');
         }
@@ -69,12 +69,12 @@ export class ServiceTracker {
         }
         this._ctx = ctx;
         this._filter = filter;
-        this._customizer = customizer || this;
+        this._listener = listener;
         this._tracked = null;
     }
     open() {
         if (this._tracked === null) {
-            this._tracked = new ServiceTracked(this._customizer);
+            this._tracked = new ServiceTracked(this);
             this._ctx.on.service.add(this._tracked, this._filter);
             let refs = this._ctx.getServiceReferences(this._filter);
             for (let i = 0, j = refs.length; i < j; i++) {
@@ -91,23 +91,23 @@ export class ServiceTracker {
         }
         return this;
     }
-    addingService(reference) {
+    adding(reference) {
         const service = this._ctx.getService(reference);
-        this.onAddingService(reference, service);
+        if (this._listener && this._listener.addingService) {
+            this._listener.addingService(reference, service);
+        }
         return service;
     }
-    modifiedService(reference, service) {
-        this.onModifiedService(reference, service);
+    modified(reference, service) {
+        if (this._listener && this._listener.modifiedService) {
+            this._listener.modifiedService(reference, service);
+        }
     }
-    removedService(reference, service) {
-        this.onRemovedService(reference, service);
+    removed(reference, service) {
+        if (this._listener && this._listener.removedService) {
+            this._listener.removedService(reference, service);
+        }
         this._ctx.ungetService(reference);
-    }
-    onAddingService(reference, service) {
-    }
-    onModifiedService(reference, service) {
-    }
-    onRemovedService(reference, service) {
     }
     size() {
         return this._tracked !== null ? this._tracked.size() : 0;
@@ -123,6 +123,10 @@ export class ServiceTracker {
     }
     getServices() {
         return this._tracked !== null ? this._tracked.getServices() : [];
+    }
+    _extendCustomizer(customizer) {
+        if (customizer) {
+        }
     }
 }
 class BundleTracked {

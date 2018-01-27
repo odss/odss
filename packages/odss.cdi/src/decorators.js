@@ -1,38 +1,43 @@
 let map = new WeakMap();
 
-function getCdi(target){
+const getCdi = target => {
     if(!map.has(target)){
         map.set(target, []);
     }
     return map.get(target);
-}
+};
 
-
-let cdi = function di(name, interfaces, ...params){
+export function Component(name, interfaces=[], ...params){
     return function(target, key, descriptor){
         let items = getCdi(target.prototype);
         let config = {
-            "name":name,
-            "class": target,
-            "interfaces":interfaces || [],
-            "references":[]
+            name,
+            specifications: target,
+            interfaces,
+            references: [],
+            properties: []
         };
         let groups = {};
         items.forEach(item => {
             switch(item.type){
-
                 case 'assign':
                     config.references.push({
                         name: name+':'+item.name,
                         assign: item.name,
                         interface: item.interface
                     });
-                break;
+                    break;
                 case 'activate':
                 case 'deactivate':
                     config[item.type] = item.name;
-                break;
-
+                    break;
+                case 'property':
+                    config.properties.push({
+                        name: item.name,
+                        property: item.property,
+                        value: item.value
+                    });
+                    break;    
                 case 'bind':
                 case 'unbind':
                     let group = groups[item.interface];
@@ -53,45 +58,60 @@ let cdi = function di(name, interfaces, ...params){
         groups = null;
         target.$cdi = config;
     }
-};
-cdi.assign = function(interfaces){
-    return function(target, key, descriptor){
-        getCdi(target).push({
+}
+
+export function Assign(name, interface_){
+    return function(target, field, descriptor){
+        getCdi(target.prototype).push({
             type:'assign',
-            name: key,
-            interface: interfaces
+            name,
+            interface: interface_
         });
     }
-};
-cdi.bind = function(interfaces, cardinality){
-    return function(target, key, descriptor){
+}
+
+export function Property(name, property, value=null){
+    return function(target, field, descriptor){
+        getCdi(target.prototype).push({
+            type: 'property',
+            name,
+            property,
+            value
+        });       
+    }
+}
+
+export function Bind(interfaces, cardinality){
+    return function(target, name){
         getCdi(target).push({
             type:'bind',
-            name: key,
-            interface : interfaces,
-            cardinality: cardinality
+            name,
+            interface: interfaces,
+            cardinality
         });
     };
-};
-cdi.unbind = function(interfaces){
-    return function(target, key, descriptor){
+}
+
+export function Unbind(interfaces){
+    return function(target, name){
         getCdi(target).push({
             type:'unbind',
-            name: key,
+            name,
             interface : interfaces
         });
     };
-};
-cdi.activate = function(target, key, descriptor){
+}
+
+export function Validate(target, name){
     getCdi(target).push({
         type:'activate',
-        name: key
+        name
     });
-};
-cdi.deactivate = function(target, key){
+}
+
+export function Invalidate(target, name){
     getCdi(target).push({
         type:'deactivate',
-        name: key
+        name
     });
-};
-export default cdi;
+}

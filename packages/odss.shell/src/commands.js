@@ -30,7 +30,7 @@ COMMANDS.push({
     man: 'install <bundle.location> (--autostart, -a)',
     execute: function(args) {
         let autostart = args.length === 2 ? args[1] === '-a' || args[1] === '--autostart' : false;
-        this.ctx.bundles.install(args[0], autostart);
+        this.ctx.installBundle(args[0], autostart);
     }
 });
 COMMANDS.push({

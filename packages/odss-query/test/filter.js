@@ -55,7 +55,6 @@ QUnit.test("Stark childs - string query", assert => {
     assert.equal(filter('|(name=Jon)(name=Sansa)').length, 2);
 });
 QUnit.test("Stark - Jon and Sansa - object query", assert => {
-    debugger;
     assert.equal(filter({name:['Jon', 'Sansa']}).length, 2);
 });
 QUnit.test("Stark and man - string query", assert => {

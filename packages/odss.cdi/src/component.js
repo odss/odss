@@ -1,7 +1,7 @@
 /**
  * Wrapper for this.component
  */
-export default class ComponentsHandler{
+export default class ComponentsWrapper{
     constructor(metadata) {
         this.metadata = metadata;
         this.component = null;
@@ -14,9 +14,9 @@ export default class ComponentsHandler{
      */
     create() {
         let ComponentClass;
-        let type = typeof this.metadata.class;
+        let type = typeof this.metadata.specifications;
         if(type === 'string'){
-            let parts = this.metadata.class.split(':');
+            let parts = this.metadata.specifications.split(':');
             let className = parts[1];
             let location = parts[0];
             return System.import(location).then(m => {
@@ -32,7 +32,7 @@ export default class ComponentsHandler{
             });
         }
         if(type === 'function'){
-            return Promise.resolve(this._create(this.metadata.class));
+            return Promise.resolve(this._create(this.metadata.specifications));
         }
         throw this._createError('Not found definition.');
     }
@@ -115,14 +115,14 @@ export default class ComponentsHandler{
      * @param {Object} service
      * @throw Error
      */
-    set(name, service) {
+    set(name, value) {
         if (this.component === null) {
-            throw this._error('Not created object before set letiable.');
+            throw this._error('Not created object before set value.');
         }
-        //console.debug('cdi.HandlerComponet::set('+name+', service)',service);
+        //console.debug('cdi.HandlerComponet::set('+name+', value)',value);
         //@TODO use methods
         Object.defineProperty(this.component, name, {
-            value: service
+            value
         });
         // this.component[name] = service;
     }
@@ -134,7 +134,7 @@ export default class ComponentsHandler{
      */
     get(name) {
         if (this.component === null) {
-            throw this._error('Not created object before get letiable.');
+            throw this._error('Not created object before get value.');
         }
         //@TODO use methods
         return this.component[name] || null;
@@ -157,14 +157,14 @@ export default class ComponentsHandler{
     }
 
     _error(reason, ex) {
-        let name = this.metadata.name !== this.metadata.class ? this.metadata.name + '(' + (this.metadata.class) + ')' : this.metadata.name;
+        let name = this.metadata.name !== this.metadata.specifications ? this.metadata.name + '(' + (this.metadata.specifications) + ')' : this.metadata.name;
         return new Error('Some problem with this.component "' + name + '". ' + reason + ' (' + ex + ')', ex);
     }
 
     _createError(reason, ex) {
         this.component = null;
         this.methods = [];
-        let name = this.metadata.name !== this.metadata.class ? this.metadata.name + '(' + (this.metadata.class) + ')' : this.metadata.name;
+        let name = this.metadata.name !== this.metadata.specifications ? this.metadata.name + '(' + (this.metadata.specifications) + ')' : this.metadata.name;
         return new Error('Can\'t create this.component "' + name + '". ' + reason + ' (' + ex + ')', ex);
     }
 

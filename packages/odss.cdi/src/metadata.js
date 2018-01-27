@@ -2,7 +2,7 @@
 const CARDINALITY = ['0..1', '0..n', '1..1', '1..n'];
 
 function prepareProperties(props) {
-    let properties = {};
+    let properties = [];
     for (let i in props) {
         Object.defineProperty(properties, i, {
             enumerable: true,
@@ -58,33 +58,33 @@ export default function metadata(config) {
     }
 
     let error = function(reason) {
-        return new Error('Component "' + (config.name || config.class) + '" validation error: ' + reason);
+        return new Error('Component "' + (config.name || config.specifications) + '" validation error: ' + reason);
     };
 
     config = Object.assign({
         "name": null,
-        "class": null,
+        "specifications": null,
         "enabled": true,
         "immediate": false,
         "activate": "activate",
         "deactivate": "deactivate",
         "modified": "modified",
         "interfaces": [],
-        "properties": {},
+        "properties": [],
         "references": []
     }, config);
 
-    if (!config.class) {
-        throw error('Implementation "class" name missing.');
+    if (!config.specifications) {
+        throw error('Implementation "specifications" name missing.');
     }
-    config.name = config.name || config.class;
+    config.name = config.name || config.specifications;
     let metadata = {};
     try {
         for (let c in config) {
             let item = config[c];
             switch (c) {
                 case 'properties':
-                    item = prepareProperties(item);
+                    item = item.concat();
                     break;
                 case 'interfaces':
                     //copy

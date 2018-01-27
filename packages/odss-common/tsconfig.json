@@ -13,6 +13,7 @@
     "ts/interfaces.ts",
     "ts/events.ts",
     "ts/trackers.ts",
+    "ts/utils.ts",
     "ts/index.ts"
   ]
 }

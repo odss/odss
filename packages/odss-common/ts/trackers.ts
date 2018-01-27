@@ -5,6 +5,7 @@ import {
     IBundle, 
     IServiceListener, 
     IServiceTrackerListener,
+    IServiceTrackerCustomizer,
     IBundleTrackerListener
 } from './interfaces';
 import {ServiceEvent, BundleEvent} from './events';
@@ -12,10 +13,10 @@ import {ServiceEvent, BundleEvent} from './events';
 
 class ServiceTracked implements IServiceListener{
     
-    private customizer: IServiceTrackerListener;
+    private customizer: IServiceTrackerCustomizer;
     private tracked: Map<IServiceReference, Object>;
 
-    constructor(customizer: IServiceTrackerListener) {
+    constructor(customizer: IServiceTrackerCustomizer) {
         this.tracked = new Map<IServiceReference, Object>();
         this.customizer = customizer;
     }
@@ -29,15 +30,6 @@ class ServiceTracked implements IServiceListener{
                 this.untrack(event.reference);
                 break;
         }
-    }
-    removed(reference: IServiceReference, service: Object) {
-        this.customizer.removedService(reference, service);
-    }
-    adding(reference: IServiceReference) {
-        return this.customizer.addingService(reference);
-    }
-    modified(reference: IServiceReference, service: Object) {
-        this.customizer.modifiedService(reference, service);
     }
     track(reference: IServiceReference) {
         if (this.tracked.has(reference)) {
@@ -63,6 +55,15 @@ class ServiceTracked implements IServiceListener{
             this.untrack(item);
         }
     }
+    adding(reference: IServiceReference) {
+        return this.customizer.adding(reference);
+    }
+    modified(reference: IServiceReference, service: Object) {
+        this.customizer.modified(reference, service);
+    }
+    removed(reference: IServiceReference, service: Object) {
+        this.customizer.removed(reference, service);
+    }
     size(): number {
         return this.tracked.size;
     }
@@ -75,13 +76,13 @@ class ServiceTracked implements IServiceListener{
 
 }
 
-export class ServiceTracker implements IServiceTrackerListener{
+export class ServiceTracker implements IServiceTrackerCustomizer{
     private _ctx: IBundleContext;
     private _filter: any;
-    private _customizer: IServiceTrackerListener;
+    private _listener: IServiceTrackerListener;
     private _tracked: ServiceTracked;
 
-    constructor(ctx: IBundleContext, filter: any, customizer: IServiceTrackerListener = null) {
+    constructor(ctx: IBundleContext, filter: any, listener: IServiceTrackerListener = null) {
         if (!ctx) {
             throw new Error('Not set bundle context');
         }
@@ -90,12 +91,12 @@ export class ServiceTracker implements IServiceTrackerListener{
         }
         this._ctx = ctx;
         this._filter = filter;
-        this._customizer = customizer || this;
+        this._listener = listener;
         this._tracked = null;
     }
     open() {
         if (this._tracked === null) {
-            this._tracked = new ServiceTracked(this._customizer);
+            this._tracked = new ServiceTracked(this);
             this._ctx.on.service.add(this._tracked, this._filter);
             let refs = this._ctx.getServiceReferences(this._filter);
             for (let i = 0, j = refs.length; i < j; i++) {
@@ -112,27 +113,24 @@ export class ServiceTracker implements IServiceTrackerListener{
         }
         return this;
     }
-    addingService(reference: IServiceReference): Object {
+    adding(reference: IServiceReference): Object {
         const service = this._ctx.getService(reference);
-        this.onAddingService(reference, service);
+        if(this._listener && this._listener.addingService){
+            this._listener.addingService(reference, service);
+        }
         return service;
     }
-    modifiedService(reference: IServiceReference, service: Object) {
-        this.onModifiedService(reference, service);
+    modified(reference: IServiceReference, service: Object) {
+        if(this._listener && this._listener.modifiedService){
+            this._listener.modifiedService(reference, service);
+        }
     }
-    removedService(reference: IServiceReference, service: Object) {
-        this.onRemovedService(reference, service);
+    removed(reference: IServiceReference, service: Object) {
+        if(this._listener && this._listener.removedService){
+            this._listener.removedService(reference, service);
+        }
         this._ctx.ungetService(reference);
     }
-    onAddingService(reference: IServiceReference, service: Object){
-
-    }
-    onModifiedService(reference: IServiceReference, service: Object){
-
-    }
-    onRemovedService(reference: IServiceReference, service: Object){
-
-    }    
     size(): number {
         return this._tracked !== null ? this._tracked.size() : 0;
     }
@@ -147,6 +145,11 @@ export class ServiceTracker implements IServiceTrackerListener{
     }
     getServices() {
         return this._tracked !== null ? this._tracked.getServices() : [];
+    }
+    _extendCustomizer(customizer){
+        if(customizer){
+
+        }
     }
 }
 
