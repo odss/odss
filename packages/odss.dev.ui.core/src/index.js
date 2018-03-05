@@ -22,5 +22,5 @@ export function start(ctx) {
 
 export function stop(ctx) {
     tracker.close();
-    panels.remove();
+    panels.dispose();
 }

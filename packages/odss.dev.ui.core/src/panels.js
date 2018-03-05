@@ -1,4 +1,4 @@
-export default  class Panels{
+export default class Panels{
     constructor($dom) {
         let $panels = $dom.querySelector('.panel-list');
         let panels = {};
@@ -71,6 +71,7 @@ export default  class Panels{
         };
         this.dispose = function() {
             $panels.removeEventListener('click', handler, false);
+            $dom.parentNode.removeChild($dom);
         };
     }
 }
