@@ -29,6 +29,7 @@ export class CoreMain{
     async authEvent(event){
         switch(event.type){
             case AuthEvent.SUCCESS:
+            case AuthEvent.LOGOUT:
                 await this._updateBundles();
                 break;
         }

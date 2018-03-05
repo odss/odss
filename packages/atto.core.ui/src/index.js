@@ -17,5 +17,5 @@ export class Activator{
     bundleEvent(event){
         // console.log(event);
     }
-    
+
 }

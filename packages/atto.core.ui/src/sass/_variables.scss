@@ -96,6 +96,22 @@ $form-input-bg-color-disabled: transparent !default;
 $form-textarea-height: 64px !default;
 
 
+
+// ============================================================================
+// DROPDOWNS
+// ============================================================================
+
+$atto-dropdown-bg-color:                 #fff !default;
+
+$atto-dropdown-text-color:               $primary-color !default;
+$atto-dropdown-text-color-hover:         #fff !default;
+$atto-dropdown-text-color-disabled:      color('grey', '200') !default;
+$atto-dropdown-text-bg-color-hover:      $primary-color !default;
+$atto-dropdown-text-bg-color-active:     color('white') !default;
+
+$atto-dropdown-border-color:             $primary-color !default;
+
+
 $panel-padding: 16px;
 $panel-border-radius: 0 !default;
 $panel-bg-color: #fff;

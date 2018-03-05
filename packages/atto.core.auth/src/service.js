@@ -32,7 +32,7 @@ export default class UserService{
     async logout(){
         await this._repository.logout();
         const user = this._user;
-        this._user = createUser();
+        this._user = null;
         this._dispacher.auth(AuthEvent.LOGOUT, user);
     }
 }
