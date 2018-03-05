@@ -1,21 +1,21 @@
 import {IAuthService, BasicCredential} from 'atto-core-api/auth';
-import * as cdi from 'odss.cdi/decorators';
+import {Assign, Component, Validate, Invalidate} from 'odss.cdi/decorators';
 
 import UI from './ui';
 
 
-@cdi.Component('LoginPanel')
-@cdi.Assign('$auth', IAuthService)
+@Component('LoginPanel')
+@Assign('$auth', IAuthService)
 export class LoginPanel{
     constructor(){
         this.$auth = null;
     }
-    @cdi.Validate
+    @Validate
     async activate(ctx){
         this.ui = new UI(this);
         this.ui.show();
     }
-    @cdi.Invalidate
+    @Invalidate
     deactivate(ctx) {
         this.ui.dispose();
         this.ui = null;
