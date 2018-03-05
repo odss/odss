@@ -24,7 +24,8 @@ export function Component(name, interfaces=[], ...params){
                     config.references.push({
                         name: name+':'+item.name,
                         assign: item.name,
-                        interface: item.interface
+                        interface: item.interface,
+                        cardinality: '1..1'
                     });
                     break;
                 case 'activate':
@@ -37,7 +38,7 @@ export function Component(name, interfaces=[], ...params){
                         property: item.property,
                         value: item.value
                     });
-                    break;    
+                    break;
                 case 'bind':
                 case 'unbind':
                     let group = groups[item.interface];
@@ -77,7 +78,7 @@ export function Property(name, property, value=null){
             name,
             property,
             value
-        });       
+        });
     }
 }
 

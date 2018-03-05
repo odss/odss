@@ -77,7 +77,7 @@ class MultipleCardinality{
     }
 }
 /**
- * Candinality: 0..n
+ * Candinality: 1..n
  */
 class MandatoryMultipleCardinality{
     constructor(dependency) {

@@ -24,7 +24,7 @@ function prepareReference(ref) {
         "name": null,
         "assign": null,
         "interface": null,
-        "cardinality": '1..1',
+        "cardinality": null,
         "policy": null,
         "filter": '',
         "bind": null,
@@ -38,7 +38,7 @@ function prepareReference(ref) {
     ref.name = ref.name || ref.interface;
 
     if (CARDINALITY.indexOf(ref.cardinality) === -1) {
-        throw new Error('Incorect cardinality: "' + ref.cardinality + '". Should be one of: [' + CARDINALITY + ']');
+        throw new Error('Incorect cardinality: "' + ref.cardinality + '". Should be one of: [' + CARDINALITY.join(', ') + ']');
     }
 
     let reference = {};

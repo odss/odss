@@ -66,7 +66,7 @@ export default class ComponentsManager{
                 }
                 if(this.metadata.interfaces){
                     this._registration = this.ctx.registerService(
-                        this.metadata.interfaces, 
+                        this.metadata.interfaces,
                         this._component.component
                     );
                 }
