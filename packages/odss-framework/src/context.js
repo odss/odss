@@ -1,4 +1,5 @@
 import { ServiceTracker, BundleTracker } from 'odss-common';
+import { Styles } from './utils';
 export default class BundleContext {
     constructor(framework, bundle) {
         this.framework = framework;
@@ -41,6 +42,9 @@ export default class BundleContext {
     }
     bundleTracker(mask, listener) {
         return new BundleTracker(this, mask, listener);
+    }
+    styles(...sources) {
+        return new Styles(sources).install();
     }
 }
 function createEvents(framework, bundle) {

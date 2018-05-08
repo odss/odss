@@ -1,20 +1,14 @@
 export default class Loader {
     static createDefaultLoader(path = '/') {
-        return new Loader(path);
-    }
-    constructor(path = '') {
+        return new Loader();
     }
     async loadBundle(location) {
         let id = await System.normalize(location);
         let module = await System.import(id);
-        let config = {
+        return Object.assign({
             id,
             location
-        };
-        for (let name of Object.keys(module)) {
-            config[name] = module[name];
-        }
-        return config;
+        }, module);
     }
     async unloadBundle(location) {
         let id = await System.normalize(location);

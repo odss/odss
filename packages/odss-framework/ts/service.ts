@@ -10,9 +10,6 @@ export default class Registry {
     private _sid: number = 0;
     constructor(events) {
         this.events = events;
-        // this._services = {};
-        // this._size = 0;
-        // this._sid = 0;
     }
     register(bundle: IBundle, name: any, service: any, properties: any) {
         name = functionNames(name);
@@ -245,5 +242,4 @@ let Registration = function(registry, bundle, id, properties) {
     this.toString = function() {
         return 'odss.core/service/Registration(id=' + id + ')';
     };
-
 };

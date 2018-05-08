@@ -3,11 +3,10 @@ export default class Bundle {
     constructor(id, framework, meta) {
         this._state = Bundles.INSTALLED;
         this._ctx = null;
-        meta.version = meta.version || '0.0.0';
-        this.meta = meta;
-        Object.freeze(this.meta);
         this._id = id;
         this._framework = framework;
+        this.meta = Object.assign({}, { version: '0.0.0' }, meta);
+        Object.freeze(this.meta);
     }
     get id() {
         return this._id;
@@ -40,7 +39,7 @@ export default class Bundle {
         await this._framework.uninstallBundle(this);
     }
     toString() {
-        return 'odss.core.Bundle(id=' + this._id + ' name="' + this.meta.name + '" namespace=' + this.meta.namespace + ')';
+        return 'odss-framework.Bundle(id=' + this._id + ' name="' + this.meta.name + '" namespace=' + this.meta.namespace + ')';
     }
 }
 let states = [

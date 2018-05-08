@@ -1,6 +1,5 @@
-import {OBJECTCLASS, functionNames} from 'odss-common';
-import squery from 'odss-query';
-
+import squery from 'sjs-query';
+import { OBJECTCLASS, functionNames } from 'odss-common';
 /**
  * @param {String|Function|Filter} filter
  * @return Filter
@@ -22,9 +21,23 @@ export function prepareFilter(filter) {
     }
     return squery(filter);
 }
-export function defReadOnly(obj, name, value) {
-    Object.defineProperty(obj, name, {
-        value: value,
-        enumerable: true
-    });
+export class Styles {
+    constructor(sources) {
+        this.elements = [];
+        this.sources = sources;
+    }
+    static create(source) {
+        let element = document.createElement('style');
+        element.setAttribute('type', 'text/css');
+        element.innerHTML = source;
+        document.head.appendChild(element);
+        return element;
+    }
+    install() {
+        this.elements = this.sources.map(Styles.create);
+        return this;
+    }
+    dispose() {
+        this.elements.forEach(element => document.head.removeChild(element));
+    }
 }

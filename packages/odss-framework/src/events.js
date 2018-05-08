@@ -68,12 +68,6 @@ function createListeners(callbackName) {
         }
     };
 }
-function fireAsync(result) {
-    if (result && typeof result.then === 'function') {
-        return result;
-    }
-    return Promise.resolve(result);
-}
 export default class EventDispatcher {
     constructor() {
         this.framework = createListeners('frameworkEvent');

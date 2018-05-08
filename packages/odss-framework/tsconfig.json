@@ -7,13 +7,12 @@
     "experimentalDecorators": true,
     "noImplicitUseStrict": true,
     "noEmitOnError": false,
-    "preserveConstEnums": true, 
+    "preserveConstEnums": true,
     "allowUnusedLabels": true,
     "outDir":"./src",
     "baseUrl": ".",
     "paths":{
-      "odss-common": ["../odss-common/ts"],
-      "odss-query": ["../odss-query"]
+      "odss-common": ["../odss-common"]
     }
   },
   "files": [

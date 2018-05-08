@@ -11,10 +11,10 @@ export class Framework extends Bundle {
         });
         this._SID = 0;
         this._loader = null;
-        this._properties = properties;
         this._bundles = new Map();
-        this._bundles.set(this.id, this);
         this._activators = new Map();
+        this._properties = properties;
+        this._bundles.set(this.id, this);
         this.on = new EventDispatcher();
         this.registry = new Registry(this.on);
     }
@@ -220,18 +220,19 @@ export class Framework extends Bundle {
         }
     }
     async uninstallBundle(bundle) {
+        await sleep();
         if (bundle.id === 0) {
             console.error(`Cannot uninstall main bundle: ${bundle.meta.location}`);
             return false;
         }
-        await sleep();
-
         if (bundle.state !== Bundles.UNINSTALLED) {
             let bundles = this._bundles;
-            if (this._bundles.has(bundle.id)) {
+            if (bundles.has(bundle.id)) {
                 await this.stopBundle(bundle);
-                this._bundles.delete(bundle.id);
+                await this.getLoader().unloadBundle(bundle.meta.location);
                 this._activators.delete(bundle.id);
+                bundles.delete(bundle.id);
+                this._bundles.delete(bundle.id);
                 bundle.updateState(Bundles.UNINSTALLED);
                 this._fireBundleEvent(Events.UNINSTALLED, bundle);
             }
@@ -251,12 +252,11 @@ export class Framework extends Bundle {
         this.on.framework.fire(new FrameworkEvent(type, this));
     }
 }
-
 function getActivator(config) {
-    if(config.hasOwnProperty('Activator')){
+    if (config.hasOwnProperty('Activator')) {
         return new config.Activator();
     }
-    const fn = () => {};
+    const fn = () => { };
     const start = config.start || fn;
     const stop = config.stop || fn;
     return {
@@ -264,7 +264,6 @@ function getActivator(config) {
         stop
     };
 }
-
 export class FrameworkFactory {
     /**
      * Create a new Framework instance.
@@ -279,8 +278,7 @@ export class FrameworkFactory {
         return frame;
     }
 }
-
-function sleep(){
+function sleep() {
     return new Promise(resolve => {
         setTimeout(resolve);
     });

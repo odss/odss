@@ -10,7 +10,7 @@ import {
     IServiceTrackerListener,
     IListener
 } from 'odss-common';
-
+import {Styles} from './utils';
 
 export default class BundleContext implements IBundleContext {
     public readonly framework: IFramework;
@@ -25,7 +25,7 @@ export default class BundleContext implements IBundleContext {
         this.on = createEvents(framework, bundle);
         Object.freeze(this);
     }
-    
+
     property(name: string, def: any) {
         return this.framework.property(name, def);
     }
@@ -62,6 +62,9 @@ export default class BundleContext implements IBundleContext {
     }
     bundleTracker(mask: number, listener: IBundleTrackerListener) {
         return new BundleTracker(this, mask, listener);
+    }
+    styles(...sources: string[]): {dispose: Function} {
+        return new Styles(sources).install();
     }
 }
 

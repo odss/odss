@@ -3,7 +3,7 @@ import { Framework } from './framework';
 
 
 export default class Bundle implements IBundle{
-    
+
     public meta: any;
     private _id: number;
     private _state: number = Bundles.INSTALLED;
@@ -11,11 +11,10 @@ export default class Bundle implements IBundle{
     private _framework: Framework;
 
     constructor(id: number, framework: Framework, meta: any) {
-        meta.version = meta.version || '0.0.0';
-        this.meta = meta;
-        Object.freeze(this.meta);
         this._id = id;
         this._framework = framework;
+        this.meta = Object.assign({}, {version: '0.0.0'}, meta);
+        Object.freeze(this.meta);
     }
     get id(){
         return this._id;
@@ -48,7 +47,7 @@ export default class Bundle implements IBundle{
         await this._framework.uninstallBundle(this);
     }
     toString() {
-        return 'odss.core.Bundle(id=' + this._id + ' name="' + this.meta.name + '" namespace=' + this.meta.namespace + ')';
+        return 'odss-framework.Bundle(id=' + this._id + ' name="' + this.meta.name + '" namespace=' + this.meta.namespace + ')';
     }
 }
 

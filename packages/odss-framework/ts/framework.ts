@@ -10,8 +10,9 @@ export class Framework extends Bundle {
 
     private _SID: number = 0;
     private _loader: Loader = null;
-    private _bundles: Map<number, Bundle>;
+    private _bundles: Map<number, Bundle> = new Map();
     private _properties: any;
+    private _activators: Map<number, any> = new Map();
     public on: EventDispatcher;
     public registry: Registry;
 
@@ -20,7 +21,6 @@ export class Framework extends Bundle {
             location: 'odss.framework'
         });
         this._properties = properties;
-        this._bundles = new Map();
         this._bundles.set(this.id, this);
         this.on = new EventDispatcher();
         this.registry = new Registry(this.on);
@@ -150,6 +150,7 @@ export class Framework extends Bundle {
         let config = await this.getLoader().loadBundle(location);
         let bundle = new Bundle(this.nextSid(), this, config);
         this._bundles.set(bundle.id, bundle);
+        this._activators.set(bundle.id, getActivator(config));
         this._fireBundleEvent(Events.INSTALLED, bundle);
         if (autostart) {
             await bundle.start();
@@ -179,7 +180,8 @@ export class Framework extends Bundle {
         this._fireBundleEvent(Events.STARTING, bundle);
 
         try {
-            await bundle.meta.start(bundle.context);
+            const activator = this._activators.get(bundle.id);
+            await activator.start(bundle.context);
             bundle.updateState(Bundles.ACTIVE);
             this._fireBundleEvent(Events.STARTED, bundle);
         } catch (e) {
@@ -211,7 +213,9 @@ export class Framework extends Bundle {
         bundle.updateState(Bundles.STOPPING);
         this._fireBundleEvent(Events.STOPPING, bundle);
         try {
-            await bundle.meta.stop(bundle.context);
+            const activator = this._activators.get(bundle.id);
+            await activator.stop(bundle.context);
+            await this.getLoader().unloadBundle(bundle.meta.location);
             bundle.unsetContext();
             bundle.updateState(Bundles.RESOLVED);
             this.registry.unregisterAll(bundle);
@@ -233,7 +237,7 @@ export class Framework extends Bundle {
 
     }
     async uninstallBundle(bundle: Bundle) {
-        await sleep()
+        await sleep();
         if (bundle.id === 0) {
             console.error(`Cannot uninstall main bundle: ${bundle.meta.location}`);
             return false;
@@ -243,6 +247,7 @@ export class Framework extends Bundle {
             if (bundles.has(bundle.id)) {
                 await this.stopBundle(bundle);
                 await this.getLoader().unloadBundle(bundle.meta.location);
+                this._activators.delete(bundle.id);
                 bundles.delete(bundle.id);
                 this._bundles.delete(bundle.id);
                 bundle.updateState(Bundles.UNINSTALLED);
@@ -263,6 +268,19 @@ export class Framework extends Bundle {
     _fireFrameworkEvent(type: number) {
         this.on.framework.fire(new FrameworkEvent(type, this));
     }
+}
+
+function getActivator(config) {
+    if(config.hasOwnProperty('Activator')){
+        return new config.Activator();
+    }
+    const fn = () => {};
+    const start = config.start || fn;
+    const stop = config.stop || fn;
+    return {
+        start,
+        stop
+    };
 }
 
 export class FrameworkFactory {

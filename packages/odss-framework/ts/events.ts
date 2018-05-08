@@ -5,7 +5,7 @@ import {prepareFilter} from './utils';
 function createListeners(callbackName){
 
     let listeners = [];
-    
+
     return {
         contains(bundle, listener) {
             for(let info of listeners) {
@@ -69,13 +69,6 @@ function createListeners(callbackName){
             }
         }
     }
-}
-
-function fireAsync(result){
-    if(result && typeof result.then === 'function'){
-        return result;
-    }
-    return Promise.resolve(result);
 }
 
 export default class EventDispatcher {

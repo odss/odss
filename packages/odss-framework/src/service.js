@@ -6,9 +6,6 @@ export default class Registry {
         this._size = 0;
         this._sid = 0;
         this.events = events;
-        // this._services = {};
-        // this._size = 0;
-        // this._sid = 0;
     }
     register(bundle, name, service, properties) {
         name = functionNames(name);
@@ -41,7 +38,7 @@ export default class Registry {
                 if (opts.bid === bundle.id) {
                     this.events.service.fire(new ServiceEvent(Events.UNREGISTERED, opts.reference));
                     if (opts.using.size) {
-                        console.warn('Service: "' + opts.name + '" from bundle (id=' + opts.bid + ') is using by budle(s): (id=' + Array.from(opts.using) + ')');
+                        throw new Error('Service: "' + opts.name + '" from bundle (id=' + opts.bid + ') is using by budle(s): (id=' + Array.from(opts.using) + ')');
                     }
                     delete this._services[sid];
                     this._size -= 1;

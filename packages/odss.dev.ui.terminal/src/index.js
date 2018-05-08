@@ -5,9 +5,10 @@ import MAIN_TEMPLATE  from './tpl/main.html';
 import STYLES from './css/main.scss';
 
 
-var terminal, reg, tracker;
+var terminal, reg, tracker, styles;
 
 export function start(ctx) {
+    styles = ctx.styles(STYLES);
     terminal = new Termial(MAIN_TEMPLATE);
     tracker = ctx.serviceTracker(IShell, {
         addingService: function(reference) {
@@ -25,4 +26,5 @@ export function stop(ctx) {
     terminal = null;
     reg.unregister();
     reg = null;
+    styles.dispose();
 }

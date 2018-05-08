@@ -1,31 +1,22 @@
 declare var System: {
     normalize: (loc: string) => Promise<string>,
-    import: (id: string) => Promise<string>
+    import: (id: string) => Promise<string>,
+    registry: {delete: Function}
 };
 
 export default class Loader {
 
-    static createDefaultLoader(path:string = '/'): Loader{
-        return new Loader(path);
+    static createDefaultLoader(path:string = '/'): Loader {
+        return new Loader();
     }
 
     async loadBundle(location: string): Promise<any> {
         let id = await System.normalize(location);
         let module = await System.import(id);
-        let config = {
-            id: id,
-            version: '0.0.0',
-            resources: [],
-            styles: [],
-            templates: [],
-            start: () => {},
-            stop: () => {},
-            location: location
-        };
-        for (let name of Object.keys(module)) {
-            config[name.toLowerCase()] = module[name];
-        }
-        return config;
+        return Object.assign({
+            id,
+            location
+        }, module);
     }
 
     async unloadBundle(location: string) {
