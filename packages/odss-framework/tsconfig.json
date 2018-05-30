@@ -22,7 +22,7 @@
     "ts/framework.ts",
     "ts/index.ts",
     "ts/loader.ts",
-    "ts/service.ts",
+    "ts/registry.ts",
     "ts/utils.ts"
   ]
 }

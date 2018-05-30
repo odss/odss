@@ -22,27 +22,3 @@ export function prepareFilter(filter) {
     }
     return squery(filter);
 }
-
-export class Styles {
-    private readonly sources: string[];
-    private elements: HTMLElement[] = [];
-
-    static create(source) {
-        let element = document.createElement('style')
-        element.setAttribute('type', 'text/css')
-        element.innerHTML = source
-        document.head.appendChild(element);
-        return element;
-    }
-    constructor(sources: string[]){
-        this.sources = sources;
-    }
-    install() {
-        this.elements = this.sources.map(Styles.create);
-        return this;
-    }
-    dispose() {
-        this.elements.forEach(element => document.head.removeChild(element));
-    }
-
-}

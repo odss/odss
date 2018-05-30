@@ -2,7 +2,7 @@ import {IBundle, Events, Bundles, FrameworkEvent, ServiceEvent, BundleEvent} fro
 import Bundle from './bundle';
 import BundleContext from './context';
 import Loader from './loader';
-import Registry from './service';
+import Registry from './registry';
 import EventDispatcher from './events';
 
 

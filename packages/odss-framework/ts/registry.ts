@@ -1,20 +1,27 @@
-import { functionNames, Events, ServiceEvent, OBJECTCLASS, SERVICE_ID } from 'odss-common';
-import { prepareFilter } from './utils';
+import {functionNames, Events, ServiceEvent, IBundle, OBJECTCLASS, SERVICE_ID} from 'odss-common';
+import {prepareFilter} from './utils';
+
+
 export default class Registry {
+    public events: any;
+    private _services: any = {};
+    private _styles: any = {};
+    private _size: number = 0;
+    private _sid: number = 0;
     constructor(events) {
-        this._services = {};
-        this._size = 0;
-        this._sid = 0;
         this.events = events;
     }
-    register(bundle, name, service, properties) {
+    registerService(bundle: IBundle, name: any, service: any, properties: any) {
         name = functionNames(name);
+
         //prepare properties
         let sid = this._sid += 1;
         this._size += 1;
         properties = properties || {};
         properties[OBJECTCLASS] = name;
         properties[SERVICE_ID] = sid;
+
+
         let registration = new Registration(this, bundle, sid, properties);
         let bid = bundle.id;
         this._services[sid] = {
@@ -27,9 +34,22 @@ export default class Registry {
             reference: registration.reference,
             properties: properties
         };
+
         this.events.service.fire(new ServiceEvent(Events.REGISTERED, registration.reference));
         return registration;
     }
+    registerStyles(bundle: IBundle, styles: string[]) {
+        let elements = styles.map(createStyle);
+        this._styles[bundle.id] = () => {
+            if(elements){
+                delete this._styles[bundle.bid];
+                removeStyles(elements);
+                elements = null;
+            };
+        };
+        return this._styles[bundle.id];
+    }
+
     unregister(bundle, registration) {
         if (registration instanceof Registration) {
             let sid = registration.id;
@@ -43,20 +63,23 @@ export default class Registry {
                     delete this._services[sid];
                     this._size -= 1;
                     return true;
-                }
-                else {
+                } else {
                     throw new Error('Bundle (id=' + bundle.id + ') try remove service: "' + opts.name + '" registered by bundle (id=' + opts.bid + ')');
                 }
             }
         }
         return false;
     }
+
     unregisterAll(bundle) {
         let bid = bundle.id;
-        for (let sid in this._services) {
+        for (let sid of Object.keys(this._services)) {
             if (this._services[sid].bid === bid) {
                 this.unregister(bundle, this._services[sid].registration);
             }
+        }
+        if(this._styles[bid]){
+            this._styles[bid]();
         }
     }
     find(bundle, reference) {
@@ -73,12 +96,14 @@ export default class Registry {
             this._services[sid].using.delete(bundle.id);
         }
     }
+
     ungetAll(bundle) {
         let bid = bundle.id;
         for (let sid in this._services) {
             this._services[sid].using.delete(bid);
         }
     }
+
     /**
      * @param {string} name
      * @param {(object|string)} filters
@@ -99,19 +124,19 @@ export default class Registry {
      * @return {Array} Return list of references
      */
     findReferences(filter) {
-        filter = prepareFilter(filter);
-        let buff = [];
-        for (let sid in this._services) {
-            if (filter.match(this._services[sid].properties)) {
-                buff.push(this._services[sid].reference);
+            filter = prepareFilter(filter);
+            let buff = [];
+            for (let sid in this._services) {
+                if (filter.match(this._services[sid].properties)) {
+                    buff.push(this._services[sid].reference);
+                }
             }
+            return buff;
         }
-        return buff;
-    }
-    /**
-     * @param {odss.core.Bundle} bundle
-     * @return {Array} bundle Retrun list of references
-     */
+        /**
+         * @param {odss.core.Bundle} bundle
+         * @return {Array} bundle Retrun list of references
+         */
     findBundleReferences(bundle) {
         let buff = [];
         let bid = bundle.id;
@@ -132,18 +157,24 @@ export default class Registry {
         }
         return buff;
     }
+
     size() {
         return this._size;
     }
     updateProperties(registration, oldProps) {
         this.events.service.fire(new ServiceEvent(Events.MODIFIED, registration.reference, oldProps));
     }
+
 }
+
+
 /**
  * @type {odss.core/service/Registration}
  */
-let Registration = function (registry, bundle, id, properties) {
+function Registration(registry, bundle, id, properties) {
+
     properties = Object.freeze(properties);
+
     let reference = Object.create(null, {
         id: {
             value: id,
@@ -160,16 +191,19 @@ let Registration = function (registry, bundle, id, properties) {
             enumerable: true
         }
     });
+
     /**
      * @param {String} name
      * @returns {Object}
      */
-    reference.property = function (name) {
+    reference.property = function(name) {
         return name in properties ? properties[name] : null;
     };
-    reference.toString = function () {
+
+    reference.toString = function() {
         return 'odss.service.Reference(id=' + id + ')';
     };
+
     Object.defineProperties(this, {
         id: {
             value: id,
@@ -180,32 +214,35 @@ let Registration = function (registry, bundle, id, properties) {
             enumerable: true
         }
     });
+
     /**
      * Unregister service
      *
      * @return {this}
      */
-    this.unregister = function () {
+    this.unregister = function() {
         registry.unregister(bundle, this);
         return this;
     };
+
     /**
      * Update property
      * @param {String} name
      * @param {Object} value
      */
-    this.update = function (name, value) {
+    this.update = function(name, value) {
         let oldProps = properties;
         properties = Object.assign({}, properties);
         properties[name] = value;
         Object.freeze(properties);
         registry.updateProperties(this, oldProps);
     };
+
     /**
      *
      * @param {Object} newProperties
      */
-    this.updateAll = function (newProperties) {
+    this.updateAll = function(newProperties) {
         let oldProps = properties;
         properties = Object.assign({}, properties);
         for (let i in newProperties) {
@@ -216,7 +253,20 @@ let Registration = function (registry, bundle, id, properties) {
         Object.freeze(properties);
         registry.updateProperties(this, oldProps);
     };
-    this.toString = function () {
+
+    this.toString = function() {
         return 'odss.core/service/Registration(id=' + id + ')';
     };
 };
+
+function removeStyles(element) {
+    document.head.removeChild(element);
+}
+
+function createStyle(source: string): HTMLStyleElement {
+    let element = document.createElement('style') as HTMLStyleElement;
+    element.setAttribute('type', 'text/css')
+    element.innerHTML = source
+    document.head.appendChild(element);
+    return element;
+}

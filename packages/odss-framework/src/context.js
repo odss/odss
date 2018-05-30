@@ -1,5 +1,4 @@
 import { ServiceTracker, BundleTracker } from 'odss-common';
-import { Styles } from './utils';
 export default class BundleContext {
     constructor(framework, bundle) {
         this.framework = framework;
@@ -35,16 +34,16 @@ export default class BundleContext {
         return this.framework.registry.unget(this.bundle, reference);
     }
     registerService(name, service, properties) {
-        return this.framework.registry.register(this.bundle, name, service, properties);
+        return this.framework.registry.registerService(this.bundle, name, service, properties);
+    }
+    styles(...styles) {
+        return this.framework.registry.registerStyles(this.bundle, styles);
     }
     serviceTracker(filter, listener) {
         return new ServiceTracker(this, filter, listener);
     }
     bundleTracker(mask, listener) {
         return new BundleTracker(this, mask, listener);
-    }
-    styles(...sources) {
-        return new Styles(sources).install();
     }
 }
 function createEvents(framework, bundle) {
