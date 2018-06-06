@@ -32,7 +32,7 @@ export default class Registry {
         return registration;
     }
     registerStyles(bundle, styles) {
-        let link = registerStyles(styles);
+        let link = registerStyles(styles, bundle.meta.location);
         this._styles[bundle.id] = {
             dispose: () => {
                 if (link) {
@@ -239,18 +239,19 @@ function Registration(registry, bundle, id, properties) {
     };
 }
 ;
-export function registerStyles(styles) {
-    let elements = styles.map(createStyle);
+export function registerStyles(styles, name) {
+    let elements = styles.map(style => createStyle(style, name));
     return Object.freeze({
         dispose() {
             elements.forEach(element => document.head.removeChild(element));
         }
     });
 }
-function createStyle(source) {
+function createStyle(source, name) {
     let element = document.createElement('style');
     element.setAttribute('type', 'text/css');
     element.innerHTML = source;
+    element.dataset.name = name;
     document.head.appendChild(element);
     return element;
 }

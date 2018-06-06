@@ -6,13 +6,13 @@
   "author": "smialy",
   "repository": {
     "type": "git",
-    "url": "http://github.com/odss/framework"
+    "url": "http://github.com/odss/odss"
   },
   "main": "src/index.js",
   "ts:main": "ts/index.ts",
   "dependencies": {
-    "sjs-query": "1.0.0",
-    "odss-common": "1.0.0"
+    "odss-common": "^1.0.0",
+    "sjs-query": "^2.0.0"
   },
   "devDependencies": {
     "rollup": "^0.53.3",
