@@ -1,5 +1,5 @@
+import sinon from 'sinon';
 import {
-    Event,
     Events,
     ServiceEvent,
     BundleEvent,
@@ -73,7 +73,7 @@ QUnit.test('test framework listeners', assert => {
     assert.deepEqual(1, spy.callCount);
     assert.deepEqual(1, spy.args[0][0].type);
 
-    spy.reset();
+    spy.resetHistory();
 
     assert.equal(true, ed.framework.remove(bundle, spy));
     ed.framework.fire(new FrameworkEvent(1, 2));
@@ -93,7 +93,7 @@ QUnit.test('test framework listeners as object', assert => {
 
     assert.deepEqual(1, spy.callCount);
 
-    spy.reset();
+    spy.resetHistory();
     assert.equal(true, ed.framework.remove(bundle, spy));
     ed.framework.fire(new FrameworkEvent(1, 2));
     assert.equal(false, spy.called);
@@ -110,7 +110,7 @@ QUnit.test('test bundle listeners as callback', assert => {
     assert.deepEqual(1, spy.callCount);
     assert.deepEqual(1, spy.args[0][0].type);
 
-    spy.reset();
+    spy.resetHistory();
 
     assert.equal(true, ed.bundle.remove(bundle, spy));
     ed.bundle.fire(new BundleEvent(1, 2));
@@ -128,7 +128,7 @@ QUnit.test('test bundle listeners as object', assert => {
 
     assert.deepEqual(1, spy.callCount);
 
-    spy.reset();
+    spy.resetHistory();
     assert.equal(true, ed.bundle.remove(bundle, spy));
     ed.bundle.fire(new BundleEvent(1, 2));
     assert.equal(false, spy.called);
@@ -147,7 +147,7 @@ QUnit.test('service listeners as callback', assert => {
     assert.deepEqual(1, spy.callCount, 'Expected only one notify for double listener');
     assert.deepEqual(1, spy.args[0][0].type, 'Expected event type');
 
-    spy.reset();
+    spy.resetHistory();
 
     assert.equal(true, ed.service.remove(bundle, spy), 'Remove action should return: "true"');
     ed.service.add(new ServiceEvent(1, {
@@ -170,7 +170,7 @@ QUnit.test('test service listeners as object', assert => {
 
     assert.deepEqual(1, spy.callCount);
 
-    spy.reset();
+    spy.resetHistory();
     assert.equal(true, ed.service.remove(bundle, spy));
     ed.service.fire(new ServiceEvent(1, {
         bundle: 2

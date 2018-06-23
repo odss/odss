@@ -1,9 +1,9 @@
+import sinon from 'sinon';
 import {
     OBJECTCLASS,
     Bundles,
     ServiceTracker, BundleTracker
 } from 'odss-common';
-import Bundle from '../src/bundle';
 
 import tests from './core';
 
@@ -37,18 +37,17 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
     });
     QUnit.test('register/unregister service', assert =>  {
         let counter = 0;
-        class TestServiceTracker extends ServiceTracker{
-            onAddingService() {
+        let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
+            addingService() {
                 counter |= 1;
-            }
-            onRemovedService() {
+            },
+            removedService() {
                 counter |= 2;
             }
-        }
-        let tracker = new TestServiceTracker(scope.ctx, 'test.tracker');
+        });
         tracker.open();
         let reg = scope.ctx.registerService('test.tracker', 'test');
-        
+
         reg.unregister();
 
         assert.equal(counter & 1, 1, 'Not fire ServiceTracker.addingService(ref)');
@@ -100,21 +99,20 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
 
     QUnit.test('stop tracker', assert =>  {
         let counter = 0;
-        class TestServiceTracker extends ServiceTracker{
-            onAddingService() {
-                counter++;
+        let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
+            addingService() {
+                counter |= 1;
+            },
+            removedService() {
+                counter |= 2;
             }
-            onRemovedService() {
-                counter++;
-            }
-        }
-        let tracker = new TestServiceTracker(scope.ctx, 'test.tracker');
+        });
         tracker.open();
-        scope.ctx.registerService('test.tracker', 'test');
-        assert.equal(counter, 1, 'Tracker should run onAddingService listener methods');
+        scope.ctx.registerService('test.tracker', 'test1');
+        assert.equal(counter, 1, 'Tracker should run addingService listener methods');
         tracker.close();
-        scope.ctx.registerService('test.tracker', 'test');
-        assert.equal(counter, 2);
+        scope.ctx.registerService('test.tracker', 'test2');
+        assert.equal(counter, 3);
     });
 
     QUnit.test('start tracker after register service', assert =>  {

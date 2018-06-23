@@ -5,22 +5,21 @@ module.exports = function(config) {
   config.set({
 
     basePath: './',
-    frameworks: ['qunit', 'sinon'],
-    files: ['src/*.js', 'test/*.js'],
+    frameworks: ['qunit'],
+    files: ['src/*.js', 'tests/*.js'],
     preprocessors: {
         "src/*.js": ["rollup"],
-        "test/*.js": ["rollup"]
+        "tests/*.js": ["rollup"]
     },
     rollupPreprocessor: {
-		  plugins: [
-        resolve()
-      ],
-      output:{
-        format: 'iife',
-        name: 'odss',
-      }
-		  // sourcemap: 'inline'
-	  },
+        plugins: [
+            resolve()
+        ],
+        output:{
+            format: 'iife',
+            name: 'odss',
+        }
+    },
     reporters: ['progress'],
     port: 9876,
     colors: true,

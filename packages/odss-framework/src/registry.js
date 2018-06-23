@@ -32,16 +32,14 @@ export default class Registry {
         return registration;
     }
     registerStyles(bundle, styles) {
-        let link = registerStyles(styles, bundle.meta.location);
-        this._styles[bundle.id] = {
-            dispose: () => {
-                if (link) {
-                    delete this._styles[bundle.bid];
-                    link.dispose();
-                    link = null;
-                    bundle = null;
-                }
+        let elements = styles.map(createStyle);
+        this._styles[bundle.id] = () => {
+            if (elements) {
+                delete this._styles[bundle.bid];
+                removeStyles(elements);
+                elements = null;
             }
+            ;
         };
         return this._styles[bundle.id];
     }
@@ -74,7 +72,7 @@ export default class Registry {
             }
         }
         if (this._styles[bid]) {
-            this._styles[bid].dispose();
+            this._styles[bid]();
         }
     }
     find(bundle, reference) {
@@ -239,19 +237,13 @@ function Registration(registry, bundle, id, properties) {
     };
 }
 ;
-export function registerStyles(styles, name) {
-    let elements = styles.map(style => createStyle(style, name));
-    return Object.freeze({
-        dispose() {
-            elements.forEach(element => document.head.removeChild(element));
-        }
-    });
+function removeStyles(element) {
+    document.head.removeChild(element);
 }
-function createStyle(source, name) {
+function createStyle(source) {
     let element = document.createElement('style');
     element.setAttribute('type', 'text/css');
     element.innerHTML = source;
-    element.dataset.name = name;
     document.head.appendChild(element);
     return element;
 }

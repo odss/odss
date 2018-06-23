@@ -1,3 +1,5 @@
+
+import sinon from 'sinon';
 import {Framework} from '../src/framework';
 
 
@@ -145,6 +147,7 @@ class Loader {
         }
         return Promise.reject(`Not found: ${location}`);
     }
+    unloadBundle(){}
     loadStyles(/* bundle */) {}
     removeStyles(/* bundle */) {}
 }
