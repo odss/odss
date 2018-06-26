@@ -3,21 +3,16 @@ export default class ComponentsRegister{
     constructor() {
         this._managers = [];
     }
-    /**
-     * @param {ComponentManager} manager
-     */
     register(manager) {
         if (!this._managers.includes(manager)) {
             this._managers.push(manager);
         }
     }
-
     unregister(manager) {
         manager.close();
         let index = this._managers.indexOf(manager);
         this._managers.splice(index, 1);
     }
-
     removeBundle(bundleId) {
         let manager;
         for (let i = this._managers.length - 1; i >= 0; i--) {
@@ -27,9 +22,6 @@ export default class ComponentsRegister{
             }
         }
     }
-    /**
-     *
-     */
     close() {
         for (let i = 0; i < this._managers.length; i++) {
             this._managers[i].close();

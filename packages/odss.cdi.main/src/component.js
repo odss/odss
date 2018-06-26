@@ -12,43 +12,45 @@ export default class ComponentsWrapper{
      *
      * @throw Error
      */
-    create() {
+    async create(dependencies=[]) {
+        if(this.component){
+            return;
+        }
         let ComponentClass;
         let type = typeof this.metadata.specifications;
         if(type === 'string'){
             let parts = this.metadata.specifications.split(':');
             let className = parts[1];
             let location = parts[0];
-            return System.import(location).then(m => {
-                try {
-                    ComponentClass = m[className];
-                } catch (e) {
-                    throw this._createError('Not found definition.', e);
-                }
-                if (typeof ComponentClass !== 'function') {
-                    throw this._createError('Constructor is not function.');
-                }
-                return this._create(ComponentClass);
-            });
+            let m = await System.import(location);
+            try {
+                ComponentClass = m[className];
+            } catch (e) {
+                throw this._createError('Not found definition.', e);
+            }
+            if (typeof ComponentClass !== 'function') {
+                throw this._createError('Constructor is not function.');
+            }
+            return this._create(ComponentClass, dependencies);
         }
         if(type === 'function'){
-            return Promise.resolve(this._create(this.metadata.specifications));
+            return this._create(this.metadata.specifications, dependencies);
         }
         throw this._createError('Not found definition.');
     }
-    _create(ComponentClass){
+    _create(ComponentClass, dependencies){
         try {
-            this.component = new ComponentClass();
+            this.component = new ComponentClass(...dependencies);
         } catch (e) {
             throw this._createError('Problem with creating object.', e);
         }
 
-        if (typeof this.component[this.metadata.activate] !== 'function') {
-            throw this._createError('Not found activate method: ' + this.metadata.activate);
-        }
-        if (typeof this.component[this.metadata.deactivate] !== 'function') {
-            throw this._createError('Not found deactivate method: ' + this.metadata.deactivate);
-        }
+        // if (typeof this.component[this.metadata.activate] !== 'function') {
+            // throw this._createError('Not found activate method: ' + this.metadata.activate);
+        // }
+        // if (typeof this.component[this.metadata.deactivate] !== 'function') {
+            // throw this._createError('Not found deactivate method: ' + this.metadata.deactivate);
+        // }
 
         let references = this.metadata.references;
         for (let i = 0; i < references.length; i++) {
@@ -96,18 +98,18 @@ export default class ComponentsWrapper{
      * @return {Object}
      * @throw Error
      */
-    invoke(name, reference, service) {
+    invoke(name, service, reference) {
         if (this.component === null) {
             throw this._error('Not created object before invoke method.');
         }
         if (typeof this.component[name] !== 'function') {
-            throw this._error('Incorect invoked method: ' + name);
+            throw this._error('Incorrect invoked method: ' + name);
         }
         if (this.methods.indexOf(name) === -1) {
             throw this._error('Not defined invoked method: ' + name);
         }
         //console.debug('cdi.HandlerComponet::invoke('+name+', service)',service);
-        return this.component[name](reference, service);
+        return this.component[name](service, reference);
     }
 
     /**
@@ -145,7 +147,10 @@ export default class ComponentsWrapper{
             throw this._error('Not created object before invoke activate method: ' + this.metadata.activate);
         }
         //console.debug('cdi.HandlerComponent::activate()');
-        return this.component[this.metadata.activate](ctx);
+        if(this.component[this.metadata.activate]){
+            return this.component[this.metadata.activate](ctx);
+
+        }
     }
 
     deactivate(ctx) {
@@ -153,7 +158,9 @@ export default class ComponentsWrapper{
             throw this._error('Not created object before invoke deactivate method: ' + this.metadata.deactivate);
         }
         // console.debug('cdi.HandlerComponent::deactivate()');
-        return this.component[this.metadata.deactivate](ctx);
+        if(this.component[this.metadata.deactivate]){
+            return this.component[this.metadata.deactivate](ctx);
+        }
     }
 
     _error(reason, ex) {
@@ -165,7 +172,7 @@ export default class ComponentsWrapper{
         this.component = null;
         this.methods = [];
         let name = this.metadata.name !== this.metadata.specifications ? this.metadata.name + '(' + (this.metadata.specifications) + ')' : this.metadata.name;
-        return new Error('Can\'t create this.component "' + name + '". ' + reason + ' (' + ex + ')', ex);
+        return new Error(`Can\'t create component ${name}. ${reason} (${ex})`, ex);
     }
 
 }

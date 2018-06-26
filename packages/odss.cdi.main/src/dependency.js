@@ -112,7 +112,7 @@ function getCardinality(dependency, cardinality) {
         case '1..n':
             return new MandatoryMultipleCardinality(dependency);
     }
-    throw new Error('Unknown candinality: ' + cardinality);
+    throw new Error(`Unknown candinality: ${cardinality}`);
 }
 
 /**
@@ -122,62 +122,50 @@ function getCardinality(dependency, cardinality) {
  * @param {Object} reference
  * @constructor
  */
-export default class DependencyManager{
+export class ReferenceDependency {
     constructor(ctx, manager, reference) {
-        //console.log('odss.cdi.DependencyManager()');
         this.manager = manager;
         this.reference = reference;
         this.cardinality = getCardinality(this, reference.cardinality);
         this.tracker = ctx.serviceTracker(reference.filter || reference.interface, this.cardinality);
     }
-    /**
-     * Start dependency listener
-     */
     open() {
         this.tracker.open();
     }
-
-    /**
-     * Stop dependency listener
-     */
     close() {
         this.tracker.close();
     }
-
-    /**
-     *
-     * @param {Object} service
-     */
     bindService(ref, service) {
-        this.manager.bindHandler(this.reference.bind, ref, service);
+        this.manager.bindHandler(this.reference.bind, service, ref);
     }
-
-    /**
-     *
-     * @param {Object} service
-     */
     unbindService(ref, service) {
-        this.manager.unbindHandler(this.reference.unbind, ref, service);
+        this.manager.unbindHandler(this.reference.unbind, service, ref);
     }
-
-    assignService(service) {
-        this.manager.assignHandler(this.reference.assign, service);
-    }
-
-    /**
-     *
-     * @param {Object} service
-     */
-    unassignService(service) {
-        this.manager.unassignHandler(this.reference.assign);
-    }
-
-    /**
-     *
-     * @returns {Boolean}
-     */
     isSatisfied() {
         return this.cardinality.isSatisfied();
     }
-
+}
+export class RequireDependency {
+    constructor(ctx, manager, require, position) {
+        this.manager = manager;
+        this.require = require;
+        this.position = position;
+        this.cardinality = getCardinality(this, '1..1');
+        this.tracker = ctx.serviceTracker(require.filter || require.interface, this.cardinality);
+    }
+    open() {
+        this.tracker.open();
+    }
+    close() {
+        this.tracker.close();
+    }
+    assignService(service) {
+        this.manager.assignHandler(this.position, service);
+    }
+    unassignService(service) {
+        this.manager.unassignHandler(this.position);
+    }
+    isSatisfied() {
+        return this.cardinality.isSatisfied();
+    }
 }

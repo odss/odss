@@ -2,7 +2,7 @@
 const CARDINALITY = ['0..1', '0..n', '1..1', '1..n'];
 
 function prepareProperties(props) {
-    let properties = {};
+    let properties = [];
     for (let i in props) {
         Object.defineProperty(properties, i, {
             enumerable: true,
@@ -24,12 +24,12 @@ function prepareReference(ref) {
         "name": null,
         "assign": null,
         "interface": null,
-        "cardinality": '1..1',
+        "cardinality": null,
         "policy": null,
         "filter": '',
         "bind": null,
         "unbind": null,
-        "updated": null
+        "update": null
     }, ref);
 
     if (!ref.interface) {
@@ -38,7 +38,7 @@ function prepareReference(ref) {
     ref.name = ref.name || ref.interface;
 
     if (CARDINALITY.indexOf(ref.cardinality) === -1) {
-        throw new Error('Incorect cardinality: "' + ref.cardinality + '". Should be one of: [' + CARDINALITY + ']');
+        throw new Error('Incorect cardinality: "' + ref.cardinality + '". Should be one of: [' + CARDINALITY.join(', ') + ']');
     }
 
     let reference = {};
@@ -52,39 +52,36 @@ function prepareReference(ref) {
 }
 
 export default function metadata(config) {
-
     if (!config) {
         throw new Error('Missing metadata');
     }
 
     let error = function(reason) {
-        return new Error('Component "' + (config.name || config.class) + '" validation error: ' + reason);
+        return new Error('Component "' + (config.name || config.specifications) + '" validation error: ' + reason);
     };
 
     config = Object.assign({
-        "name": null,
-        "class": null,
-        "enabled": true,
-        "immediate": false,
+        "specifications": null,
         "activate": "activate",
         "deactivate": "deactivate",
         "modified": "modified",
-        "interfaces": [],
-        "properties": {},
+        "provides": [],
+        "requires": [],
+        "properties": [],
         "references": []
     }, config);
 
-    if (!config.class) {
-        throw error('Implementation "class" name missing.');
+    if (!config.specifications) {
+        throw error('Implementation "specifications" name missing.');
     }
-    config.name = config.name || config.class;
+    config.name = config.name || config.specifications;
     let metadata = {};
     try {
-        for (let c in config) {
+        for (let c of Object.keys(config)) {
             let item = config[c];
             switch (c) {
                 case 'properties':
-                    item = prepareProperties(item);
+                    item = item.concat();
                     break;
                 case 'interfaces':
                     //copy
@@ -94,10 +91,7 @@ export default function metadata(config) {
                     item = prepareReferences(item);
                     break;
             }
-            Object.defineProperty(metadata, c, {
-                enumerable: true,
-                value: item
-            });
+            metadata[c] = item;
         }
     } catch (e) {
         throw error(e);
