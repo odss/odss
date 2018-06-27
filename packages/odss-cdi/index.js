@@ -64,7 +64,7 @@ export function Component(...args) {
                     let group = groups[item.interface];
                     if(!group){
                         group = groups[item.interface] = {
-                            name: name+':'+item.name
+                            name: config.name+':'+item.name
                         };
                         config.references.push(group);
                     }
