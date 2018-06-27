@@ -74,7 +74,7 @@ export default class ComponentsManager{
         } catch (e) {
             this._error('component.activate()', e);
         }
-        if(this.metadata.provides){
+        if(this.metadata.provides.length){
             this._registration = this.ctx.registerService(
                 this.metadata.provides,
                 this._component.component

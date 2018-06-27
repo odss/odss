@@ -10,7 +10,7 @@ class ISpellChecker {
 
     }
 }
-@Component(ISpellChecker)
+@Component(ISpellDictionary)
 export class EnglishSpellDictionary {
 
     activate(ctx){
@@ -60,9 +60,4 @@ export class SpellChecker {
     deactivate(){
         console.log('A spell checker has been stopped')
     }
-}
-
-@Component(IHttp)
-export class Http{
-
 }
