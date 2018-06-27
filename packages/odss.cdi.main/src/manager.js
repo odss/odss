@@ -22,16 +22,17 @@ export default class ComponentsManager{
 
     async open() {
         if(!this.metadata.requires.length){
-            debugger
             await this._component.create();
         }
         for(let item of this.metadata.properties){
             let value = this.ctx.property(item.property, item.value);
             this._component.set(item.name, value);
         }
+
+        let i = 0;
         for (let require of this.metadata.requires) {
-            let dep = new RequireDependency(this.ctx, this, require);
-            this._deps.push(dep);
+            this._deps.push(new RequireDependency(this.ctx, this, require, i));
+            i += 1;
         }
         for (let reference of this.metadata.references) {
             this._deps.push(new ReferenceDependency(this.ctx, this, reference));

@@ -1,5 +1,4 @@
-import {Component, Bind, Unbind} from 'odss-cdi';
-
+import {Component, Bind, Unbind, Requires} from 'odss-cdi';
 
 class ISpellDictionary{
     check_word(word) {
@@ -11,11 +10,9 @@ class ISpellChecker {
 
     }
 }
-
-@Component({
-    provides: [ISpellDictionary]
-})
+@Component(ISpellChecker)
 export class EnglishSpellDictionary {
+
     activate(ctx){
         this.dictionary = ["hello", "world", "welcome", "to", "the", "odss", "test"];
     }
@@ -27,9 +24,7 @@ export class EnglishSpellDictionary {
     }
 }
 
-@Component({
-    provides: [ISpellDictionary]
-})
+@Component(ISpellDictionary)
 export class PolishSpellDictionary {
     activate(ctx){
         this.dictionary = ["witaj", "świecie", "witaj", "w", "odss", "tescie"];
@@ -43,9 +38,7 @@ export class PolishSpellDictionary {
 }
 
 
-@Component({
-    provides: [ISpellChecker]
-})
+@Component(ISpellChecker)
 export class SpellChecker {
     constructor() {
         this.languages = new Map();
@@ -67,4 +60,9 @@ export class SpellChecker {
     deactivate(){
         console.log('A spell checker has been stopped')
     }
+}
+
+@Component(IHttp)
+export class Http{
+
 }

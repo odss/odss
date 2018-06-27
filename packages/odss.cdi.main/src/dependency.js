@@ -148,10 +148,9 @@ export class ReferenceDependency {
 export class RequireDependency {
     constructor(ctx, manager, require, position) {
         this.manager = manager;
-        this.require = require;
         this.position = position;
         this.cardinality = getCardinality(this, '1..1');
-        this.tracker = ctx.serviceTracker(require.filter || require.interface, this.cardinality);
+        this.tracker = ctx.serviceTracker(require, this.cardinality);
     }
     open() {
         this.tracker.open();
