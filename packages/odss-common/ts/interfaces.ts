@@ -1,9 +1,9 @@
 export interface IFramework extends IBundle{
     readonly on: any;
     readonly registry: any;
-    
-    property(name: string, defaultValue: any): any;
-    properties(): any;
+
+    getProperty(name: string, defaultValue: any): any;
+    getProperties(): any;
     hasBundle(bundle: IBundle): boolean;
     getBundle(bundleId: number): IBundle;
     getBundles(): Array<IBundle>;
@@ -24,7 +24,7 @@ export interface IFrameworkEvents {
     framework: IEventsListener;
     bundle: IEventsListener;
     service: IEventsListener;
-    
+
     fireEvent(event: any);
     removeAll(bundle: any);
 }
@@ -35,7 +35,7 @@ export interface IBundle {
     readonly meta: any;
     readonly state: number;
     readonly context: IBundleContext;
-    
+
     start();
     stop();
     reload(autostart: boolean);
@@ -44,23 +44,27 @@ export interface IBundle {
 
 export interface IBundleContext{
     framework: IFramework,
-    on: IContextEvents;
-    property(name: string, def: any);
+    getProperty(name: string, def: any): any;
+    getProperties(): any;
     getService(reference: IServiceReference): any;
     ungetService(reference: IServiceReference): any;
-    getServiceReferences(name: string, filter?:any);
-    getServiceReference(name: string, filter: any);
-    getBundle(id: number);
+    getServiceReferences(name: string, filter?:any): IServiceReference[];
+    getServiceReference(name: string, filter: any): IServiceReference;
+    getBundle(id: number): IBundle;
     getBundles(): Array<IBundle>;
-
+    on: IContextEvents;
+    onService();
+    onBundle();
+    onFramework();
 }
 
 export interface IServiceReference{
     readonly id: number;
     readonly bundle: IBundle;
-    property(key: string): any;
-    properties(): any;
-    usingBundles(): Array<IBundle>;
+
+    getProperty(key: string): any;
+    getProperties(): any;
+    usingBundles(): IBundle[];
 }
 
 export interface IServiceRegistration{

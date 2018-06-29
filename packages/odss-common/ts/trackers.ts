@@ -1,9 +1,9 @@
 import {Events} from './consts';
 import {
-    IBundleContext, 
-    IServiceReference, 
-    IBundle, 
-    IServiceListener, 
+    IBundleContext,
+    IServiceReference,
+    IBundle,
+    IServiceListener,
     IServiceTrackerListener,
     IServiceTrackerCustomizer,
     IBundleTrackerListener
@@ -12,7 +12,7 @@ import {ServiceEvent, BundleEvent} from './events';
 
 
 class ServiceTracked implements IServiceListener{
-    
+
     private customizer: IServiceTrackerCustomizer;
     private tracked: Map<IServiceReference, Object>;
 
@@ -140,7 +140,7 @@ export class ServiceTracker implements IServiceTrackerCustomizer{
     getReferences() {
         return this._tracked !== null ? this._tracked.getReferences() : [];
     }
-    getService() { 
+    getService() {
         return this.getServices()[0];
     }
     getServices() {

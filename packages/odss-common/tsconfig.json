@@ -3,17 +3,13 @@
     "outDir":"./src",
     "target": "esnext",
     "module": "esnext",
-    "declaration": false,
     "importHelpers": false,
     "experimentalDecorators": true,
-    "noImplicitUseStrict": true
+    "noImplicitUseStrict": true,
+    "declaration": true,
+    "declarationDir":"./types"
   },
   "files": [
-    "ts/consts.ts",
-    "ts/interfaces.ts",
-    "ts/events.ts",
-    "ts/trackers.ts",
-    "ts/utils.ts",
     "ts/index.ts"
   ]
 }
