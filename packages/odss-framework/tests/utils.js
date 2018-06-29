@@ -56,14 +56,15 @@ QUnit.test('prepare filter from function', assert =>  {
 });
 
 QUnit.test('prepare filter from ldap query', assert =>  {
-    let filter = $utils.prepareFilter('(' + OBJECTCLASS + '=some.simple.test)');
+    let filter = $utils.prepareFilter('*', '(' + OBJECTCLASS + '=some.simple.test)');
 
-    assert.equal(filter.name, OBJECTCLASS);
-    assert.equal(filter.value, 'some.simple.test');
-    assert.equal(filter.opt, 'eq');
+    assert.equal(filter.value.length, 2)
+    assert.equal(filter.value[1].name, OBJECTCLASS);
+    assert.equal(filter.value[1].value, 'some.simple.test');
+    assert.equal(filter.value[1].opt, 'eq');
 });
 
-QUnit.test('prepare $filters', assert =>  {
+QUnit.test('prepare filters in array', assert =>  {
     let filter = $utils.prepareFilter(['one', 'two', 'three']);
 
     assert.equal(filter.opt, 'or');

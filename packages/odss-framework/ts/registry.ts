@@ -1,5 +1,5 @@
-import {functionNames, Events, ServiceEvent, IBundle, OBJECTCLASS, SERVICE_ID} from 'odss-common';
-import {prepareFilter} from './utils';
+import {Events, ServiceEvent, IBundle, OBJECTCLASS, SERVICE_ID} from 'odss-common';
+import {functionNames, prepareFilter} from './utils';
 
 
 export default class Registry {
@@ -25,14 +25,14 @@ export default class Registry {
         let registration = new Registration(this, bundle, sid, properties);
         let bid = bundle.id;
         this._services[sid] = {
-            sid: sid,
-            bid: bid,
+            sid,
+            bid,
+            name,
+            service,
+            properties,
+            registration,
             using: new Set(),
-            name: name,
-            service: service,
-            registration: registration,
             reference: registration.reference,
-            properties: properties
         };
 
         this.events.service.fire(new ServiceEvent(Events.REGISTERED, registration.reference));
@@ -109,8 +109,8 @@ export default class Registry {
      * @param {(object|string)} filters
      * @return {odss.core.service.Reference}
      */
-    findReference(filter) {
-        filter = prepareFilter(filter);
+    findReference(name: any, filter:string = null) {
+        filter = prepareFilter(name, filter);
         for (let sid in this._services) {
             if (filter.match(this._services[sid].properties)) {
                 return this._services[sid].reference;
@@ -123,8 +123,8 @@ export default class Registry {
      * @param {(object|string)} filters
      * @return {Array} Return list of references
      */
-    findReferences(filter) {
-            filter = prepareFilter(filter);
+    findReferences(name: any, filter:string = '') {
+            filter = prepareFilter(name, filter);
             let buff = [];
             for (let sid in this._services) {
                 if (filter.match(this._services[sid].properties)) {

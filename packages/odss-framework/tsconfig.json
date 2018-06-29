@@ -11,6 +11,8 @@
     "allowUnusedLabels": true,
     "outDir":"./src",
     "baseUrl": ".",
+    "declaration": true,
+    "declarationDir":"./types",
     "paths":{
       "odss-common": ["../odss-common"]
     }

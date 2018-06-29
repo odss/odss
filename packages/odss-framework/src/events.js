@@ -25,8 +25,8 @@ function createListeners(callbackName) {
             }
             return false;
         },
-        add(bundle, listener, filter = '') {
-            filter = prepareFilter(filter);
+        add(bundle, listener, name = null, filter = '') {
+            filter = prepareFilter(name, filter);
             for (let info of listeners) {
                 if (info[0] === bundle && info[1] === listener) {
                     return false;

@@ -135,10 +135,9 @@ QUnit.test('test bundle listeners as object', assert => {
 });
 QUnit.test('service listeners as callback', assert => {
     let spy = sinon.spy();
-
-    assert.equal(true, ed.service.add(bundle, spy, '(*)'), 'Expected true for add first listener');
+    assert.equal(true, ed.service.add(bundle, spy, null, '(*)'), 'Expected true for add first listener');
     //add second time
-    assert.equal(false, ed.service.add(bundle, spy, '(*)'), 'Expected false for add the same listener');
+    assert.equal(false, ed.service.add(bundle, spy, null, '(*)'), 'Expected false for add the same listener');
 
     ed.service.fire(new ServiceEvent(1, {
         bundle: 2
@@ -161,9 +160,9 @@ QUnit.test('test service listeners as object', assert => {
     let listener = new TestServiceListener();
     let spy = sinon.spy(listener, 'serviceEvent');
 
-    assert.equal(true, ed.service.add(bundle, spy, '(*)'));
+    assert.equal(true, ed.service.add(bundle, spy));
     //add second time
-    assert.equal(false, ed.service.add(bundle, spy, '(*)'));
+    assert.equal(false, ed.service.add(bundle, spy));
     ed.service.fire(new ServiceEvent(1, {
         bundle: 2
     }));
@@ -217,8 +216,9 @@ QUnit.test('service filters', assert => {
 
     spy = sinon.spy();
 
+    debugger
     //catch all - *
-    ed.service.add(bundle, spy, '(*)');
+    ed.service.add(bundle, spy);
     ed.service.fire(new ServiceEvent('test', {
         bundle: bundle,
         name: 'test',
