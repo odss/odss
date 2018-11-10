@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "outDir":"./src",
-    "target": "esnext",
-    "module": "esnext",
-    "importHelpers": false,
-    "experimentalDecorators": true,
-    "noImplicitUseStrict": true,
-    "declaration": true,
-    "declarationDir":"./types"
+      "allowJs": false,
+      "target": "esnext",
+      "noImplicitAny": false,
+      "removeComments": false,
+      "strict": true,
+      "outDir": "./dist/",
+      "declaration": true,
+      "declarationDir":"./types"
   },
   "files": [
-    "ts/index.ts"
+      "src/index.ts"
+  ],
+  "exclude": [
+      "node_modules",
+      "dist/*"
   ]
 }

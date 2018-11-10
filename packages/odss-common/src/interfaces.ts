@@ -1,4 +1,4 @@
-export interface IFramework extends IBundle{
+export interface IFramework extends IBundle {
     readonly on: any;
     readonly registry: any;
 
@@ -105,7 +105,7 @@ export interface IBundleEvents{
 }
 
 export interface IServiceEvents{
-    add(listener: IServiceListener, filter: any): void;
+    add(listener: IServiceListener, name: any, filter: string): void;
     remove(listener: IServiceListener): void;
 }
 

@@ -88,7 +88,7 @@ export interface IBundleEvents {
     remove(listener: IBundleListener): void;
 }
 export interface IServiceEvents {
-    add(listener: IServiceListener, filter: any): void;
+    add(listener: IServiceListener, name: any, filter: string): void;
     remove(listener: IServiceListener): void;
 }
 export interface IContextEvents {

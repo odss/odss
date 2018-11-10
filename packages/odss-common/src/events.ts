@@ -1,9 +1,9 @@
 import {IEvent, IServiceEvent, IBundleEvent, IFrameworkEvent, IBundle, IServiceReference} from './interfaces';
 
 
-export class Event implements IEvent{
+export class Event implements IEvent {
 
-    public type: number;    
+    public type: number;
 
     constructor(type: number) {
         this.type = type;
@@ -13,7 +13,7 @@ export class Event implements IEvent{
     }
 }
 
-export class BundleEvent extends Event implements IBundleEvent{
+export class BundleEvent extends Event implements IBundleEvent {
 
     public bundle: IBundle;
 
@@ -33,10 +33,10 @@ export class FrameworkEvent extends BundleEvent {
     }
 }
 
-export class ServiceEvent extends Event implements IServiceEvent{
+export class ServiceEvent extends Event implements IServiceEvent {
     public readonly reference: IServiceReference;
     public readonly properties: any;
-    
+
     constructor(type: number, reference: IServiceReference, properties:any = {}) {
         super(type);
         this.reference = reference;
