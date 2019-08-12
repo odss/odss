@@ -13,7 +13,7 @@
     "src/index.js"
   ],
   "dependencies": {
-    "@stool/dom": "2.2.0",
-    "@odss/framework": "^1.0.0"
+    "@odss/framework": "^1.0.0",
+    "@stool/dom": "2.2.0"
   }
 }
