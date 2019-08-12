@@ -1,6 +1,6 @@
 {
   "name": "@odss/framework",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "odss framework",
   "license": "MIT",
   "repository": {
@@ -22,8 +22,8 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@odss/common": "^1.0.0",
-    "@odss/query": "^1.0.0",
+    "@odss/common": "^2.0.0",
+    "@odss/query": "^2.0.0",
     "mocha": "^6.2.0"
   },
   "devDependencies": {

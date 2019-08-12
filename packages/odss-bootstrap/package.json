@@ -1,6 +1,6 @@
 {
   "name": "@odss/bootstrap",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "odss bootstrap",
   "license": "MIT",
   "module": "src/index.js",
@@ -13,7 +13,7 @@
     "src/index.js"
   ],
   "dependencies": {
-    "@odss/framework": "^1.0.0",
+    "@odss/framework": "^2.0.0",
     "@stool/dom": "2.2.0"
   }
 }
