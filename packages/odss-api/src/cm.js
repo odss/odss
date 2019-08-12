@@ -1,5 +1,5 @@
 export class IManagerService{
-    updated(properties){
+    updated(properties) {
 
     }
 }

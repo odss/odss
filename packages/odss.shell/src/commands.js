@@ -1,4 +1,4 @@
-import {ICommand} from 'odss.api';
+import {ICommand} from '@odss/api';
 
 
 export default (ctx, shell) =>
@@ -28,9 +28,10 @@ COMMANDS.push({
     name: 'install',
     description: 'Install bundle',
     man: 'install <bundle.location> (--autostart, -a)',
-    execute: function(args) {
+    execute: async function(args, out, err) {
         let autostart = args.length === 2 ? args[1] === '-a' || args[1] === '--autostart' : false;
-        this.ctx.installBundle(args[0], autostart);
+        let bundle = await this.ctx.installBundle(args[0], autostart);
+        out('Bundle(id=' + bundle.id + ' location=' + bundle.meta.location + ') installed');
     }
 });
 COMMANDS.push({

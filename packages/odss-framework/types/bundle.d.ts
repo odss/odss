@@ -1,4 +1,4 @@
-import { IBundle } from 'odss-common';
+import { IBundle, IBundleContext } from '@odss/common';
 import { Framework } from './framework';
 export default class Bundle implements IBundle {
     meta: any;
@@ -9,7 +9,7 @@ export default class Bundle implements IBundle {
     constructor(id: number, framework: Framework, meta: any);
     readonly id: number;
     readonly state: number;
-    readonly context: any;
+    readonly context: IBundleContext;
     updateState(state: any): void;
     setContext(ctx: any): void;
     unsetContext(): void;

@@ -1,16 +1,19 @@
 {
-  "name": "odss-bootstrap",
+  "name": "@odss/bootstrap",
   "version": "1.0.0",
   "description": "odss bootstrap",
   "license": "MIT",
-  "author": "smialy",
+  "module": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "http://github.com/odss/bootstrap"
+    "url": "http://github.com/odss/odss"
   },
+  "files": [
+    "README.md",
+    "src/index.js"
+  ],
   "dependencies": {
-    "odss-framework": "^1.0.0",
-    "sjs-dom": "1.0.0"
-  },
-  "main": "src/index.js"
+    "@stool/dom": "2.2.0",
+    "@odss/framework": "^1.0.0"
+  }
 }

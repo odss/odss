@@ -1,3 +1,8 @@
+export interface ILoader {
+    loadBundle(location): Promise<any>;
+    unloadBundle(location): Promise<any>;
+}
+
 export interface IFramework extends IBundle {
     readonly on: any;
     readonly registry: any;
@@ -53,9 +58,9 @@ export interface IBundleContext{
     getBundle(id: number): IBundle;
     getBundles(): Array<IBundle>;
     on: IContextEvents;
-    onService();
-    onBundle();
-    onFramework();
+    onService(listener: IServiceListener, name: any, filter: string);
+    onBundle(listener: IBundleListener);
+    onFramework(listener: IFrameworkListener);
 }
 
 export interface IServiceReference{

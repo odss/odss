@@ -1,9 +1,9 @@
-import sinon from 'sinon';
+import * as sinon from 'sinon';
 import {
     OBJECTCLASS,
     Bundles,
     ServiceTracker, BundleTracker
-} from 'odss-common';
+} from '@odss/common';
 
 import tests from './core';
 
@@ -140,7 +140,7 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker').open();
         assert.equal(tracker.size(), 2, 'Found 2 services');
         let ref = tracker.getReference();
-        assert.equal(ref.property(OBJECTCLASS), 'test.tracker');
+        assert.equal(ref.getProperty(OBJECTCLASS), 'test.tracker');
     });
 
     QUnit.test('ServiceTracker::getServiceReferences()', assert =>  {
@@ -152,9 +152,8 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
         assert.equal(tracker.size(), 2, 'Found 2 services');
 
         let refs = tracker.getReferences();
-        assert.equal(refs[0].property(OBJECTCLASS), 'test.tracker');
-
-        assert.equal(refs[1].property(OBJECTCLASS), 'test.tracker');
+        assert.equal(refs[0].getProperty(OBJECTCLASS), 'test.tracker');
+        assert.equal(refs[1].getProperty(OBJECTCLASS), 'test.tracker');
     });
 
 });
@@ -170,8 +169,13 @@ QUnit.module("odss.core.tracker.BundleTracker", hook => {
             addingBundle: function(/* bundle */) {},
             removedBundle: function(/* bundle */) {}
         };
-        sinon.spy(scope.listener, 'addingBundle');
-        sinon.spy(scope.listener, 'removedBundle');
+        try {
+            debugger;
+            sinon.spy(scope.listener, 'addingBundle');
+            sinon.spy(scope.listener, 'removedBundle');
+        }catch(e){
+            console.log(e);
+        }
     });
 
     hook.afterEach(() => {

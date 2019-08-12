@@ -1,4 +1,4 @@
-import {Bundles} from 'odss-common';
+import {Bundles} from '@odss/common';
 
 import ComponentsRegister from './register';
 import ComponentsManager from './manager';

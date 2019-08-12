@@ -1,9 +1,9 @@
-import sinon from 'sinon';
+import * as sinon from 'sinon';
 import {
     Events,
     Bundles
 }
-from 'odss-common';
+from '@odss/common';
 import {
     Framework
 } from '../src/framework';
@@ -23,10 +23,10 @@ QUnit.module("odss-framweork", hook => {
 
     QUnit.test('get property', async assert => {
         let framework = await tests.framework();
-        assert.equal(framework.property('prop1'), 'test1');
-        assert.equal(framework.property('prop2'), 'test2');
-        assert.deepEqual(framework.property('unexists'), null, 'Not exists property');
-        assert.equal(framework.property('unexists', 'iknow'), 'iknow', 'Default property');
+        assert.equal(framework.getProperty('prop1'), 'test1');
+        assert.equal(framework.getProperty('prop2'), 'test2');
+        assert.deepEqual(framework.getProperty('unexists'), null, 'Not exists property');
+        assert.equal(framework.getProperty('unexists', 'iknow'), 'iknow', 'Default property');
     });
 
     QUnit.test('get bundles', async assert => {

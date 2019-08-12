@@ -1,0 +1,47 @@
+{
+  "name": "@odss/query",
+  "version": "1.0.0",
+  "description": "LDAP Query Helper",
+  "license": "MIT",
+  "main": "dist/node/index.js",
+  "module": "dist/esm/index.mjs",
+  "types": "types/index.d.ts",
+  "homepage": "https://github.com/smialy/stool#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smialy/stool.git"
+  },
+  "scripts": {
+    "build": "npm run build:clean && npm run build:tsc && npm run build:exts",
+    "build:clean": "rm -rf dist/ && rm -rf types",
+    "build:tsc": "tsc && tsc -p tsconfig.esm.json",
+    "build:exts": "renamer --path-element ext --find js --replace mjs dist/esm/*",
+    "test": "qunit --require ts-node/register tests/*",
+    "karma": "karma start --single-run",
+    "lint": "eslint tests && tslint src/*",
+    "prepare": "npm run build"
+  },
+  "files": [
+    "README.md",
+    "dist/*.js",
+    "types/*.ts"
+  ],
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "karma": "^4.2.0",
+    "karma-chrome-launcher": "^3.0.0",
+    "karma-firefox-launcher": "^1.2.0",
+    "karma-qunit": "^4.0.0",
+    "karma-rollup-preprocessor": "^7.0.2",
+    "qunit": "^2.9.2",
+    "renamer": "^1.1.2",
+    "rollup": "^1.19.4",
+    "rollup-plugin-commonjs": "^10.0.2",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "ts-node": "^8.3.0",
+    "tslib": "^1.10.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  }
+}

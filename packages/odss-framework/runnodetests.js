@@ -1,4 +1,4 @@
-require("babel-register")({
+require("@babel/register")({
     only: [/tests/, /src/, /odss-common/, /sjs-query/]
 });
 const run = require('qunit/bin/run');

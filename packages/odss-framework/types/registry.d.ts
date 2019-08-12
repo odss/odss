@@ -1,4 +1,7 @@
-import { IBundle } from 'odss-common';
+import { IBundle } from '@odss/common';
+interface IRegistration {
+    readonly id: number;
+}
 export default class Registry {
     events: any;
     private _services;
@@ -8,7 +11,7 @@ export default class Registry {
     constructor(events: any);
     registerService(bundle: IBundle, name: any, service: any, properties: any): any;
     registerStyles(bundle: IBundle, styles: string[]): any;
-    unregister(bundle: any, registration: any): boolean;
+    unregister(bundle: IBundle, registration: IRegistration): boolean;
     unregisterAll(bundle: any): void;
     find(bundle: any, reference: any): any;
     unget(bundle: any, reference: any): void;
@@ -34,3 +37,4 @@ export default class Registry {
     size(): number;
     updateProperties(registration: any, oldProps: any): void;
 }
+export {};

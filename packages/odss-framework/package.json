@@ -1,43 +1,66 @@
 {
-  "name": "odss-framework",
+  "name": "@odss/framework",
   "version": "1.0.0",
   "description": "odss framework",
   "license": "MIT",
-  "author": "smialy",
   "repository": {
     "type": "git",
     "url": "http://github.com/odss/odss"
   },
-  "main": "src/index.js",
-  "main:ts": "ts/index.ts",
-  "dependencies": {
-    "odss-common": "^1.0.0",
-    "sjs-query": "^2.0.0",
-    "ts-node": "^6.1.2"
-  },
+  "main": "dist/esm/index.js",
+  "module": "dist/esm/index.mjs",
+  "types": "types/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "test": "node runnodetests.js",
+    "build2": "rm -rf dist/ && rm -rf types && tsc && tsc -p tsconfig.esm.json",
+    "build": "npm run build:clean && npm run build:tsc && npm run build:exts",
+    "build:clean": "rm -rf dist/ && rm -rf types",
+    "build:tsc": "tsc && tsc -p tsconfig.esm.json",
+    "build:exts": "renamer --path-element ext --find js --replace mjs dist/esm/*",
+    "test": "qunit --require ts-node/register tests/*",
     "karma": "karma start --single-run",
-    "lint": "eslint src tests"
+    "lint": "eslint tests && tslint src/*",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@odss/common": "^1.0.0",
+    "@odss/query": "^1.0.0",
+    "mocha": "^6.2.0"
   },
   "devDependencies": {
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
-    "babel-register": "^6.26.0",
-    "eslint": "^4.19.1",
-    "karma": "^2.0.0",
-    "karma-chrome-launcher": "^2.1.1",
-    "karma-firefox-launcher": "^1.0.1",
-    "karma-qunit": "^2.0.1",
-    "karma-rollup-preprocessor": "^6.0.0",
-    "qunit": "^2.6.0",
-    "rollup": "^0.58.2",
-    "sinon": "^6.0.0",
-    "typescript": "^2.8.1"
+    "read-dir-deep": "^7.0.1",
+    "eslint": "^6.1.0",
+    "karma": "^4.2.0",
+    "karma-chrome-launcher": "^3.0.0",
+    "karma-firefox-launcher": "^1.2.0",
+    "karma-qunit": "^4.0.0",
+    "karma-rollup-preprocessor": "^7.0.2",
+    "qunit": "^2.9.2",
+    "renamer": "^1.1.2",
+    "rollup": "^1.19.4",
+    "rollup-plugin-commonjs": "^10.0.2",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "sinon": "^7.4.1",
+    "ts-node": "^8.3.0",
+    "tslib": "^1.10.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3",
+    "@pika/plugin-build-web": "^0.6.0",
+    "@pika/plugin-ts-standard-pkg": "^0.6.0"
   },
-  "babel": {
-    "plugins": [
-      "transform-es2015-modules-commonjs"
+  "files": [
+    "README.md",
+    "dist/*.js",
+    "types/*.ts"
+  ],
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@stool/pika-ext-mjs"
+      ]
     ]
   }
 }

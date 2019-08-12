@@ -1,10 +1,10 @@
-import sinon from 'sinon';
+import * as sinon from 'sinon';
 import {
     Events,
     ServiceEvent,
     BundleEvent,
     FrameworkEvent
-} from 'odss-common';
+} from '@odss/common';
 import EventDispatcher from '../src/events';
 
 
@@ -135,12 +135,15 @@ QUnit.test('test bundle listeners as object', assert => {
 });
 QUnit.test('service listeners as callback', assert => {
     let spy = sinon.spy();
+
     assert.equal(true, ed.service.add(bundle, spy, null, '(*)'), 'Expected true for add first listener');
-    //add second time
     assert.equal(false, ed.service.add(bundle, spy, null, '(*)'), 'Expected false for add the same listener');
 
     ed.service.fire(new ServiceEvent(1, {
-        bundle: 2
+        bundle: 2,
+        getProperties(){
+            return {objectclass: 'filter'};
+        }
     }));
 
     assert.deepEqual(1, spy.callCount, 'Expected only one notify for double listener');
@@ -150,7 +153,10 @@ QUnit.test('service listeners as callback', assert => {
 
     assert.equal(true, ed.service.remove(bundle, spy), 'Remove action should return: "true"');
     ed.service.add(new ServiceEvent(1, {
-        bundle: 2
+        bundle: 2,
+        getProperties(){
+            return {objectclass: 'filter'};
+        }
     }));
 
     assert.equal(false, spy.calledOnce, 'Expected only one notify for single listener');
@@ -164,7 +170,10 @@ QUnit.test('test service listeners as object', assert => {
     //add second time
     assert.equal(false, ed.service.add(bundle, spy));
     ed.service.fire(new ServiceEvent(1, {
-        bundle: 2
+        bundle: 2,
+        getProperties(){
+            return {objectclass: 'filter'}
+        }
     }));
 
     assert.deepEqual(1, spy.callCount);
@@ -172,7 +181,10 @@ QUnit.test('test service listeners as object', assert => {
     spy.resetHistory();
     assert.equal(true, ed.service.remove(bundle, spy));
     ed.service.fire(new ServiceEvent(1, {
-        bundle: 2
+        bundle: 2,
+        getProperties() {
+            return {objectclass: 'filter'};
+        }
     }));
     assert.equal(false, spy.called);
 });
@@ -201,38 +213,41 @@ QUnit.test('service filters', assert => {
     ed.service.fire(new ServiceEvent('test', {
         bundle: bundle,
         name: 'test',
-        properties: {
-            objectclass: 'filter'
+        getProperties() {
+            return {objectclass: 'filter'}
         }
     }));
     ed.service.fire(new ServiceEvent('test', {
         bundle: bundle,
         name: 'filter',
-        properties: {
-            objectclass: 'filter'
+        getProperties() {
+            return {objectclass: 'filter'}
         }
     }));
     assert.equal(2, spy.callCount);
 
     spy = sinon.spy();
 
-    debugger
     //catch all - *
     ed.service.add(bundle, spy);
     ed.service.fire(new ServiceEvent('test', {
         bundle: bundle,
         name: 'test',
-        properties: {
-            objectclass: 'filter'
+        getProperties() {
+            return {objectclass: 'filter'}
         }
     }));
     ed.service.fire(new ServiceEvent('test', {
         bundle: bundle,
         name: 'filter',
-        properties: {
-            objectclass: 'filter'
+        getProperties() {
+            return {objectclass: 'filter'}
         }
     }));
     assert.equal(2, spy.callCount);
-
 });
+
+
+function createServiceEvent(bundle, name, ) {
+
+}

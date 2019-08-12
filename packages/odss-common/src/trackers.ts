@@ -79,15 +79,15 @@ class ServiceTracked implements IServiceListener{
 export class ServiceTracker implements IServiceTrackerCustomizer{
     private _ctx: IBundleContext;
     private _name: any;
-    private _filter: any;
-    private _listener: IServiceTrackerListener|null;
-    private _tracked: ServiceTracked|null = null;
+    private _filter?: any;
+    private _listener?: IServiceTrackerListener;
+    private _tracked?: ServiceTracked;
 
     constructor(
         ctx: IBundleContext,
         name: any,
-        listener: IServiceTrackerListener|null = null,
-        filter: string = ''
+        listener?: IServiceTrackerListener,
+        filter?: string,
     ) {
         if (!ctx) {
             throw new Error('Not set bundle context');
@@ -101,7 +101,7 @@ export class ServiceTracker implements IServiceTrackerCustomizer{
         this._listener = listener;
     }
     open() {
-        if (this._tracked === null) {
+        if (!this._tracked) {
             this._tracked = new ServiceTracked(this);
             this._ctx.on.service.add(this._tracked, this._name, this._filter);
             let refs = this._ctx.getServiceReferences(this._name, this._filter);
@@ -112,10 +112,10 @@ export class ServiceTracker implements IServiceTrackerCustomizer{
         return this;
     }
     close() {
-        if (this._tracked !== null) {
+        if (this._tracked) {
             this._ctx.on.service.remove(this._tracked);
             this._tracked.close();
-            this._tracked = null;
+            this._tracked = undefined;
         }
         return this;
     }
@@ -138,19 +138,19 @@ export class ServiceTracker implements IServiceTrackerCustomizer{
         this._ctx.ungetService(reference);
     }
     size(): number {
-        return this._tracked !== null ? this._tracked.size() : 0;
+        return this._tracked ? this._tracked.size() : 0;
     }
     getReference(): IServiceReference {
         return this.getReferences()[0];
     }
     getReferences() {
-        return this._tracked !== null ? this._tracked.getReferences() : [];
+        return this._tracked ? this._tracked.getReferences() : [];
     }
     getService() {
         return this.getServices()[0];
     }
     getServices() {
-        return this._tracked !== null ? this._tracked.getServices() : [];
+        return this._tracked ? this._tracked.getServices() : [];
     }
     _extendCustomizer(customizer){
         if(customizer){
@@ -224,20 +224,19 @@ class BundleTracked{
 export class BundleTracker {
     private _ctx: IBundleContext;
     private mask: number;
-    private _listener: IBundleTrackerListener|null;
-    private _tracked: BundleTracked|null;
+    private _listener?: IBundleTrackerListener;
+    private _tracked?: BundleTracked;
 
-    constructor(ctx: IBundleContext, mask: number, listener: IBundleTrackerListener|null=null) {
+    constructor(ctx: IBundleContext, mask: number, listener: IBundleTrackerListener) {
         this._ctx = ctx;
         if (!mask) {
             throw new Error('Not set mask for bundles');
         }
         this.mask = mask;
         this._listener = listener;
-        this._tracked = null;
     }
     open() {
-        if (this._tracked === null) {
+        if (!this._tracked) {
             this._tracked = new BundleTracked(this.mask, this._listener || this);
             this._ctx.on.bundle.add(this._tracked);
             let bundles = this._ctx.getBundles();
@@ -250,18 +249,18 @@ export class BundleTracker {
         return this;
     }
     close() {
-        if (this._tracked !== null) {
+        if (this._tracked) {
             this._ctx.on.bundle.remove(this._tracked);
             this._tracked.close();
-            this._tracked = null;
+            this._tracked = undefined;
         }
         return this;
     }
     size() {
-        return this._tracked !== null ? this._tracked.size() : 0;
+        return this._tracked ? this._tracked.size() : 0;
     }
     bundles() {
-        return this._tracked !== null ? this._tracked.getBundles() : [];
+        return this._tracked ? this._tracked.getBundles() : [];
     }
     addingBundle(bundle: IBundle) {
     }

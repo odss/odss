@@ -1,5 +1,5 @@
-import sinon from 'sinon';
-import {OBJECTCLASS, Events} from 'odss-common';
+import * as sinon from 'sinon';
+import {OBJECTCLASS, Events} from '@odss/common';
 import Registry from '../src/registry';
 
 
@@ -160,8 +160,8 @@ QUnit.test('ungetAll()', assert =>  {
 QUnit.test('register service with function namespace', assert =>  {
     let fn = function a_b_c_d_ITest() {};
     let reg = self.registry.registerService(self.bundle, fn, 'testService');
-    assert.equal(reg.reference.properties[OBJECTCLASS], 'a.b.c.d.ITest', 'Incorect service namesapce');
-    assert.equal(reg.reference.property(OBJECTCLASS), 'a.b.c.d.ITest', 'Incorect service namesapce in reference');
+    assert.equal(reg.reference.getProperties()[OBJECTCLASS], 'a.b.c.d.ITest', 'Incorect service namesapce');
+    assert.equal(reg.reference.getProperty(OBJECTCLASS), 'a.b.c.d.ITest', 'Incorect service namesapce in reference');
 
 });
 
@@ -170,7 +170,7 @@ QUnit.test('change properties', assert =>  {
         key: 'value'
     });
     reg.update('key', 'test');
-    assert.equal('test', reg.reference.property('key'));
+    assert.equal('test', reg.reference.getProperty('key'));
 
 });
 

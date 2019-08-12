@@ -3,22 +3,24 @@
   "version": "1.0.0",
   "description": "ODSS Common",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/node/index.js",
+  "module": "dist/esm/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist/ && rm -rf types && tsc",
+    "build": "rm -rf dist/ && rm -rf types && tsc && tsc -p tsconfig.esm.json",
     "lint": "tslint src/*",
     "prepare": "npm run build"
   },
   "files": [
     "README.md",
-    "dist/*.js",
+    "dist/**/*.js",
     "types/*.ts"
   ],
   "devDependencies": {
-    "eslint": "^5.7.0",
-    "ts-node": "^7.0.1",
-    "tslib": "^1.9.3",
-    "tslint": "^5.11.0",
-    "typescript": "^3.1.6"
+    "eslint": "^6.1.0",
+    "ts-node": "^8.3.0",
+    "tslib": "^1.10.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
   }
 }

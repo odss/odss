@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MATCH_ALL = 'all';
+exports.MATCH_NONE = 'none';
+exports.AND = 'and';
+exports.OR = 'or';
+exports.NOT = 'not';
+exports.EQ = 'eq';
+exports.LTE = 'lte';
+exports.GTE = 'gte';
+exports.APPROX = 'approx';
+exports.PRESENT = 'present';
+exports.SUBSTRING = 'substring';

@@ -112,14 +112,14 @@ export default class Shell{
      * @param {Callback} out
      * @param {Callback} err
      */
-    execute(cmdLine, out, err) {
+    async execute(cmdLine, out, err) {
         let args = cmdLine.split(' ');
         let cmdName = args.shift();
         if (cmdName) {
             let command = this.getCommand(cmdName);
             if (command) {
                 try {
-                    command.execute(args, out, err);
+                    return await command.execute(args, out, err);
                 } catch (e) {
                     err(e);
                 }

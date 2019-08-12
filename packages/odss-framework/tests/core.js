@@ -1,6 +1,5 @@
-
-import sinon from 'sinon';
-import {Framework} from '../src/framework';
+import * as sinon from 'sinon';
+import { Framework } from '../src/framework';
 
 
 let ACTIVATORS = {

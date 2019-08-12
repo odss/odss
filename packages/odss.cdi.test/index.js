@@ -1,16 +1,22 @@
-import {Component, Bind, Unbind, Requires} from 'odss-cdi';
+import {Component, Bind, Unbind, Requires} from '@odss/cdi';
+import { Property } from '../odss-cdi';
 
 class ISpellDictionary{
-    check_word(word) {
+    checkWord(word) {
 
     }
 }
 class ISpellChecker {
-    check(passage, language='en'){
+    check(massage, language='en'){
 
     }
 }
-@Component(ISpellDictionary)
+@Component(ISpellDictionary,
+    properties={
+        'language': 'en',
+    }
+)
+@Property('language', 'en')
 export class EnglishSpellDictionary {
 
     activate(ctx){
@@ -19,12 +25,13 @@ export class EnglishSpellDictionary {
     deactivate(ctx){
         this.dictionary = null;
     }
-    check_word(word) {
+    checkWord(word) {
         return this.dictionary.indexOf(word) !== -1;
     }
 }
 
 @Component(ISpellDictionary)
+@Property('language', 'pl')
 export class PolishSpellDictionary {
     activate(ctx){
         this.dictionary = ["witaj", "świecie", "witaj", "w", "odss", "tescie"];
@@ -32,7 +39,7 @@ export class PolishSpellDictionary {
     deactivate(ctx){
         this.dictionary = null;
     }
-    check_word(word) {
+    checkWord(word) {
         return this.dictionary.indexOf(word) !== -1;
     }
 }
@@ -45,13 +52,13 @@ export class SpellChecker {
     }
     @Bind(ISpellDictionary)
     add(service, ref) {
-        let language = ref.property('language');
+        let language = ref.getProperty('language');
         this.languages.set(language, service);
 
     }
     @Unbind(ISpellDictionary)
     remove(service, ref) {
-        let language = ref.property('language');
+        let language = ref.getProperty('language');
         this.languages.delete(language);
     }
     activate(){
@@ -59,5 +66,12 @@ export class SpellChecker {
     }
     deactivate(){
         console.log('A spell checker has been stopped')
+    }
+
+    check(message, language='en') {
+        const dict = this.languages.get(lan);
+        if (dict) {
+            return message.split(' ').every(word => dict.checkWord(word));
+        }
     }
 }

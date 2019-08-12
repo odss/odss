@@ -85,14 +85,14 @@ export default class ComponentsManager{
         if (!this._isActivate) {
             return;
         }
-        if(this.metadata.requires.length){
-            await this._component.dispose();
-        }
         this._isActivate = false;
         try {
             await this._component.deactivate(this.bundle.context);
         } catch (e) {
             this._error('component.deactivate()', e);
+        }
+        if(this.metadata.requires.length){
+            await this._component.dispose();
         }
         if (this._registration) {
             this._registration.unregister();

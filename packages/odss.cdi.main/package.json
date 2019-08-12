@@ -1,11 +1,7 @@
 {
-  "name": "odss.cdi",
+  "name": "@odss/cdi.main",
   "version": "1.0.0",
   "license": "MIT",
   "author": "smialy",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/odss/cdi"
-  },
-  "main": "src/index.js"
+  "module": "src/index.js"
 }

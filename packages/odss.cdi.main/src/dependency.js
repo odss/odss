@@ -7,7 +7,6 @@ class OptionalCardinality{
         this._serviceCounter = 0;
         this._serviceId = null;
     }
-
     addingService(reference, service) {
         console.log('cdi.OptionalCardinality::addingService(reference)', reference);
         if (this._serviceId === null) {
@@ -22,7 +21,6 @@ class OptionalCardinality{
             this._dependency.unassignService();
         }
     }
-
     isSatisfied() {
         return true;
     }

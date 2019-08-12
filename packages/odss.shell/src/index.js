@@ -1,4 +1,4 @@
-import {IShell, ICommand} from 'odss.api';
+import { IShell, ICommand } from '@odss/api';
 import Shell from './shell';
 import commands from './commands';
 
@@ -7,13 +7,10 @@ let shell;
 let tracker;
 
 export function start(ctx) {
-    //create service
     shell = new Shell();
 
-    //register created shell service
     ctx.registerService(IShell, shell);
 
-    //listern for added services ICommand
     tracker = ctx.serviceTracker(ICommand, {
         addingService: function(reference) {
             shell.addCommand(ctx.getService(reference));

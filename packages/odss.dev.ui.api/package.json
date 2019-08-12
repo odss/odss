@@ -1,19 +1,8 @@
 {
-  "name": "odss.dev.ui.api",
+  "name": "@odss/dev.ui.api",
   "version": "1.0.0",
   "description": "ODSS Dev UI API",
-  "keywords": [
-    "www"
-  ],
-  "homepage": "",
   "license": "MIT",
   "author": "smialy",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/odss/dev-ui-api"
-  },
-  "main": "src/index.js",
-  "dependencies": {
-    "odss-namespace": "github:odss/namespace"
-  }
+  "module": "src/index.js"
 }

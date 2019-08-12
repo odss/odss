@@ -1,4 +1,4 @@
-import {Bundles} from 'odss-common';
+import {Bundles} from '@odss/common';
 import Bundle from '../src/bundle';
 
 

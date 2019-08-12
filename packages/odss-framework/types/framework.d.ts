@@ -1,5 +1,5 @@
+import { ILoader } from '@odss/common';
 import Bundle from './bundle';
-import Loader from './loader';
 import Registry from './registry';
 import EventDispatcher from './events';
 export declare class Framework extends Bundle {
@@ -18,17 +18,17 @@ export declare class Framework extends Bundle {
      * @param {String} name
      * @param {Object} def Default value
      */
-    property(name: any, defaultProperty: any): any;
+    getProperty(name: any, defaultProperty: any): any;
     /**
      * @return {Object}
      */
-    properties(): any;
+    getProperties(): any;
     start(): Promise<void>;
     stop(): Promise<void>;
     uninstall(): Promise<void>;
     update(): Promise<void>;
-    setLoader(loader: any): void;
-    getLoader(): Loader;
+    setLoader(loader: ILoader): void;
+    getLoader(): ILoader;
     hasBundle(bundleId: any): boolean;
     getBundle(obj: any): Bundle;
     getBundles(): Bundle[];

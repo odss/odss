@@ -6,13 +6,6 @@ const getCdi = target => {
     return map.get(target);
 };
 
-function toArray(arr) {
-    if(arr) {
-        return Array.isArray(arr) ? arr : [arr];
-    }
-    return [];
-}
-
 function findComponentArgs(name, args){
     let provides = [];
     let isFirst = true;
@@ -30,6 +23,7 @@ function findComponentArgs(name, args){
         provides
     };
 }
+
 export function Component(...args) {
     return (target, key, descriptor) => {
         let options = findComponentArgs(target.name, args);
@@ -81,7 +75,7 @@ export function Component(...args) {
     }
 }
 
-export function Requires(...interfaces){
+export function Requires(...interfaces) {
     return function(target, field, descriptor){
         getCdi(target.prototype).push({
             type:'requires',
