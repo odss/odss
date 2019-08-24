@@ -4,5 +4,6 @@
 	},
 	"dependencies": {
 		"typescript": "^3.5.3"
-	}
+	},
+	"name": "odss"
 }
