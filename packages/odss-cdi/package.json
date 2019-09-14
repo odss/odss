@@ -22,9 +22,10 @@
   "dependencies": {
     "@stool/core": "^2.7.0",
     "reflect-metadata": "^0.1.13"
-},
-"devDependencies": {
+  },
+  "devDependencies": {
     "@types/qunit": "^2.9.0",
+    "@types/reflect-metadata": "^0.1.0",
     "eslint": "^6.1.0",
     "karma": "^4.2.0",
     "karma-chrome-launcher": "^3.0.0",
