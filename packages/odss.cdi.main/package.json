@@ -1,7 +1,0 @@
-{
-  "name": "@odss/cdi.main",
-  "version": "1.0.0",
-  "license": "MIT",
-  "author": "smialy",
-  "module": "src/index.js"
-}

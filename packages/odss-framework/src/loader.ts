@@ -14,7 +14,7 @@ const BROWSER_ENV = 'browser.env';
 const UNKNOWN_ENV = 'unknown.env';
 const WEBWORKER_ENV = 'webworker.env';
 
-class NodeLoader implements ILoader{
+class NodeLoader implements ILoader {
     private resolver: Function;
     constructor({ resolver }) {
         this.resolver = resolver;
@@ -52,10 +52,10 @@ const LOADERS = {
     [BROWSER_ENV]: BrowserLoader,
 };
 
-export function createDefaultLoader(options): ILoader {
+export function createDefaultLoader(properties): ILoader {
     const env = detectEnv();
     const Loader = LOADERS[env];
-    return new Loader(options);
+    return new Loader(properties);
 }
 
 function detectEnv() {

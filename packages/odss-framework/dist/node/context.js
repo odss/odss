@@ -41,8 +41,8 @@ class BundleContext {
     registerService(name, service, properties) {
         return this.framework.registry.registerService(this.bundle, name, service, properties);
     }
-    registerStyles(...styles) {
-        return this.framework.registry.registerStyles(this.bundle, styles);
+    registerStyle(...styles) {
+        return this.framework.registry.registerStyle(this.bundle, styles);
     }
     serviceTracker(name, listener, filter = '') {
         return new common_1.ServiceTracker(this, name, listener, filter);

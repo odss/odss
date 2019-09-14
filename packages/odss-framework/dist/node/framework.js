@@ -99,8 +99,8 @@ class Framework extends bundle_1.default {
     }
     getLoader() {
         if (this._loader === null) {
-            const path = this.getProperty('loader.path', '/');
-            this._loader = loader_1.createDefaultLoader(path);
+            const properties = this.getProperty('loader', {});
+            this._loader = loader_1.createDefaultLoader(properties);
         }
         return this._loader;
     }

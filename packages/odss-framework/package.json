@@ -1,30 +1,28 @@
 {
   "name": "@odss/framework",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "odss framework",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "http://github.com/odss/odss"
   },
-  "main": "dist/esm/index.js",
+  "main": "dist/node/index.js",
   "module": "dist/esm/index.mjs",
   "types": "types/index.d.ts",
   "scripts": {
-    "build2": "rm -rf dist/ && rm -rf types && tsc && tsc -p tsconfig.esm.json",
-    "build": "npm run build:clean && npm run build:tsc && npm run build:exts",
+    "build": "npm run build:clean && npm run build:all && npm run build:exts",
+    "build:all": "tsc && tsc -p tsconfig.esm.json",
     "build:clean": "rm -rf dist/ && rm -rf types",
-    "build:tsc": "tsc && tsc -p tsconfig.esm.json",
     "build:exts": "renamer --path-element ext --find js --replace mjs dist/esm/*",
     "test": "qunit --require ts-node/register tests/*",
     "karma": "karma start --single-run",
-    "lint": "eslint tests && tslint src/*",
+    "lint": "tslint src/* tests/*",
     "prepare": "npm run build"
   },
   "dependencies": {
     "@odss/common": "^1.0.0",
-    "@odss/query": "^1.0.0",
-    "mocha": "^6.2.0"
+    "@odss/query": "^1.0.0"
   },
   "devDependencies": {
     "read-dir-deep": "^7.0.1",
@@ -44,23 +42,12 @@
     "ts-node": "^8.3.0",
     "tslib": "^1.10.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "@pika/plugin-build-web": "^0.6.0",
-    "@pika/plugin-ts-standard-pkg": "^0.6.0"
+    "typescript": "^3.5.3"
   },
   "files": [
     "README.md",
-    "dist/*.js",
+    "dist/node/*.js",
+    "dist/esm/*.mjs",
     "types/*.ts"
-  ],
-  "@pika/pack": {
-    "pipeline": [
-      [
-        "@pika/plugin-ts-standard-pkg"
-      ],
-      [
-        "@stool/pika-ext-mjs"
-      ]
-    ]
-  }
+  ]
 }

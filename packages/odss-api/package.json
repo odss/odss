@@ -1,12 +1,27 @@
 {
   "name": "@odss/api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ODSS API",
   "license": "MIT",
   "author": "smialy",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/odss/odss"
+  "main": "dist/node/index.js",
+  "module": "dist/esm/index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist/ && rm -rf types && tsc && tsc -p tsconfig.esm.json",
+    "lint": "tslint src/*",
+    "prepare": "npm run build"
   },
-  "module": "src/index.js"
+  "files": [
+    "README.md",
+    "dist/**/*.js",
+    "types/*.ts"
+  ],
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "ts-node": "^8.3.0",
+    "tslib": "^1.10.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  }
 }

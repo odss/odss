@@ -97,8 +97,8 @@ export class Framework extends Bundle {
     }
     getLoader() {
         if (this._loader === null) {
-            const path = this.getProperty('loader.path', '/');
-            this._loader = createDefaultLoader(path);
+            const properties = this.getProperty('loader', {});
+            this._loader = createDefaultLoader(properties);
         }
         return this._loader;
     }

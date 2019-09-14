@@ -1,9 +1,6 @@
 {
-	"devDependencies": {
-		"lerna": "^3.16.4"
-	},
-	"dependencies": {
-		"typescript": "^3.5.3"
-	},
-	"name": "odss"
+  "name": "odds",
+  "devDependencies": {
+    "lerna": "^3.16.4"
+  }
 }

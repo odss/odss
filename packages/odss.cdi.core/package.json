@@ -1,0 +1,10 @@
+{
+  "name": "@odss/cdi.main",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "smialy",
+  "main": "src/index.js",
+  "dependencies": {
+      "@odss/common": "1.0.0"
+  }
+}

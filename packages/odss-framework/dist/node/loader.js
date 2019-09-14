@@ -37,10 +37,10 @@ const LOADERS = {
     [NODE_ENV]: NodeLoader,
     [BROWSER_ENV]: BrowserLoader,
 };
-function createDefaultLoader(options) {
+function createDefaultLoader(properties) {
     const env = detectEnv();
     const Loader = LOADERS[env];
-    return new Loader(options);
+    return new Loader(properties);
 }
 exports.createDefaultLoader = createDefaultLoader;
 function detectEnv() {

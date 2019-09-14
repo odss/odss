@@ -16,7 +16,7 @@ export interface IFramework extends IBundle {
     uninstallBundle(bundle: IBundle);
 }
 
-export interface IEventsListener{
+export interface IEventsListener {
     contains(bundle:any, listener:any);
     size(): number;
     remove(bundle:any, listener:any);
@@ -47,7 +47,7 @@ export interface IBundle {
     uninstall();
 }
 
-export interface IBundleContext{
+export interface IBundleContext {
     framework: IFramework,
     getProperty(name: string, def: any): any;
     getProperties(): any;
@@ -63,7 +63,7 @@ export interface IBundleContext{
     onFramework(listener: IFrameworkListener);
 }
 
-export interface IServiceReference{
+export interface IServiceReference {
     readonly id: number;
     readonly bundle: IBundle;
 
@@ -72,18 +72,18 @@ export interface IServiceReference{
     usingBundles(): IBundle[];
 }
 
-export interface IServiceRegistration{
+export interface IServiceRegistration {
     readonly reference: IServiceReference;
     unregister(): void;
 }
 
-export interface IEvent{}
+export interface IEvent {}
 
-export interface IServiceEvent extends IEvent{}
+export interface IServiceEvent extends IEvent {}
 
-export interface IBundleEvent extends IEvent{}
+export interface IBundleEvent extends IEvent {}
 
-export interface IFrameworkEvent extends IBundleEvent{}
+export interface IFrameworkEvent extends IBundleEvent {}
 
 export interface IListener {}
 

@@ -60,8 +60,8 @@ export default class BundleContext implements IBundleContext {
     registerService(name: any, service: any, properties: any) {
         return this.framework.registry.registerService(this.bundle, name, service, properties);
     }
-    registerStyles(...styles: string[]): {unregister: Function} {
-        return this.framework.registry.registerStyles(this.bundle, styles);
+    registerStyle(...styles: string[]): {unregister: Function} {
+        return this.framework.registry.registerStyle(this.bundle, styles);
     }
     serviceTracker(name: any, listener: IServiceTrackerListener, filter: string = '') {
         return new ServiceTracker(this, name, listener, filter);

@@ -35,10 +35,10 @@ const LOADERS = {
     [NODE_ENV]: NodeLoader,
     [BROWSER_ENV]: BrowserLoader,
 };
-export function createDefaultLoader(options) {
+export function createDefaultLoader(properties) {
     const env = detectEnv();
     const Loader = LOADERS[env];
-    return new Loader(options);
+    return new Loader(properties);
 }
 function detectEnv() {
     if (typeof process !== 'undefined' && process.versions != null && process.versions.node != null) {

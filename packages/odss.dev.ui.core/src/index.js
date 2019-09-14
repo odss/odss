@@ -7,7 +7,7 @@ import CSS from './main.scss';
 
 export class Activator {
     start(ctx) {
-        ctx.registerStyles(CSS);
+        ctx.registerStyle(CSS);
         let $dom = createView(MAIN_TEMPLATE);
         this.panels = new Panels($dom);
         this.tracker = ctx.serviceTracker(IPanel, {

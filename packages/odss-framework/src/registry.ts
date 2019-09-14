@@ -41,7 +41,7 @@ export default class Registry {
         this.events.service.fire(new ServiceEvent(Events.REGISTERED, registration.reference));
         return registration;
     }
-    registerStyles(bundle: IBundle, styles: string[]) {
+    registerStyle(bundle: IBundle, styles: string[]) {
         let elements = styles.map(createStyle);
         this._styles[bundle.id] = () => {
             if(elements){

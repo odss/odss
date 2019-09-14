@@ -8,7 +8,7 @@ import STYLES from './css/main.scss';
 var terminal, reg, tracker, styles;
 
 export function start(ctx) {
-    ctx.registerStyles(STYLES);
+    ctx.registerStyle(STYLES);
     terminal = new Termial(MAIN_TEMPLATE);
     tracker = ctx.serviceTracker(IShell, {
         addingService: function(reference) {
