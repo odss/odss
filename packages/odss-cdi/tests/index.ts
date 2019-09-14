@@ -11,11 +11,11 @@ import {
 } from '../src/index';
 import { MetadataKeys } from '../src/consts';
 
-QUnit.module("@odss/cdi::Inject()", () => {
+QUnit.module('@odss/cdi::Inject()', () => {
 
     const IService: string = 'pack.one.IService';
     interface IService {
-        push():void ;
+        push(): void;
     }
 
     QUnit.test('props', assert => {
@@ -52,7 +52,7 @@ QUnit.module("@odss/cdi::Inject()", () => {
 
         const properties = Reflect.getMetadata(
             MetadataKeys.PROPERTIES_DEPENDENCY,
-            Test
+            Test,
         );
 
         assert.deepEqual(properties, expected);
@@ -68,9 +68,7 @@ QUnit.module("@odss/cdi::Inject()", () => {
               @Inject('param2') private param2,
               @Inject(method) private paramMethod,
               @Inject(IService) private paramService,
-            ) {
-                console.log('a')
-            }
+            ) { }
         }
 
         const params = Reflect.getMetadata(
@@ -78,24 +76,24 @@ QUnit.module("@odss/cdi::Inject()", () => {
             Test,
         );
         const expected = [{
-            "index": 3,
-            "type": "pack.one.IService"
+            index: 3,
+            types: 'pack.one.IService',
         }, {
-            "index": 2,
-            "type": "method"
+            index: 2,
+            type: 'method',
         }, {
-            "index": 1,
-            "type": "param2"
+            index: 1,
+            type: 'param2',
         }, {
-            "index": 0,
-            "type": "param1"
+            index: 0,
+            type: 'param1',
         }];
         assert.deepEqual(params, expected);
     });
 
 });
 
-QUnit.test("@odss/cdi:Validate()", assert => {
+QUnit.test('@odss/cdi:Validate()', assert => {
 
     class Test {
         @Validate()
@@ -110,7 +108,7 @@ QUnit.test("@odss/cdi:Validate()", assert => {
     assert.deepEqual(validMeta, { name: 'valid' });
 });
 
-QUnit.test("@odss/cdi:Invalidate()", assert => {
+QUnit.test('@odss/cdi:Invalidate()', assert => {
 
     class Test {
         @Invalidate()
@@ -126,7 +124,7 @@ QUnit.test("@odss/cdi:Invalidate()", assert => {
     assert.deepEqual(invalidMeta, { name: 'invalid' });
 });
 
-QUnit.module("@odss/cdi::Component()", () => {
+QUnit.module('@odss/cdi::Component()', () => {
     QUnit.test('default name', assert => {
 
         @Component()
@@ -167,16 +165,16 @@ QUnit.module("@odss/cdi::Component()", () => {
         );
         const expected = [{
             index: 0,
-            type: "A",
+            type: 'A',
         }, {
             index: 1,
-            type: "B",
+            type: 'B',
         }];
         assert.deepEqual(meta, expected);
     });
 });
 
-QUnit.module("@odss/cdi::Requires()", () => {
+QUnit.module('@odss/cdi::Requires()', () => {
     QUnit.test('without constructor', assert => {
 
         @Requires()
@@ -219,16 +217,16 @@ QUnit.module("@odss/cdi::Requires()", () => {
         );
         const expected = [{
             index: 0,
-            type: "A",
+            type: 'A',
         }, {
             index: 1,
-            type: "B",
+            type: 'B',
         }];
         assert.deepEqual(meta, expected);
     });
 });
 
-QUnit.module("@odss/cdi::Bind()", () => {
+QUnit.module('@odss/cdi::Bind()', () => {
     QUnit.test('auto read types', assert => {
         class A {}
 
@@ -246,7 +244,7 @@ QUnit.module("@odss/cdi::Bind()", () => {
         const expected = [{
             key: 'add',
             type: 'A',
-            cardinality: '0..n'
+            cardinality: '0..n',
         }];
         assert.deepEqual(meta, expected);
     });
@@ -268,13 +266,13 @@ QUnit.module("@odss/cdi::Bind()", () => {
         const expected = [{
             key: 'add',
             type: 'Aa',
-            cardinality: '1..1'
+            cardinality: '1..1',
         }];
         assert.deepEqual(meta, expected);
     });
 });
 
-QUnit.module("@odss/cdi::Unbind()", () => {
+QUnit.module('@odss/cdi::Unbind()', () => {
     QUnit.test('auto read types', assert => {
         class A {}
 
@@ -318,7 +316,7 @@ QUnit.module("@odss/cdi::Unbind()", () => {
     });
 });
 
-QUnit.module("@odss/cdi::Modified()", () => {
+QUnit.module('@odss/cdi::Modified()', () => {
     QUnit.test('auto read types', assert => {
         class A {}
 
@@ -361,7 +359,7 @@ QUnit.module("@odss/cdi::Modified()", () => {
         assert.deepEqual(meta, expected);
     });
 });
-QUnit.module("@odss/cdi::Update()", () => {
+QUnit.module('@odss/cdi::Update()', () => {
     QUnit.test('auto read types', assert => {
         class A {}
 

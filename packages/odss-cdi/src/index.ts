@@ -17,17 +17,14 @@ declare type PropertyDecorator = (target: Object, propertyKey: string | symbol) 
 declare type MethodDecorator = <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
 declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) => void;
 */
-function getTokenType(token: any) {
-    return token && isFunction(token) ? (token as Function).name : token;
-}
 
 export function Inject(token?: any) {
-    return (target: Object, key: string | symbol, index?: number) => {
+    return (target: object, key: string | symbol, index?: number) => {
         token = token || Reflect.getMetadata('design:type', target, key);
         const type = getTokenType(token);
         // console.log({target, key, index, type})
         if (isUndefined(index)) {
-            let properties = Reflect.getMetadata(
+            const properties = Reflect.getMetadata(
                 MetadataKeys.PROPERTIES_DEPENDENCY,
                 target.constructor,
             ) || [];
@@ -37,7 +34,7 @@ export function Inject(token?: any) {
                 target.constructor,
             );
         } else {
-            let params = Reflect.getMetadata(
+            const params = Reflect.getMetadata(
                 MetadataKeys.CONSTRUCTOR_DEPENDENCY,
                 target,
             ) || [];
@@ -55,15 +52,15 @@ export function Validate() {
         Reflect.defineMetadata(
             MetadataKeys.VALIDATE_METHOD,
             { name },
-            target.constructor
+            target.constructor,
         );
-    }
+    };
 }
 
 export function Invalidate() {
     return (target: any, name: string | symbol) => {
         Reflect.defineMetadata(MetadataKeys.INVALIDATE_METHOD, { name }, target.constructor);
-    }
+    };
 }
 
 export function Component(name?: string): ClassDecorator {
@@ -82,20 +79,8 @@ export function Requires(...tokens: any[]): ClassDecorator {
     };
 }
 
-function checkConstructorDependecy(target, tokens=[]) {
-    tokens = tokens.length ? tokens : Reflect.getMetadata('design:paramtypes', target) || [];
-    const params = tokens
-        .map(getTokenType)
-        .map((type, index) => ({ index, type }));
-    Reflect.defineMetadata(
-        MetadataKeys.CONSTRUCTOR_DEPENDENCY,
-        params,
-        target,
-    );
-}
-
 export function Bind(token?: any, cardinality: string = '0..n') {
-    return (target: Object, key: string | symbol, descriptor) => {
+    return (target: object, key: string | symbol, descriptor) => {
         if (!token) {
             token = (Reflect.getMetadata('design:paramtypes', target, key) || [])[0];
         }
@@ -114,12 +99,12 @@ export function Bind(token?: any, cardinality: string = '0..n') {
 }
 
 export function Unbind(token?: any) {
-    return (target: Object, key: string | symbol, descriptor) => {
+    return (target: object, key: string | symbol, descriptor) => {
         if (!token) {
             token = (Reflect.getMetadata('design:paramtypes', target, key) || [])[0];
         }
         const type = getTokenType(token);
-        let params = Reflect.getMetadata(
+        const params = Reflect.getMetadata(
             MetadataKeys.UNBIND_DEPENDENCY,
             target.constructor,
         ) || [];
@@ -131,12 +116,12 @@ export function Unbind(token?: any) {
     };
 }
 export function Modified(token?: any) {
-    return (target: Object, key: string | symbol, descriptor) => {
+    return (target: object, key: string | symbol, descriptor) => {
         if (!token) {
             token = (Reflect.getMetadata('design:paramtypes', target, key) || [])[0];
         }
         const type = getTokenType(token);
-        let params = Reflect.getMetadata(
+        const params = Reflect.getMetadata(
             MetadataKeys.MODIFIED_DEPENDENCY,
             target.constructor,
         ) || [];
@@ -149,7 +134,7 @@ export function Modified(token?: any) {
 }
 
 export function Update() {
-    return (target: Object, key: string | symbol, descriptor) => {
+    return (target: object, key: string | symbol, descriptor) => {
         Reflect.defineMetadata(
             MetadataKeys.UPDATE_DEPENDENCY,
             [{ key }],
@@ -158,17 +143,18 @@ export function Update() {
     };
 }
 
-// class A {}
+function checkConstructorDependecy(target, tokens = []) {
+    tokens = tokens.length ? tokens : Reflect.getMetadata('design:paramtypes', target) || [];
+    const params = tokens
+        .map(getTokenType)
+        .map((type, index) => ({ index, type }));
+    Reflect.defineMetadata(
+        MetadataKeys.CONSTRUCTOR_DEPENDENCY,
+        params,
+        target,
+    );
+}
 
-// @Component()
-// class Test {
-//     @Bind()
-//     add(a: A) {
-//     }
-// }
-
-// const meta = Reflect.getMetadata(
-//     MetadataKeys.BIND_DEPENDENCY,
-//     Test,
-// );
-// console.log(meta);
+function getTokenType(token: any) {
+    return token && isFunction(token) ? (token as Function).name : token;
+}
