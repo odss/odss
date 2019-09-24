@@ -3,15 +3,15 @@ import {
     IBundleContext,
     IServiceReference,
     IBundle,
+    IBundleTracker,
     IServiceListener,
     IServiceTrackerListener,
     IServiceTrackerCustomizer,
-    IBundleTrackerListener
+    IBundleTrackerListener,
 } from './interfaces';
 import {ServiceEvent, BundleEvent} from './events';
 
-
-class ServiceTracked implements IServiceListener{
+class ServiceTracked implements IServiceListener {
 
     private customizer: IServiceTrackerCustomizer;
     private tracked: Map<IServiceReference, Object>;
@@ -76,7 +76,7 @@ class ServiceTracked implements IServiceListener{
 
 }
 
-export class ServiceTracker implements IServiceTrackerCustomizer{
+export class ServiceTracker implements IServiceTrackerCustomizer {
     private _ctx: IBundleContext;
     private _name: any;
     private _filter?: any;
@@ -119,19 +119,19 @@ export class ServiceTracker implements IServiceTrackerCustomizer{
         }
         return this;
     }
-    adding(reference: IServiceReference): Object {
+    adding(reference: IServiceReference): any {
         const service = this._ctx.getService(reference);
         if(this._listener && this._listener.addingService){
             this._listener.addingService(reference, service);
         }
         return service;
     }
-    modified(reference: IServiceReference, service: Object) {
+    modified(reference: IServiceReference, service: any) {
         if(this._listener && this._listener.modifiedService){
             this._listener.modifiedService(reference, service);
         }
     }
-    removed(reference: IServiceReference, service: Object) {
+    removed(reference: IServiceReference, service: any) {
         if(this._listener && this._listener.removedService){
             this._listener.removedService(reference, service);
         }
@@ -160,7 +160,7 @@ export class ServiceTracker implements IServiceTrackerCustomizer{
 }
 
 
-class BundleTracked{
+class BundleTracked {
     private listener: IBundleTrackerListener|null;
     private mask: number;
     private bundles: Set<IBundle>;
@@ -221,7 +221,7 @@ class BundleTracked{
  * @type {tracker.BundleTracker}
  * @constructor
  */
-export class BundleTracker {
+export class BundleTracker implements IBundleTracker {
     private _ctx: IBundleContext;
     private mask: number;
     private _listener?: IBundleTrackerListener;
@@ -256,10 +256,10 @@ export class BundleTracker {
         }
         return this;
     }
-    size() {
+    size(): number {
         return this._tracked ? this._tracked.size() : 0;
     }
-    bundles() {
+    bundles(): IBundle[] {
         return this._tracked ? this._tracked.getBundles() : [];
     }
     addingBundle(bundle: IBundle) {

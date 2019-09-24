@@ -77,7 +77,7 @@ QUnit.module('@odss/cdi::Inject()', () => {
         );
         const expected = [{
             index: 3,
-            types: 'pack.one.IService',
+            type: 'pack.one.IService',
         }, {
             index: 2,
             type: 'method',

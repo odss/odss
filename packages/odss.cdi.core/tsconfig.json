@@ -1,12 +1,17 @@
 {
     "compilerOptions": {
-        "allowJs": false,
         "target": "esnext",
         "module": "commonjs",
+        "lib": ["es2017"],
+        "moduleResolution": "node",
         "noImplicitAny": false,
-        "removeComments": false,
-        "strict": true,
-        "outDir": "./dist/node",
+        "removeComments": true,
+        "noImplicitUseStrict": true,
+        "noImplicitThis": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "strict": false,
+        "outDir": "./dist/node"
     },
     "files": [
         "src/index.ts"

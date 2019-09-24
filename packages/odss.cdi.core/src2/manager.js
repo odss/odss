@@ -2,10 +2,9 @@ import {ReferenceDependency, RequireDependency} from './dependency';
 import ComponentsWrapper from './component';
 
 
-export default class ComponentsManager{
-    constructor(ctx, bundle, metadata) {
+export default class ComponentsManager {
+    constructor(bundle, metadata) {
 
-        this.ctx = ctx;
         this.bundle = bundle;
         this.metadata = metadata;
 
@@ -87,7 +86,7 @@ export default class ComponentsManager{
         }
         this._isActivate = false;
         try {
-            await this._component.deactivate(this.bundle.context);
+            await this._component.invoke(this.bundle.context);
         } catch (e) {
             this._error('component.deactivate()', e);
         }

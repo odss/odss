@@ -58,9 +58,14 @@ export interface IBundleContext {
     getBundle(id: number): IBundle;
     getBundles(): Array<IBundle>;
     on: IContextEvents;
+    registerService(name: any, service: any, properties?: object);
+    registerStyle(...styles: string[]): { unregister: () => void };
     onService(listener: IServiceListener, name: any, filter: string);
     onBundle(listener: IBundleListener);
     onFramework(listener: IFrameworkListener);
+
+    serviceTracker(name: any, listener: IServiceTrackerListener, filter?: string);
+    bundleTracker(mask: number, listener: IBundleTrackerListener)
 }
 
 export interface IServiceReference {
@@ -122,19 +127,26 @@ export interface IContextEvents{
 
 
 export interface IServiceTrackerListener {
-    addingService(reference: IServiceReference, service: Object): void;
-    modifiedService(reference: IServiceReference, service: Object): void;
-    removedService(reference: IServiceReference, service: Object): void;
+    addingService(reference: IServiceReference, service: any): void;
+    modifiedService(reference: IServiceReference, service: any): void;
+    removedService(reference: IServiceReference, service: any): void;
 }
 
 export interface IServiceTrackerCustomizer {
-    adding(reference: IServiceReference): Object;
-    modified(reference: IServiceReference, service: Object): void;
-    removed(reference: IServiceReference, service: Object): void;
+    adding(reference: IServiceReference): any;
+    modified(reference: IServiceReference, service: any): void;
+    removed(reference: IServiceReference, service: any): void;
 }
 
 export interface IBundleTrackerListener {
     addingBundle(bundle: IBundle): void;
     modifiedBundle(bundle: IBundle): void;
     removedBundle(bundle: IBundle): void;
+}
+
+export interface IBundleTracker extends IBundleTrackerListener {
+    open(): void;
+    close(): void;
+    size(): number;
+    bundles(): IBundle[];
 }

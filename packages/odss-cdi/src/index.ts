@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 
 import { isFunction, isUndefined } from '@stool/core';
+import { getTokenType } from '@odss/common';
 import { MetadataKeys } from './consts';
+export { MetadataKeys }
 
 /*
 interface TypedPropertyDescriptor<T> {
@@ -18,11 +20,20 @@ declare type MethodDecorator = <T>(target: Object, propertyKey: string | symbol,
 declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) => void;
 */
 
+export function Component(name?: string): ClassDecorator {
+    return (target: object) => {
+        name = name || (target as Function).name;
+        Reflect.defineMetadata(MetadataKeys.COMPONENT, { name }, target);
+        if (!Reflect.hasMetadata(MetadataKeys.CONSTRUCTOR_DEPENDENCY, target)) {
+            checkConstructorDependecy(target);
+        }
+    };
+}
+
 export function Inject(token?: any) {
     return (target: object, key: string | symbol, index?: number) => {
         token = token || Reflect.getMetadata('design:type', target, key);
         const type = getTokenType(token);
-        // console.log({target, key, index, type})
         if (isUndefined(index)) {
             const properties = Reflect.getMetadata(
                 MetadataKeys.PROPERTIES_DEPENDENCY,
@@ -48,35 +59,25 @@ export function Inject(token?: any) {
 }
 
 export function Validate() {
-    return (target: any, name: string | symbol) => {
+    return (target: any, name: string | symbol) =>
         Reflect.defineMetadata(
             MetadataKeys.VALIDATE_METHOD,
-            { name },
+            name,
             target.constructor,
         );
-    };
 }
 
 export function Invalidate() {
-    return (target: any, name: string | symbol) => {
-        Reflect.defineMetadata(MetadataKeys.INVALIDATE_METHOD, { name }, target.constructor);
-    };
-}
-
-export function Component(name?: string): ClassDecorator {
-    return (target: object) => {
-        name = name || (target as Function).name;
-        Reflect.defineMetadata(MetadataKeys.COMPONENT, { name }, target);
-        if (!Reflect.hasMetadata(MetadataKeys.CONSTRUCTOR_DEPENDENCY, target)) {
-            checkConstructorDependecy(target);
-        }
-    };
+    return (target: any, name: string | symbol) =>
+        Reflect.defineMetadata(
+            MetadataKeys.INVALIDATE_METHOD,
+            name,
+            target.constructor,
+        );
 }
 
 export function Requires(...tokens: any[]): ClassDecorator {
-    return (target: object) => {
-        checkConstructorDependecy(target, tokens);
-    };
+    return (target: object) => checkConstructorDependecy(target, tokens);
 }
 
 export function Bind(token?: any, cardinality: string = '0..n') {
@@ -155,6 +156,6 @@ function checkConstructorDependecy(target, tokens = []) {
     );
 }
 
-function getTokenType(token: any) {
-    return token && isFunction(token) ? (token as Function).name : token;
+class A {
+    static readonly NAMESPACE: string = 'odss.api.IService';
 }

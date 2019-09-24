@@ -38,7 +38,7 @@ class BundleContext {
     ungetService(reference) {
         return this.framework.registry.unget(this.bundle, reference);
     }
-    registerService(name, service, properties) {
+    registerService(name, service, properties = {}) {
         return this.framework.registry.registerService(this.bundle, name, service, properties);
     }
     registerStyle(...styles) {

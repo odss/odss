@@ -24,7 +24,7 @@ export default class ComponentsRegister{
     }
     close() {
         for (let i = 0; i < this._managers.length; i++) {
-            this._managers[i].close();
+            await this._managers[i].close();
         }
         this._managers = [];
     }

@@ -1,7 +1,7 @@
 /**
  * Candinality: 0..1
  */
-class OptionalCardinality{
+class OptionalCardinality {
     constructor(dependency) {
         this._dependency = dependency;
         this._serviceCounter = 0;
@@ -29,7 +29,7 @@ class OptionalCardinality{
 /**
  * Candinality: 1..1
  */
-class MandatoryCardinality{
+class MandatoryCardinality {
 
     constructor(dependency) {
         this._dependency = dependency;
@@ -56,7 +56,7 @@ class MandatoryCardinality{
 /**
  * Candinality: 0..n
  */
-class MultipleCardinality{
+class MultipleCardinality {
     constructor(dependency) {
         this._dependency = dependency;
     }
@@ -77,7 +77,7 @@ class MultipleCardinality{
 /**
  * Candinality: 1..n
  */
-class MandatoryMultipleCardinality{
+class MandatoryMultipleCardinality {
     constructor(dependency) {
         this._dependency = dependency;
         this._counter = 0;

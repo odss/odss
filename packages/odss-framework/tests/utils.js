@@ -4,40 +4,10 @@ import * as $utils from '../src/utils';
 QUnit.test('import', assert =>  {
     assert.ok(OBJECTCLASS === 'objectclass', 'consts.OBJECTCLASS');
     assert.ok(SERVICE_ID === 'service_id', 'consts.SERVICE_ID');
-    assert.ok(typeof $utils.functionName === 'function', '$utils.functionName');
-    assert.ok(typeof $utils.functionNames === 'function', '$utils.functionNames');
     assert.ok(typeof $utils.prepareFilter === 'function', '$utils.prepareFilter');
 });
 
 QUnit.module('@odss/framework::utils');
-
-QUnit.test('incorrect name type', assert =>  {
-    assert.throws(() => {
-        $utils.functionName();
-    }, 'Not found function name');
-
-    assert.throws(() => {
-        $utils.functionName(undefined);
-    }, 'Incorect function name: undefined');
-
-    assert.throws(() => {
-        $utils.functionName('');
-    }, 'Empty function name');
-});
-
-QUnit.test('prepare function name', assert =>  {
-    assert.equal($utils.functionName('test'), 'test', 'Service name as string');
-
-    let functionWithName = function functionWithName() {};
-    assert.equal($utils.functionName(functionWithName), 'functionWithName', 'Service name as funtion name');
-
-    let namespaceFunction = function a_b_c_d_NamespaceFunction() {};
-    assert.equal($utils.functionName(namespaceFunction), 'a.b.c.d.NamespaceFunction', 'Service name as funtion name with namespace');
-
-    function SomeFunction() {}
-    SomeFunction.$namespace = 'a.b.c.d';
-    assert.equal($utils.functionName(SomeFunction), 'a.b.c.d.SomeFunction', 'Service name with custom namespace');
-});
 
 QUnit.test('prepare filter from class name', assert =>  {
     let filter = $utils.prepareFilter('some.simple.test');

@@ -1,4 +1,4 @@
-import { IShell, ICommand, CompleteResponse } from '@odss/api';
+import { IShell, ICommand } from '@odss/api';
 
 import Completer from './completer';
 
@@ -6,24 +6,24 @@ export default class Shell implements IShell {
     private _commands: ICommand[] = [];
     private _completer = new Completer(this);
 
-    hasCommand(name: string): boolean {
+    hasCommand(id: string): boolean {
         for (let i = 0; i < this._commands.length; i++) {
-            if (this._commands[i].name === name) {
+            if (this._commands[i].id === id) {
                 return true;
             }
         }
         return false;
     }
 
-    addCommand(cmd: ICommand): void {
-        if (this.hasCommand(cmd.name)) {
-            throw new Error('Command(name= ' + cmd.name + ') is already registered');
+    addCommand(command: ICommand): void {
+        if (this.hasCommand(command.id)) {
+            throw new Error('Command(id= ' + command.id + ') is already registered');
         }
-        this._commands.push(cmd);
+        this._commands.push(command);
     }
     /**
      *
-     * @param {String|odss-api.Command} cmd Command or command name
+     * @param {String|odss-api.Command} cmd Command or command id
      */
     removeCommand(cmd: ICommand) {
         for (let i = 0; this._commands.length; i++) {
@@ -42,51 +42,51 @@ export default class Shell implements IShell {
     }
 
     /**
-     * @return {Array} Return list of commands services name
+     * @return {Array} Return list of commands services id
      */
     getCommandsName(): string[] {
         let buff: string[] = [];
         for (let i = 0, j = this._commands.length; i < j; i++) {
-            buff.push(this._commands[i].name);
+            buff.push(this._commands[i].id);
         }
         return buff;
     }
 
     /**
-     * @param {String} name Command name
+     * @param {String} id Command id
      */
-    getCommand(name): ICommand {
+    getCommand(id): ICommand {
         for (let i = 0, j = this._commands.length; i < j; i++) {
             let command = this._commands[i];
-            if (command.name === name) {
+            if (command.id === id) {
                 return command;
             }
         }
-        throw new Error(`Not found command: ${name}`);
+        throw new Error(`Not found command: ${id}`);
     }
 
     /**
      *
-     * @param {String} name Command name
+     * @param {String} id Command id
      * @return {String} Command usage
      */
-    getCommandUsage(name: string): string {
-        let command = this.getCommand(name);
+    getCommandUsage(id: string): string {
+        let command = this.getCommand(id);
         if (command) {
-            return command.name;
+            return command.id;
         }
         return '';
     }
 
     /**
      *
-     * @param {String} name Command name
+     * @param {String} id Command id
      * @return {String} Command description
      */
-    getCommandDescription(name: string): string {
-        let command = this.getCommand(name);
+    getCommandDescription(id: string): string {
+        let command = this.getCommand(id);
         if (command) {
-            return command.name;
+            return command.id;
         }
         return '';
     }

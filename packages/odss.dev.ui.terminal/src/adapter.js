@@ -6,30 +6,37 @@ export default class CommandAdapter{
         this.shell = shell;
         this.on = new Event();
     }
-    execute(line) {
+    async execute(line) {
         var on = this.on;
-        this.shell.execute(line, function(res) {
+        try {
+            const value = await this.shell.execute(line);
             on.trigger({
                 type: 'success',
-                value: res
+                value,
             });
-        }, function(err) {
+        } catch(e) {
             on.trigger({
                 type: 'error',
-                value: err
+                value: e,
             });
-        });
+        }
     }
 
-    complete(line) {
+    async complete(line) {
         var on = this.on;
-        this.shell.complete(line, function(input, options) {
+        try {
+            const value = await this.shell.complete(line);
             on.trigger({
                 type: 'complete',
-                input: input,
-                output: options.join(' ')
+                input: '',
+                output: value.join(' '),
             });
-        });
+        } catch(e) {
+            on.trigger({
+                type: 'error',
+                value: e,
+            });
+        };
     }
     close() {
         if (typeof this.terminal.close === 'function') {

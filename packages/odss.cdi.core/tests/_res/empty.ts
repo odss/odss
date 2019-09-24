@@ -1,0 +1,5 @@
+function test() {}
+
+class Test {
+
+}

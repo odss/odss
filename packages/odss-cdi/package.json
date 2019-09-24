@@ -1,5 +1,5 @@
 {
-  "name": "odss-cdi",
+  "name": "@odss/cdi",
   "version": "1.0.0",
   "license": "MIT",
   "author": "smialy",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@stool/core": "^2.7.0",
+    "@odss/common": "^1.0.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

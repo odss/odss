@@ -1,6 +1,6 @@
 {
   "name": "@odss/shell",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "ODSS Shell",
   "license": "MIT",
   "author": "smialy",
@@ -18,7 +18,8 @@
     "types/*.ts"
   ],
   "dependencies": {
-    "@odss/api": "^1.1.0"
+    "@odss/api": "^1.0.0",
+    "@odss/common": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^6.1.0",

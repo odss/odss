@@ -1,7 +1,7 @@
 /**
  * Wrapper for this.component
  */
-export default class ComponentsWrapper{
+export default class ComponentsWrapper {
     constructor(metadata) {
         this.metadata = metadata;
         this.component = null;

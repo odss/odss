@@ -1,32 +1,32 @@
-import { IShell, ICommand } from '@odss/api';
+import { IServiceReference, IBundleContext } from '@odss/common';
+import { ICommand, ShellService, CommandService } from '@odss/api';
 
 import Shell from './shell';
 import { AllCommands } from './commands';
-import { getTargetProps } from './decorators';
 
 
 let shell;
 let tracker;
 
-export function start(ctx) {
+export function start(ctx: IBundleContext) {
     shell = new Shell();
 
-    ctx.registerService(IShell, shell);
+    ctx.registerService(ShellService, shell);
 
-    tracker = ctx.serviceTracker(ICommand, {
-        addingService: function(reference) {
-            const command = ctx.getService(reference);
+    tracker = ctx.serviceTracker(CommandService, {
+        addingService: function(reference: IServiceReference, command: object) {
             shell.addCommand(command);
         },
-        removedService: function(reference) {
-            shell.removeCommand(ctx.getService(reference));
+        modifiedService(reference: IServiceReference, service: Object): void { },
+
+        removedService: function(reference: IServiceReference, command: object) {
+            shell.removeCommand(command);
         }
     }).open();
 
     //create and register all core commands
     AllCommands.forEach(Command => {
-        // const props = getTargetProps(Command);
-        ctx.registerService(ICommand, new Command(ctx, shell));
+        ctx.registerService(CommandService, new Command(ctx, shell));
     });
 
 }

@@ -1,5 +1,5 @@
 import { IBundleContext, IServiceReference } from '@odss/common';
-import { Component, Bind, Unbind, Provide, Property } from '@odss/cdi';
+import { Component, Bind, Unbind, Provide, Validate, Invalidate, Property } from '@odss/cdi';
 
 
 const ISpellDictionary = 'odss.cdi.example.ISpellDictionary';
@@ -63,9 +63,13 @@ export class SpellChecker {
         let language = ref.getProperty('language');
         this.languages.delete(language);
     }
+
+    @Validate()
     activate(): void {
         console.log('A spell checker has been started')
     }
+
+    @Invalidate()
     deactivate(): void {
         console.log('A spell checker has been stopped')
     }

@@ -1,21 +1,8 @@
-export const IShell = 'odss-api.IShell';
-export const ICommand = 'odss-api.ICommand';
-
-export type CommandConfigOption = {
-    readonly name: string,
-    readonly flags: string,
-    readonly description: string,
-    readonly default: any,
-};
-
-export type CommandConfig = {
-    readonly name: string,
-    readonly description: string,
-    readonly options: CommandConfigOption[],
-};
-
-export type CompleteResponse = {
-    names?: string[],
+export interface ICommandOption {
+    readonly name: string;
+    readonly flags: string;
+    readonly description: string;
+    readonly defaultValue: any;
 }
 
 export interface IShell {
@@ -30,10 +17,18 @@ export interface IShell {
     execute(line: string): Promise<string>;
     complete(line: string): Promise<string[]>;
 }
-
 export interface ICommand {
-    readonly name: string;
+    id: string;
+    description?: string | null;
+    options?: ICommandOption[]
 
     execute(cmdLine: string[]): Promise<string>;
     complete?(cmdLine: string[]): Promise<string[]>
+}
+
+export class CommandService {
+    static NAMESPACE = 'odss.api.shell'
+}
+export class ShellService {
+    static NAMESPACE = 'odss.api.shell'
 }

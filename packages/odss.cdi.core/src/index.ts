@@ -1,56 +1,22 @@
 import { Bundles, IBundleTracker, IBundleContext } from '@odss/common';
-
-import ComponentsRegister from './register';
-import ComponentsManager from './manager';
-import metadata from './metadata';
+import { BundleRegister } from './bundle-register';
 
 export class Activator {
-    private register: ComponentsRegister;
-    private tracker: IBundleTracker
+
+    private tracker: IBundleTracker;
+    private bundleRegister: BundleRegister;
+
     start(ctx: IBundleContext) {
-        this.register = new ComponentsRegister(ctx);
-        this.tracker = ctx.bundleTracker(Bundles.ACTIVE | Bundles.REGISTERED, {
-            addingBundle: bundle => {
-                const configs = findComponents(bundle.meta);
-                const components = createComponentsManager(ctx, bundle, configs);
-                for (let component of components) {
-                    this.register.register(component);
-                    component.open();
-                }
-            },
-            removedBundle: bundle => {
-                this.register.removeBundle(bundle.id);
-            },
-            modifiedBundle: bundle => {
-
-            }
-        }).open();
+        this.bundleRegister = new BundleRegister(ctx);
+        this.tracker = ctx.bundleTracker(Bundles.ACTIVE, this.bundleRegister).open();
     }
-
     stop(ctx: IBundleContext) {
+        if (this.bundleRegister) {
+            this.bundleRegister.close();
+        }
         if (this.tracker) {
             this.tracker.close();
-        }
-        if (this.register) {
-            this.register.close();
-        }
-    }
-}
-
-function* findComponents(meta: object) {
-    for(let item of Object.values(meta)){
-        if(item.__ODSS_CDI__){
-            yield item.__ODSS_CDI__;
-        }
-    }
-}
-
-function* createComponentsManager(ctx: IBundleContext, bundle: IBundle, configs){
-    for(let config of configs) {
-        try {
-            yield new ComponentsManager(ctx, bundle, metadata(config));
-        } catch (e) {
-            console.error(bundle.toString(), e);
+            this.tracker = null;
         }
     }
 }

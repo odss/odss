@@ -1,5 +1,5 @@
-import { Events, ServiceEvent, OBJECTCLASS, SERVICE_ID } from '@odss/common';
-import { functionNames, prepareFilter } from './utils';
+import { Events, ServiceEvent, OBJECTCLASS, SERVICE_ID, getTokenTypes } from '@odss/common';
+import { prepareFilter } from './utils';
 export default class Registry {
     constructor(events) {
         this._services = {};
@@ -8,12 +8,11 @@ export default class Registry {
         this._sid = 0;
         this.events = events;
     }
-    registerService(bundle, name, service, properties) {
-        name = functionNames(name);
+    registerService(bundle, name, service, properties = {}) {
+        name = getTokenTypes(name);
         //prepare properties
         let sid = this._sid += 1;
         this._size += 1;
-        properties = properties || {};
         properties[OBJECTCLASS] = name;
         properties[SERVICE_ID] = sid;
         let registration = new Registration(this, bundle, sid, properties);

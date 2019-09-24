@@ -10,12 +10,11 @@ class Registry {
         this._sid = 0;
         this.events = events;
     }
-    registerService(bundle, name, service, properties) {
-        name = utils_1.functionNames(name);
+    registerService(bundle, name, service, properties = {}) {
+        name = common_1.getTokenTypes(name);
         //prepare properties
         let sid = this._sid += 1;
         this._size += 1;
-        properties = properties || {};
         properties[common_1.OBJECTCLASS] = name;
         properties[common_1.SERVICE_ID] = sid;
         let registration = new Registration(this, bundle, sid, properties);

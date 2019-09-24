@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/node/index.js",
   "module": "dist/esm/index.js",
-  "types": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "rm -rf dist/ && rm -rf types && tsc && tsc -p tsconfig.esm.json",
     "lint": "tslint src/*",

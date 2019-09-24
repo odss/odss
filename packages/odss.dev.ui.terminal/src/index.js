@@ -1,16 +1,16 @@
-import { IShell } from '@odss/api';
+import { ShellService } from '@odss/api';
 import { IPanel } from '@odss/dev.ui.api';
 import Termial from './terminal';
 import MAIN_TEMPLATE  from './tpl/main.html';
 import STYLES from './css/main.scss';
 
 
-var terminal, reg, tracker, styles;
+var terminal, reg, tracker;
 
 export function start(ctx) {
     ctx.registerStyle(STYLES);
     terminal = new Termial(MAIN_TEMPLATE);
-    tracker = ctx.serviceTracker(IShell, {
+    tracker = ctx.serviceTracker(ShellService, {
         addingService: function(reference) {
             terminal.activate((ctx.getService(reference)));
 
