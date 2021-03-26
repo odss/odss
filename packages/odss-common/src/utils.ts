@@ -1,46 +1,50 @@
+import { IDisposable } from './interfaces';
 
 const __name__ = Symbol('odss.function.name');
 
-export function getTokenType(fn) {
-    if (!fn) {
+type Func = () => void | { name: string };
+type TokenType = Func | string | number;
+
+export function getTokenType(token: TokenType): string {
+    if (!token) {
         throw new Error('Empty function name.');
     }
-    const type = typeof fn;
+    const type = typeof token;
     if (type === 'string') {
-        return transformUnderline(fn);
+        return transformUnderline(token);
     }
     if (type === 'function') {
-        if (fn[__name__]) {
-            return fn[__name__];
+        if (token[__name__]) {
+            return token[__name__];
         }
-        const namespace = extractNamespace(fn);
-        let name = transformUnderline(extractName(fn));
-        name = fn[__name__] = `${namespace}${name}`;
+        const namespace = extractNamespace(token);
+        let name = transformUnderline(extractName(token));
+        name = token[__name__] = `${namespace}${name}`;
         return name;
     }
     if (type === 'number') {
-        return (name as number).toString();
+        return token.toString();
     }
     throw new Error('Incorrect type. Expected: String or Function or Number.');
 }
 
-export function getTokenTypes(names) {
+export function getTokenTypes(names: TokenType | TokenType[]): string[] {
     if (!Array.isArray(names)) {
         names = [names];
     }
     return names.map(getTokenType);
 }
 
-function extractName(fn) {
-    if (typeof fn.name === 'string') {
-        return fn.name;
+function extractName(fn: TokenType): string {
+    if (typeof fn['name'] === 'string') {
+        return fn['name'];
     }
     const match = /function\s+(.+?)\(/.exec(fn.toString());
-    return (match ? match[1] : '');
+    return match ? match[1] : '';
 }
 
-function extractNamespace(fn) {
-    const namespace = fn.NAMESPACE || fn.$namespace || '';
+function extractNamespace(fn: TokenType): string {
+    const namespace = fn['NAMESPACE'] || fn['$namespace'] || '';
     return namespace ? `${namespace}.` : '';
 }
 
@@ -54,4 +58,22 @@ function extractNamespace(fn) {
  */
 function transformUnderline(name) {
     return name.replace(/_/g, '.');
+}
+
+export function toDisposable(dispose: IDisposable | any): IDisposable {
+    if (typeof dispose === 'undefined') {
+        return {
+            dispose() {
+                // do nothing.
+            },
+        };
+    }
+    if (typeof dispose === 'function') {
+        return {
+            dispose() {
+                dispose();
+            },
+        };
+    }
+    return dispose;
 }

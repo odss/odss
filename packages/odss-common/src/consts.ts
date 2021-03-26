@@ -7,7 +7,7 @@ export const Bundles = {
     RESOLVED: 4, //is able to start
     STARTING: 8, //actual starting
     STOPPING: 16, //actual stoping
-    ACTIVE: 32 //now running
+    ACTIVE: 32, //now running
 };
 export const Events = {
     INSTALLED: 1,
@@ -22,5 +22,5 @@ export const Events = {
     REGISTERED: 1,
     MODIFIED: 2,
     UNREGISTERED: 4,
-    MODIFIED_ENDMATCH: 8
+    MODIFIED_ENDMATCH: 8,
 };

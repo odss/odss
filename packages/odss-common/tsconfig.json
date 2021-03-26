@@ -1,18 +1,11 @@
 {
     "compilerOptions": {
-        "allowJs": true,
-        "target": "esnext",
-        "module": "commonjs",
-        "noImplicitAny": false,
-        "removeComments": false,
-        "strict": true,
-        "outDir": "./dist/node",
+      "target": "esnext",
+      "module": "CommonJS",
+      "noImplicitAny": false,
+      "strict": true,
     },
     "files": [
-        "src/index.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist/*"
+        "src/index.ts",
     ]
-}
+  }
