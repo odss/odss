@@ -1,107 +1,180 @@
-// import CRITERIAS from './criterias';
+import * as consts from './consts';
 
-export class Filter {
+export type PValue = string | string[] | number | number[];
+export type Params = {
+    [key: string]: PValue;
+};
 
-    public opt: string;
-    public value: any;
-    public name: string;
+export interface IFilter {
+    readonly opt: string;
+    match(params: Params): boolean;
+}
+export interface INamedsFilter extends IFilter {
+    readonly name: string;
+    readonly value: string;
+}
+export interface ICompositeFilter extends IFilter {
+    filters: IFilter[];
+}
 
-    /**
-     * @constructor
-     * @param {string} opt
-     * @param {mix} value
-     * @param {string} name
-     */
-    constructor(opt: string, value: any= null, name: string= '') {
-        this.opt = opt;
-        this.value = value;
-        this.name = name;
+export abstract class Filter implements IFilter {
+    constructor(public readonly opt: string) {}
+
+
+    abstract match(params: Params): boolean;
+
+    public toString(): string {
+        return '[Filter opt=' + this.opt + ']';
     }
-    /**
-     * Try find filter and check it
-     *
-     * @param {mix} param
-     * @return {Boolean}
-     */
-    public match(params: any) {
-        return this[this.opt](params);
+
+    static isFilter(obj: any ): boolean {
+        return obj && obj.opt && typeof obj.match === 'function';
     }
-    /**
-     * Filter items
-     *
-     * @param {Array} list
-     * @return {Array}
-     */
-    public filter(list: any[]): any[] {
-        return list.filter((params) => this.match(params));
+    static create(opt: string, name: string, value = ''): IFilter {
+        switch (opt) {
+            case consts.EQ:
+                return new EqFilter(name, value);
+            case consts.LTE:
+                return new LteFilter(name, value);
+            case consts.GTE:
+                return new GteFilter(name, value);
+            case consts.APPROX:
+                return new ApproxFilter(name, value);
+            case consts.PRESENT:
+                return new PresentFilter(name);
+        }
+        throw Error(`Not found type: ${opt}`);
     }
-    public tostring(): string {
-        return '[Filter opt=' + this.opt + ' name=' + this.name + ' value=' + this.value + ']';
+}
+
+export class AllFilter extends Filter {
+    constructor() {
+        super(consts.MATCH_ALL);
     }
-    public eq(params) {
-        if (this.name in params) {
-            if (Array.isArray(params[this.name])) {
-                return params[this.name].indexOf(this.value) !== -1;
+    match(): boolean {
+        return true;
+    }
+}
+export class NoneFilter extends Filter {
+    constructor() {
+        super(consts.MATCH_NONE);
+    }
+    match(): boolean {
+        return false;
+    }
+}
+
+export class ApproxFilter extends Filter {
+    constructor(public readonly name: string, public readonly value: string) {
+        super(consts.APPROX);
+    }
+    match(params: Params): boolean {
+        const value = params[this.name];
+        if (value) {
+            if (Array.isArray(value)) {
+                return value.some(item => item.includes(this.value));
             }
-            return params[this.name] === this.value;
+            if (typeof value === 'string') {
+                return value.indexOf(this.value) !== -1;
+            }
         }
         return false;
     }
-    public lte(params) {
-        return this.name in params ? params[this.name] <= this.value : false;
+}
+export class PresentFilter extends Filter {
+    constructor(public readonly name: string) {
+        super(consts.PRESENT);
     }
-    public gte(params) {
-        return this.name in params ? params[this.name] >= this.value : false;
-    }
-    public approx(params) {
-        if (this.name in params) {
-            if (Array.isArray(params[this.name])) {
-                return params[this.name].some((item) => item.indexOf(this.value) !== -1);
-            }
-            return params[this.name].indexOf(this.value) !== -1;
-        }
-        return false;
-    }
-    public present(params) {
+    match(params: Params): boolean {
         return this.name in params;
     }
-    public substring(params) {
+}
+
+export class SubstringFilter extends Filter {
+    constructor(public readonly name: string, public readonly regexp: RegExp) {
+        super(consts.SUBSTRING);
+    }
+    match(params: Params): boolean {
         if (this.name in params) {
-            if (Array.isArray(params[this.name])) {
-                return params[this.name].some((item) => this.value.test(item));
+            const value = params[this.name];
+            if (Array.isArray(value)) {
+                return value.some(item => this.regexp.test(item));
             }
-            return this.value.test(params[this.name]);
+            return this.regexp.test('' + value);
         }
         return false;
     }
-    public or(params) {
-        for (let i = 0; i < this.value.length; i++) {
-            if (this.value[i].match(params)) {
+}
+export class EqFilter extends Filter implements INamedsFilter {
+    constructor(public readonly name: string, public readonly value: string) {
+        super(consts.EQ);
+    }
+    match(params: Params): boolean {
+        const value = params[this.name] as [string];
+        if (value) {
+            if (Array.isArray(value)) {
+                return value.includes(this.value);
+            }
+            return value === this.value;
+        }
+        return false;
+    }
+}
+export class GteFilter extends Filter implements INamedsFilter {
+    constructor(public readonly name: string, public readonly value: string) {
+        super(consts.GTE);
+    }
+    match(params: Params): boolean {
+        return this.name in params ? params[this.name] >= this.value : false;
+    }
+}
+
+export class LteFilter extends Filter implements INamedsFilter {
+    constructor(public readonly name: string, public readonly value: string) {
+        super(consts.LTE);
+    }
+    match(params: Params): boolean {
+        return this.name in params ? params[this.name] <= this.value : false;
+    }
+}
+
+export class NotFilter extends Filter implements ICompositeFilter {
+    constructor(public readonly filters: IFilter[] = []) {
+        super(consts.NOT);
+    }
+    match(params: Params): boolean {
+        for (let i = 0; i < this.filters.length; i++) {
+            if (!this.filters[i].match(params)) {
                 return true;
             }
         }
         return false;
     }
-    public and(params) {
-        for (let i = 0; i < this.value.length; i++) {
-            if (!this.value[i].match(params)) {
+}
+export class AndFilter extends Filter implements ICompositeFilter {
+    constructor(public readonly filters: IFilter[] = []) {
+        super(consts.AND);
+    }
+    match(params: Params): boolean {
+        for (let i = 0; i < this.filters.length; i++) {
+            if (!this.filters[i].match(params)) {
                 return false;
             }
         }
         return true;
     }
-    public not(params) {
-        for (let i = 0; i < this.value.length; i++) {
-            if (!this.value[i].match(params)) {
+}
+
+export class OrFilter extends Filter implements ICompositeFilter {
+    constructor(public readonly filters: IFilter[] = []) {
+        super(consts.OR);
+    }
+    match(params: Params): boolean {
+        for (let i = 0; i < this.filters.length; i++) {
+            if (this.filters[i].match(params)) {
                 return true;
             }
         }
-        return false;
-    }
-    public all(/* params */) {
-        return true;
-    }
-    public none(/* params */) {
         return false;
     }
 }

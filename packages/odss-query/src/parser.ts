@@ -1,56 +1,64 @@
 import * as consts from './consts';
-import {Filter} from './filters';
+import {
+    IFilter,
+    Filter,
+    AndFilter,
+    EqFilter,
+    OrFilter,
+    SubstringFilter,
+    NotFilter,
+    AllFilter,
+    PresentFilter,
+    ICompositeFilter,
+} from './filters';
 
-export default function parse(query) {
+type QueryValue = string | Filter | Filter[];
+type QueryObject = Record<string, string>;
+type QueryType = QueryValue | QueryObject;
+
+export function squery(query: QueryType): IFilter {
     let filter;
     if (Array.isArray(query)) {
-        filter = prepareArray(query);
+        filter = new AndFilter(query);
     } else {
-        if (query instanceof Filter) {
+        if (Filter.isFilter(query)) {
             filter = query;
         } else if (typeof query === 'string') {
             filter = parseString(query);
         } else if (typeof query === 'object') {
-            filter = prepareObject(query);
+            filter = prepareObject(query as QueryObject);
         }
     }
     if (!filter) {
         throw new TypeError('Incorrect query type.');
     }
     if (filter.opt === consts.AND || filter.opt === consts.OR) {
-        if (Array.isArray(filter.value) && filter.value.length === 1) {
-            filter = filter.value[0];
+        if (Array.isArray(filter.filters) && filter.filters.length === 1) {
+            filter = filter.filters[0];
         }
     }
     return filter;
 }
 
-function prepareArray(query) {
-    return new Filter(consts.AND, query);
-}
-
-function prepareObject(query) {
-    const filter = new Filter(consts.AND, []);
+function prepareObject(query: QueryObject): IFilter {
+    const filters: IFilter[] = [];
     for (const name of Object.keys(query)) {
         const values = query[name];
         if (Array.isArray(values)) {
-            const subfilter = new Filter(consts.OR, []);
+            const subfilters: IFilter[] = [];
             for (let v = 0; v < values.length; v += 1) {
-                subfilter.value.push(new Filter(consts.EQ, values[v], name));
+                subfilters.push(new EqFilter(name, values[v]));
             }
-            if (subfilter.value.length === 1) {
-                filter.value.push(subfilter.value[0]);
-            } else {
-                filter.value.push(subfilter);
-            }
+            const filter = subfilters.length === 1 ? subfilters[0] : new OrFilter(subfilters);
+            filters.push(filter);
         } else {
-            filter.value.push(new Filter(consts.EQ, values, name));
+            filters.push(new EqFilter(name, values as string));
         }
     }
-    return filter;
+    return filters.length === 1 ? filters[0] : new AndFilter(filters);
 }
 
-function parseString(query) {
+function parseString(query: string): IFilter {
     query = query.trim();
     if (!query) {
         throw new TypeError('Empty query.');
@@ -78,12 +86,11 @@ function parseString(query) {
         pos = -1;
     }
 
-    let sf: any = null;
+    let sf: IFilter | null = null;
 
     let isEscaped = false;
-    const stack: Array<Filter | number> = [];
+    const stack: Array<IFilter | number> = [];
     while (++pos < len) {
-
         if (isEscaped) {
             isEscaped = false;
             continue;
@@ -93,13 +100,13 @@ function parseString(query) {
             skipWhitespace();
             switch (query.charAt(pos + 1)) {
                 case '&':
-                    stack.push(new Filter(consts.AND, []));
+                    stack.push(new AndFilter());
                     break;
                 case '|':
-                    stack.push(new Filter(consts.OR, []));
+                    stack.push(new OrFilter());
                     break;
                 case '!':
-                    stack.push(new Filter(consts.NOT, []));
+                    stack.push(new NotFilter());
                     break;
                 default:
                     stack.push(pos + 1);
@@ -107,21 +114,20 @@ function parseString(query) {
         } else if (query.charAt(pos) === ')') {
             const top = stack.pop() || null;
             const head = stack[stack.length - 1];
-            if (top instanceof Filter) {
-                if (head instanceof Filter) {
-                    head.value.push(top);
+            if (Filter.isFilter(top)) {
+                if (Filter.isFilter(head)) {
+                    (head as ICompositeFilter).filters.push(top as IFilter);
                 } else {
-                    sf = top;
+                    sf = top as IFilter;
                 }
-            } else if (head instanceof Filter) {
-                head.value.push(subquery(query, top, pos - 1));
+            } else if (Filter.isFilter(head)) {
+                (head as ICompositeFilter).filters.push(subquery(query, top as number, pos - 1));
             } else {
-                sf = subquery(query, top, pos - 1);
+                sf = subquery(query, top as number, pos - 1);
             }
         } else if (!isEscaped && query.charAt(pos) === '\\') {
             isEscaped = true;
         }
-
     }
     if (sf === null) {
         throw new Error('Incorect query: ' + query);
@@ -129,21 +135,21 @@ function parseString(query) {
     return sf;
 }
 
-function subquery(query, start, end) {
-    const checkEqual = (pos) => {
+function subquery(query: string, start: number, end: number): IFilter {
+    const checkEqual = pos => {
         if (query.charAt(pos) !== '=') {
             throw new Error('Expected <= in query: ' + sub);
         }
     };
     const sub = query.substring(start, end + 1);
     if (sub === '*') {
-        return new Filter(consts.MATCH_ALL);
+        return new AllFilter();
     }
     if (!sub) {
         throw new Error('Empty query');
     }
     if (!/[~$^<>=*]/.test(query)) {
-        return new Filter(consts.PRESENT, '*', sub);
+        return new PresentFilter(sub);
     }
     let opt = '';
     let endName = start;
@@ -185,14 +191,14 @@ function subquery(query, start, end) {
     if (start > end) {
         throw new Error('Not found query value');
     }
-    let value = query.substring(start, end + 1);
+    const value = query.substring(start, end + 1);
     if (opt === consts.EQ) {
         if (value === '*') {
             opt = consts.PRESENT;
         } else if (value.indexOf('*') !== -1) {
-            opt = consts.SUBSTRING;
-            value = new RegExp('^' + value.split('*').join('.*?') + '$');
+            const reg = new RegExp('^' + value.split('*').join('.*?') + '$');
+            return new SubstringFilter(name, reg);
         }
     }
-    return new Filter(opt, value, name);
+    return Filter.create(opt, name, value);
 }

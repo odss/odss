@@ -1,17 +1,17 @@
-
-export function addSlashes(str: string) {
-    return str.replace(/\\/g, '\\\\').
-    replace(/\t/g, '\\t').
-    replace(/\n/g, '\\n').
-    replace(/\f/g, '\\f').
-    replace(/\r/g, '\\r').
-    replace(/'/g, '\\\'').
-    replace(/"/g, '\\"');
+export function addSlashes(str: string): string {
+    return str
+        .replace(/\\/g, '\\\\')
+        .replace(/\t/g, '\\t')
+        .replace(/\n/g, '\\n')
+        .replace(/\f/g, '\\f')
+        .replace(/\r/g, '\\r')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"');
 }
 
-export function escape(name: string) {
+export function escape(name: string): string {
     const sb: string[] = [];
-    if ((name.length > 0) && ((name.charAt(0) === ' ') || (name.charAt(0) === '#'))) {
+    if (name.length > 0 && (name.charAt(0) === ' ' || name.charAt(0) === '#')) {
         sb.push('\\');
     }
 
@@ -43,7 +43,7 @@ export function escape(name: string) {
                 sb.push(curChar);
         }
     }
-    if ((name.length > 1) && (name.charAt(name.length - 1) === ' ')) {
+    if (name.length > 1 && name.charAt(name.length - 1) === ' ') {
         sb[sb.length - 1] = '\\ ';
     }
     return sb.join('');

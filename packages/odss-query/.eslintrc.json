@@ -1,32 +1,11 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true,
-        "node": true,
-        "qunit": true
-    },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "sourceType": "module"
-    },
-    "rules": {
-        "no-console": "off",
-        "indent": [
-            "error",
-            4,
-            {"SwitchCase": 1}
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ]
-    }
+
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ]
 }
