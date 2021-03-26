@@ -1,8 +1,6 @@
 import { OBJECTCLASS, getTokenTypes } from '@odss/common';
-import squery from '@odss/query';
+import { squery } from '@odss/query';
 
-
-const __name__ = Symbol('odss.function.name');
 
 /**
  * @param {String|Function|Filter} filter

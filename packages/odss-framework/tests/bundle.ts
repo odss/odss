@@ -15,7 +15,7 @@ QUnit.test('imports', assert =>  {
 });
 
 QUnit.test('meta', assert =>  {
-    let bundle = new Bundle(123, {}, {
+    let bundle = new Bundle(123, undefined, {
         name: 'test',
         namespace: 'ntest'
     });

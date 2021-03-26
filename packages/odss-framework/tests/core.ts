@@ -119,7 +119,7 @@ const CONFIGS = {
 function findConfig(location) {
 
     let config = location in CONFIGS ? CONFIGS[location] : CONFIGS.def;
-    let buff = {};
+    let buff: any = {};
     for (let i in config) {
         buff[i] = config[i];
     }
@@ -136,9 +136,6 @@ function findConfig(location) {
 }
 
 class Loader {
-    constructor(root) {
-        this.root = root;
-    }
     loadBundle(location) {
         let config = findConfig(location);
         if (config) {
@@ -152,20 +149,20 @@ class Loader {
 }
 
 let tests = {
-    framework: async function(autoStart) {
+    framework: async function(autoStart = false) {
         let loader = new Loader();
         let framework = new Framework({
             prop1: 'test1',
             prop2: 'test2'
         });
 
-        framework.setLoader(loader);
+        framework.setLoader(loader as any);
         if (autoStart) {
             await framework.start();
         }
         return framework;
     },
-    bundle: async function(namespace, autoStart) {
+    bundle: async function(namespace, autoStart = false) {
         namespace = namespace || 'def';
         let framework = await this.framework(autoStart);
         await framework.installBundle(namespace, autoStart);
@@ -174,11 +171,11 @@ let tests = {
     factory: async function() {
         let framework = await this.framework();
         return {
-            bundle: async function(namespace, autoStart) {
+            bundle: async function(namespace, autoStart = false) {
                 await framework.installBundle(namespace, autoStart);
                 return framework.getBundle(namespace);
             },
-            framework: async function(noStart) {
+            framework: async function(noStart=false) {
                 if (!noStart) {
                     await framework.start();
                 }

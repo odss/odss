@@ -34,13 +34,13 @@ QUnit.test('prepare filter from ldap query', assert =>  {
 });
 
 QUnit.test('prepare filters in array', assert =>  {
+    debugger;
     let filter = $utils.prepareFilter(['one', 'two', 'three']);
 
     assert.equal(filter.opt, 'or');
-    assert.equal(filter.value.length, 3);
-    assert.equal(filter.name, '');
+    assert.equal(filter.filters.length, 3);
 
-    let filters = filter.value;
+    let filters = filter.filters;
 
     assert.equal(filters[0].opt, 'eq');
     assert.equal(filters[0].name, OBJECTCLASS);

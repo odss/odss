@@ -11,10 +11,10 @@ import tests from './core';
 
 QUnit.module("sosig.tracker.getService()Tracker", hook => {
 
-    const scope = {};
+    const scope: any = {};
 
     hook.beforeEach(async () => {
-        scope.factory = await tests.factory(true);
+        scope.factory = await tests.factory();
         scope.bundle = await scope.factory.bundle('service');
         await scope.bundle.start();
         scope.ctx = scope.bundle.context;
@@ -28,11 +28,11 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
     QUnit.test('init tracker', assert =>  {
         let bundle = scope.bundle;
         assert.throws(() => {
-            new ServiceTracker();
-        }, 'Empty bundle.contextt');
+            new ServiceTracker(undefined, 'name1');
+        }, 'Empty bundle.context');
 
         assert.throws(() => {
-            new ServiceTracker(bundle.context);
+            new ServiceTracker(bundle.context, '');
         }, 'Empty name');
     });
     QUnit.test('register/unregister service', assert =>  {
@@ -40,6 +40,9 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
             addingService() {
                 counter |= 1;
+            },
+            modifiedService() {
+
             },
             removedService() {
                 counter |= 2;
@@ -75,7 +78,6 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
 
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
         assert.equal(tracker.getReferences().length, 0, 'Tracker references should return not empty array');
-        assert.equal(tracker.reference, null, 'Tracker reference incorrect');
         assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
         assert.equal(tracker.getService(), null, 'Tracker services should return: test');
 
@@ -91,7 +93,6 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
 
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
         assert.equal(tracker.getReferences().length, 0, 'Tracker references should return not empty array');
-        assert.equal(tracker.reference, null, 'Tracker reference incorrect');
         assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
         assert.equal(tracker.getService(), null, 'Tracker services should return: test');
 
@@ -102,6 +103,9 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
             addingService() {
                 counter |= 1;
+            },
+            modifiedService() {
+
             },
             removedService() {
                 counter |= 2;
@@ -122,7 +126,9 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
             addingService: function(/* reference */) {
                 counter++;
-            }
+            },
+            modifiedService() {},
+            removedService() {}
         });
 
         tracker.open();
@@ -158,9 +164,9 @@ QUnit.module("sosig.tracker.getService()Tracker", hook => {
 
 });
 QUnit.module("odss.core.tracker.BundleTracker", hook => {
-    const scope = {}
+    const scope: any = {}
     hook.beforeEach(async () => {
-        scope.factory = await tests.factory(true);
+        scope.factory = await tests.factory();
         scope.bundle = await scope.factory.bundle('service');
         scope.bundle.start();
         scope.ctx = scope.bundle.context;
@@ -193,8 +199,6 @@ QUnit.module("odss.core.tracker.BundleTracker", hook => {
 
         assert.equal(tracker.size(), 0, 'Tracker size should be 0');
         assert.equal(tracker.bundles().length, 0, 'Tracker bundles should return empty array');
-        assert.equal(tracker.bundle, null, 'Tracker bundle should assert.equal null');
-
 
         tracker.open(); //after start shoud found bundles: system and service
 

@@ -10,16 +10,34 @@ import {
     IFrameworkListener,
     IBundleTrackerListener,
     IServiceTrackerListener,
-    IListener
+    IListener,
+    IDisposable,
+    IServiceObject
 } from '@odss/common';
+import { Framework } from './framework';
+import Bundle from './bundle';
 
+class ServiceObject implements IServiceObject {
+    constructor(private _ctx: IBundleContext, private _reference: IServiceReference) {
+
+    }
+    getService(): any {
+        this._ctx.getService(this._reference);
+    }
+    ungetService() {
+        this._ctx.ungetService(this._reference);
+    }
+    getServiceReference() {
+        return this._reference;
+    }
+}
 
 export default class BundleContext implements IBundleContext {
-    public readonly framework: IFramework;
+    public readonly framework: Framework;
     public readonly bundle: IBundle;
     public readonly on: any;
 
-    constructor(framework: IFramework, bundle: IBundle) {
+    constructor(framework: Framework, bundle: IBundle) {
         this.framework = framework;
         this.bundle = bundle;
         this.on = createEvents(framework, bundle);
@@ -29,7 +47,7 @@ export default class BundleContext implements IBundleContext {
     getProperty(name: string, def: any) {
         return this.framework.getProperty(name, def);
     }
-    getProperties() {
+    getProperties(): any {
         return this.framework.getProperties();
     }
 
@@ -43,7 +61,7 @@ export default class BundleContext implements IBundleContext {
         return await this.framework.installBundle(location, autoStart);
     }
     async uninstallBundle(bundle: IBundle) {
-        return await this.framework.uninstallBundle(bundle);
+        return await this.framework.uninstallBundle(bundle as any);
     }
     getServiceReferences(name: any, filter: string = '') {
         return this.framework.registry.findReferences(name, filter);
@@ -51,8 +69,11 @@ export default class BundleContext implements IBundleContext {
     getServiceReference(name: any, filter: string = '') {
         return this.framework.registry.findReference(name, filter);
     }
-    getService(reference: IServiceReference) {
+    getService(reference: IServiceReference): any {
         return this.framework.registry.find(this.bundle, reference);
+    }
+    getServiceObject(reference: IServiceReference) {
+        return new ServiceObject(this, reference);
     }
     ungetService(reference: IServiceReference) {
         return this.framework.registry.unget(this.bundle, reference);
@@ -64,7 +85,7 @@ export default class BundleContext implements IBundleContext {
         return this.framework.registry.registerStyle(this.bundle, styles);
     }
     serviceTracker(name: any, listener: IServiceTrackerListener, filter: string = '') {
-        return new ServiceTracker(this, name, listener, filter);
+        return new ServiceTracker(this, name, listener, filter).open();
     }
     bundleTracker(mask: number, listener: IBundleTrackerListener) {
         return new BundleTracker(this, mask, listener);
@@ -78,9 +99,27 @@ export default class BundleContext implements IBundleContext {
     onFramework(listener: IFrameworkListener) {
         // return this.framework.onFramework(listener);
     }
+    addServiceListener(listener: IServiceListener, name: any, filter: string): IDisposable {
+        return this.framework.on.service.add(this.bundle, listener, name, filter);
+    }
+    addBundleListener(listener: IBundleListener): IDisposable {
+        return this.framework.on.bundle.add(this.bundle, listener);
+    }
+    addFrameworkListener(listener: IFrameworkListener): IDisposable {
+        return this.framework.on.framework.add(this.bundle, listener);
+    }
+    removeServiceListener(listener: IServiceListener): void {
+        return this.framework.on.service.remove(this.bundle, listener);
+    }
+    removeBundleListener(listener: IBundleListener): void {
+        return this.framework.on.bundle.remove(this.bundle, listener);
+    }
+    removeFrameworkListener(listener: IFrameworkListener): void {
+        return this.framework.on.framework.remove(this.bundle, listener);
+    }
 }
 
-function createEvents(framework: IFramework, bundle: IBundle) {
+function createEvents(framework: Framework, bundle: IBundle) {
     return Object.freeze({
         service: createEvent(framework.on.service, bundle),
         bundle: createEvent(framework.on.bundle, bundle),

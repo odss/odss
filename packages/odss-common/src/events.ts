@@ -5,7 +5,7 @@ import {
     IFrameworkEvent,
     IBundle,
     IServiceReference,
-} from './interfaces';
+} from './types';
 
 export class Event implements IEvent {
     public type: number;
@@ -30,8 +30,6 @@ export class BundleEvent extends Event implements IBundleEvent {
         return (
             '[BundleEvent type=' +
             this.type +
-            ' bundle.namespace=' +
-            this.bundle.meta.namespace +
             ']'
         );
     }

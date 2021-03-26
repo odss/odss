@@ -1,15 +1,15 @@
-import {FrameworkEvent, ServiceEvent, BundleEvent} from '@odss/common';
+import {FrameworkEvent, ServiceEvent, BundleEvent, IBundle} from '@odss/common';
 import {prepareFilter} from './utils';
 
 const BUNDLE = 0;
 const LISTENER = 1;
 
-function createListeners(callbackName){
+function createListeners<T>(callbackName: string): any{
 
-    let listeners = [];
+    let listeners: any[] = [];
 
     return {
-        contains(bundle, listener) {
+        contains(bundle: IBundle, listener) {
             for(let info of listeners) {
                 if (info[BUNDLE] === bundle && info[LISTENER] === listener) {
                     return true;
@@ -20,7 +20,7 @@ function createListeners(callbackName){
         size() {
             return listeners.length;
         },
-        remove(bundle, listener) {
+        remove(bundle: IBundle, listener) {
             let info;
             for (let i = 0, j = listeners.length; i < j; i++) {
                 info = listeners[i];
@@ -31,7 +31,7 @@ function createListeners(callbackName){
             }
             return false;
         },
-        add(bundle, listener, name, filter=null) {
+        add(bundle: IBundle, listener, name, filter=null) {
             for(let info of listeners) {
                 if (info[BUNDLE] === bundle && info[LISTENER] === listener) {
                     return false;
@@ -40,10 +40,11 @@ function createListeners(callbackName){
             if(name || filter){
                 filter = prepareFilter(name, filter);
             }
-            listeners.push([bundle, listener, filter]);
+            const info = [bundle, listener, filter];
+            listeners.push(info);
             return true;
         },
-        fire(event) {
+        fire(event: T) {
             let cbn = callbackName;
             for (let info of listeners) {
                 if (event instanceof ServiceEvent) {
@@ -63,7 +64,7 @@ function createListeners(callbackName){
                 }
             }
         },
-        clean(bundle) {
+        clean(bundle: IBundle) {
             for (let i = 0; i < listeners.length;) {
                 if (listeners[i][BUNDLE] === bundle) {
                     listeners.splice(i, 1);
@@ -71,8 +72,8 @@ function createListeners(callbackName){
                 }
                 i++;
             }
-        }
-    }
+        },
+    };
 }
 
 
@@ -81,9 +82,9 @@ export default class EventDispatcher {
     public bundle: any;
     public service: any;
     constructor() {
-        this.framework = createListeners('frameworkEvent');
-        this.bundle = createListeners('bundleEvent');
-        this.service = createListeners('serviceEvent');
+        this.framework = createListeners<FrameworkEvent>('frameworkEvent');
+        this.bundle = createListeners<BundleEvent>('bundleEvent');
+        this.service = createListeners<ServiceEvent>('serviceEvent');
         Object.freeze(this);
     }
     fireEvent(event) {

@@ -1,5 +1,6 @@
 export const OBJECTCLASS = 'objectclass';
 export const SERVICE_ID = 'service_id';
+export const SERVICE_RANKING = 'service_ranking';
 
 export const Bundles = {
     UNINSTALLED: 1,

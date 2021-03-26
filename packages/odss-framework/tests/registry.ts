@@ -7,7 +7,7 @@ QUnit.test('import', assert =>  {
     assert.ok(typeof Registry === 'function', 'Registry');
 });
 
-let self = {};
+let self: any = {};
 QUnit.module("odss-framework.service", {
     beforeEach: () => {
         self.bundle = {

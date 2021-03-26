@@ -1,71 +1,20 @@
 import { ILoader } from "@odss/common";
 
-declare var System: {
-    resolve: (id: string) => Promise<string>,
-    import: (id: string) => Promise<string>,
-    delete: (url: string) => Boolean,
-    registry: {
-        delete: (id: string) => void
-    }
-};
-
-const NODE_ENV = 'node.env';
-const BROWSER_ENV = 'browser.env';
-const UNKNOWN_ENV = 'unknown.env';
-const WEBWORKER_ENV = 'webworker.env';
-
-class NodeLoader implements ILoader {
+class GenericLoader implements ILoader {
     private resolver: Function;
     constructor({ resolver }) {
-        this.resolver = resolver;
+        this.resolver = resolver ? resolver : name => name;
     }
-    async loadBundle(location) {
-        const id = await this.resolver(location);
-        const module = await import(id);
-        return Object.assign({
-            id,
-            location
-        }, module);
+    async loadBundle(location): Promise<any> {
+        const path = await this.resolver(location);
+        const module = typeof require === 'function' ? require(path) : await import(path);
+        return { path, location, ...module };
     }
-    async unloadBundle(location) {
+    async unloadBundle(location): Promise<void> {
 
     }
 }
-
-class BrowserLoader implements ILoader {
-    async loadBundle(location) {
-        const id = await System.resolve(location);
-        let module = await System.import(id);
-        return Object.assign({
-            id,
-            location
-        }, module);
-    }
-    async unloadBundle(location) {
-        let id = await System.resolve(location);
-        return System.registry.delete(id);
-    }
-}
-
-const LOADERS = {
-    [NODE_ENV]: NodeLoader,
-    [BROWSER_ENV]: BrowserLoader,
-};
 
 export function createDefaultLoader(properties): ILoader {
-    const env = detectEnv();
-    const Loader = LOADERS[env];
-    return new Loader(properties);
-}
-
-function detectEnv() {
-    if (typeof process !== 'undefined' && process.versions != null && process.versions.node != null) {
-        return NODE_ENV;
-    } else if (typeof window !== 'undefined') {
-        return BROWSER_ENV;
-    } else if (typeof importScripts === 'function') {
-        return WEBWORKER_ENV;
-    }
-    return UNKNOWN_ENV;
-
+    return new GenericLoader(properties);
 }

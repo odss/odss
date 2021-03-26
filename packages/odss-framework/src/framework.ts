@@ -1,25 +1,31 @@
-import {ILoader, Events, Bundles, FrameworkEvent, ServiceEvent, BundleEvent} from '@odss/common';
+import {ILoader, IBundle, Events, Bundles, FrameworkEvent, ServiceEvent, BundleEvent, IBundleContext, IServiceReference} from '@odss/common';
 import Bundle from './bundle';
 import BundleContext from './context';
 import { createDefaultLoader } from './loader';
 import Registry from './registry';
 import EventDispatcher from './events';
 
+const FRAMEWORK_ID = 0
 
-export class Framework extends Bundle {
+export class Framework implements IBundle {
+
+    readonly id: number = FRAMEWORK_ID;
+    readonly location: string = 'odss.framework';
+    readonly version: string = '0.0.0';
+    readonly meta: any = {};
+
+    context: IBundleContext;
+    state: number = Bundles.INSTALLED;
 
     private _SID: number = 0;
-    private _loader: ILoader = null;
-    private _bundles: Map<number, Bundle> = new Map();
-    private _properties: any;
+    private _loader?: ILoader;
+    private _bundles: Map<number, IBundle> = new Map();
+    private _properties: any = {};
     private _activators: Map<number, any> = new Map();
     public on: EventDispatcher;
     public registry: Registry;
 
-    constructor(properties={}) {
-        super(0, null, {
-            location: 'odss.framework'
-        });
+    constructor(properties: any = {}) {
         this._properties = properties;
         this._bundles.set(this.id, this);
         this.on = new EventDispatcher();
@@ -35,7 +41,7 @@ export class Framework extends Bundle {
      * @param {String} name
      * @param {Object} def Default value
      */
-    getProperty(name, defaultProperty) {
+    getProperty(name, defaultProperty = undefined) {
         if (this._properties.hasOwnProperty(name)) {
             return this._properties[name];
         }
@@ -48,7 +54,7 @@ export class Framework extends Bundle {
          * @return {Object}
          */
     getProperties() {
-        return Object.assign({}, this._properties);
+        return { ...this._properties };
     }
     async start() {
         if (this.state === Bundles.ACTIVE || this.state === Bundles.STARTING) {
@@ -58,7 +64,7 @@ export class Framework extends Bundle {
             throw new Error('Cannot start stoping bundle');
         }
         this._fireBundleEvent(Events.STARTING, this);
-        this.updateState(Bundles.ACTIVE);
+        this.state = Bundles.ACTIVE;
         for (let [id, bundle] of this._bundles.entries()) {
             //framework bundle
             if(id === 0){
@@ -67,7 +73,7 @@ export class Framework extends Bundle {
             try {
                 await this.startBundle(bundle);
             } catch (e) {
-                console.error(`Problem with start a bundle: ${bundle.meta.location}`, e);
+                console.error(`Problem with start a bundle: ${bundle.location}`, e);
             }
         }
         this._fireBundleEvent(Events.STARTED, this);
@@ -76,29 +82,28 @@ export class Framework extends Bundle {
         if (this.state !== Bundles.ACTIVE) {
             return;
         }
-        this.updateState(Bundles.STOPPING);
+        this.state = Bundles.STOPPING;
         this._fireBundleEvent(Events.STOPPING, this);
 
-        this.updateState(Bundles.RESOLVED);
-
-        for (let bundle of this._bundles.values()) {
+        this.state = Bundles.RESOLVED;
+        const bundles = Array.from(this._bundles.values()).reverse();
+        for (const bundle of bundles) {
+            if (bundle.id === FRAMEWORK_ID) {
+                continue;
+            }
             try {
                 await this.stopBundle(bundle);
             } catch (e) {
-                console.error(`Problem with stop a bundle: ${bundle.meta.location}`, e);
+                console.error(`Problem with stop a bundle: ${bundle.location}`, e);
             }
         }
         this._fireBundleEvent(Events.STOPPED, this);
     }
-    async uninstall() {
-        throw new Error('Not allowed uninstall framework');
+    async uninstall(): Promise<void> {
+        throw new Error('Not allowed uninstall framework.');
     }
-    async update() {
-        if (this.state === Bundles.ACTIVE) {
-            await this.stop();
-            await this.start();
-            this._fireFrameworkEvent(Events.UPDATED);
-        }
+    reload(): Promise<void> {
+        throw new Error("Not allowed reload framework");
     }
 
     setLoader(loader: ILoader) {
@@ -106,7 +111,7 @@ export class Framework extends Bundle {
     }
 
     getLoader(): ILoader {
-        if (this._loader === null) {
+        if (!this._loader) {
             const properties = this.getProperty('loader', {});
             this._loader = createDefaultLoader(properties);
         }
@@ -120,7 +125,7 @@ export class Framework extends Bundle {
             }
         } else if (typeof bundleId === 'string') {
             for (let bundle of this._bundles.values()) {
-                if (bundle.meta.location === bundleId) {
+                if (bundle.location === bundleId) {
                     return true;
                 }
             }
@@ -135,7 +140,7 @@ export class Framework extends Bundle {
             throw new Error('Not found: Bundle(id=' + obj + ')');
         } else if (typeof obj === 'string') {
             for (let bundle of this._bundles.values()) {
-                if (bundle.meta.location === obj) {
+                if (bundle.location === obj) {
                     return bundle;
                 }
             }
@@ -147,7 +152,7 @@ export class Framework extends Bundle {
         return Array.from(this._bundles.values());
     }
 
-    async installBundle(location: string, autostart: boolean) {
+    async installBundle(location: string, autostart: boolean = true) {
         let config = await this.getLoader().loadBundle(location);
         let bundle = new Bundle(this.nextSid(), this, config);
         this._bundles.set(bundle.id, bundle);
@@ -159,73 +164,73 @@ export class Framework extends Bundle {
         return bundle;
     }
 
-    async startBundle(bundle: Bundle) {
-        if (bundle.id === 0) {
-            throw new Error('Cannot start framework bundle: ' + bundle.meta.location);
+    async startBundle(bundle: IBundle) {
+        if (bundle.id === FRAMEWORK_ID) {
+            throw new Error('Cannot start framework bundle: ' + bundle.location);
         }
         let state = bundle.state;
 
         if (state === Bundles.ACTIVE) {
-            console.warn(`'Bundle: ${bundle.meta.location} already active`);
+            console.warn(`'Bundle: ${bundle.location} already active`);
             return true;
         }
         if (state === Bundles.STARTING) {
-            throw new Error('Bundle ' + bundle.meta.location + ' cannot be started, since it is stopping');
+            throw new Error('Bundle ' + bundle.location + ' cannot be started, since it is stopping');
         }
         if (state === Bundles.UNINSTALLED) {
-            throw new Error('Cannot start uninstalled bundle: ' + bundle.meta.location);
+            throw new Error('Cannot start uninstalled bundle: ' + bundle.location);
         }
 
-        bundle.setContext(new BundleContext(this, bundle));
-        bundle.updateState(Bundles.STARTING);
+        (bundle as Bundle).setContext(new BundleContext(this, bundle));
+        (bundle as Bundle).updateState(Bundles.STARTING);
         this._fireBundleEvent(Events.STARTING, bundle);
 
         try {
             const activator = this._activators.get(bundle.id);
             await activator.start(bundle.context);
-            bundle.updateState(Bundles.ACTIVE);
+            (bundle as Bundle).updateState(Bundles.ACTIVE);
             this._fireBundleEvent(Events.STARTED, bundle);
         } catch (e) {
-            bundle.unsetContext();
-            bundle.updateState(state);
+            (bundle as Bundle).unsetContext();
+            (bundle as Bundle).updateState(state);
             this.registry.unregisterAll(bundle);
             this.registry.ungetAll(bundle);
             this.on.removeAll(bundle);
             throw e;
         }
     }
-    async stopBundle(bundle: Bundle) {
-        if (bundle.id === 0) {
-            throw new Error('Cannot stop framework bundle: ' + bundle.meta.location);
+    async stopBundle(bundle: IBundle) {
+        if (bundle.id === FRAMEWORK_ID) {
+            throw new Error('Cannot stop framework bundle: ' + bundle.location);
         }
         let state = bundle.state;
 
         if (state === Bundles.UNINSTALLED) {
-            throw new Error('Cannot stop uninstalled bundle: ' + bundle.meta.location);
+            throw new Error('Cannot stop uninstalled bundle: ' + bundle.location);
         }
         if (state === Bundles.STOPPING) {
-            throw new Error('Bundle: ' + bundle.meta.location + ' cannot be stopped since it is already stopping');
+            throw new Error('Bundle: ' + bundle.location + ' cannot be stopped since it is already stopping');
         }
 
         if (state !== Bundles.ACTIVE) {
             return true;
         }
 
-        bundle.updateState(Bundles.STOPPING);
+        (bundle as Bundle).updateState(Bundles.STOPPING);
         this._fireBundleEvent(Events.STOPPING, bundle);
         try {
             const activator = this._activators.get(bundle.id);
             await activator.stop(bundle.context);
-            await this.getLoader().unloadBundle(bundle.meta.location);
-            bundle.unsetContext();
-            bundle.updateState(Bundles.RESOLVED);
+            await this.getLoader().unloadBundle(bundle.location);
+            (bundle as Bundle).unsetContext();
+            (bundle as Bundle).updateState(Bundles.RESOLVED);
             this.registry.unregisterAll(bundle);
             this.registry.ungetAll(bundle);
             this.on.removeAll(bundle);
             this._fireBundleEvent(Events.STOPPED, bundle);
         } catch (e) {
-            bundle.updateState(state);
-            console.error(`Activator stop error in : ${bundle.meta.location}`, e);
+            (bundle as Bundle).updateState(state);
+            console.error(`Activator stop error in : ${bundle.location}`, e);
             return false;
         }
         return true;
@@ -239,7 +244,7 @@ export class Framework extends Bundle {
     }
     async uninstallBundle(bundle: Bundle) {
         await sleep();
-        if (bundle.id === 0) {
+        if (bundle.id === FRAMEWORK_ID) {
             console.error(`Cannot uninstall main bundle: ${bundle.meta.location}`);
             return false;
         }
@@ -256,7 +261,7 @@ export class Framework extends Bundle {
         }
         return true;
     }
-    _fireBundleEvent(type: number, bundle: Bundle) {
+    _fireBundleEvent(type: number, bundle: IBundle) {
         if (this === bundle) {
             this.on.framework.fire(new FrameworkEvent(type, bundle));
         }
@@ -267,6 +272,12 @@ export class Framework extends Bundle {
     }
     _fireFrameworkEvent(type: number) {
         this.on.framework.fire(new FrameworkEvent(type, this));
+    }
+    getRegisteredServices(): IServiceReference[] {
+        return [];
+    }
+    getServicesInUse(): IServiceReference[] {
+        return [];
     }
 }
 
@@ -285,23 +296,12 @@ function getActivator(config) {
 
 export class FrameworkFactory {
 
-    /**
-     * Create a new Framework instance.
-     * @param {Object} config
-     * @return New configured Framework
-     */
-    create(config: any): Framework{
-        let frame = new Framework(config);
-        // if (config.path) {
-        //     frame.getLoader().setPath(config.path);
-        // }
-        return frame;
+    create(properties: any = {}): Framework{
+        return new Framework(properties);
     }
 }
 
 
 function sleep(){
-    return new Promise(resolve => {
-        setTimeout(resolve);
-    });
+    return Promise.resolve();
 }

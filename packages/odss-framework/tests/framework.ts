@@ -11,7 +11,7 @@ import {
 import tests from './core';
 
 
-let self = {};
+let self: any = {};
 
 QUnit.module("odss-framweork", hook => {
     hook.beforeEach(async function() {
@@ -66,16 +66,16 @@ QUnit.module("odss-framweork", hook => {
 
     QUnit.test('state on start/stop framework', async assert => {
         let framework = await tests.framework();
-        assert.equal(Bundles.INSTALLED, framework.state);
+        console.log(framework.state, Bundles.INSTALLED);
+        assert.equal(framework.state, Bundles.INSTALLED, 'installed');
 
         await framework.start();
 
-        assert.equal(Bundles.ACTIVE, framework.state);
+        assert.equal(framework.state, Bundles.ACTIVE, 'active');
 
-        //framework is not stopable
         await framework.stop();
 
-        assert.equal(Bundles.RESOLVED, framework.state);
+        assert.equal(framework.state, Bundles.RESOLVED, 'resolved');
     });
 
     QUnit.test('start/stop all bundles', async assert => {
@@ -84,22 +84,22 @@ QUnit.module("odss-framweork", hook => {
         let listener = sinon.spy();
         assert.equal(true, framework.on.bundle.add(self.bundle, listener));
 
-        await framework.installBundle('test1');
-        await framework.installBundle('test2');
+        await framework.installBundle('test1', false);
+        await framework.installBundle('test2', false);
 
         let bundle1 = framework.getBundle('test1');
         let bundle2 = framework.getBundle('test2');
 
-        assert.equal(Bundles.INSTALLED, bundle1.state);
-        assert.equal(Bundles.INSTALLED, bundle2.state);
+        assert.equal(Bundles.INSTALLED, bundle1.state, 'bundle1 === INSTALLED');
+        assert.equal(Bundles.INSTALLED, bundle2.state, 'bundle2 === INSTALLED');
 
         await framework.start();
 
-        assert.equal(Bundles.ACTIVE, bundle1.state);
-        assert.equal(Bundles.ACTIVE, bundle2.state);
+        assert.equal(Bundles.ACTIVE, bundle1.state, 'bundle1 === ACTIVE');
+        assert.equal(Bundles.ACTIVE, bundle2.state, 'bundle2 === ACTIVE');
 
-        await framework.uninstallBundle(bundle1);
-        await framework.uninstallBundle(bundle2);
+        await framework.uninstallBundle(bundle1 as any);
+        await framework.uninstallBundle(bundle2 as any);
 
         //bundle: (x2)
         //  installed
@@ -113,8 +113,8 @@ QUnit.module("odss-framweork", hook => {
     });
     QUnit.test('auto start/stop all bundle', async assert => {
         let framework = await tests.framework();
-        await framework.installBundle('test1');
-        await framework.installBundle('test2');
+        await framework.installBundle('test1', false);
+        await framework.installBundle('test2', false);
         let bundles = framework.getBundles();
         let bundle, i;
         for (i = 0; i < bundles.length; i++) {

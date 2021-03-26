@@ -6,18 +6,15 @@ module.exports = function(config) {
         basePath: '',
         frameworks: ['qunit'],
         files: [
-            "tests/*.js",
-            // 'src/*.ts'
+            "tests/*.ts",
         ],
         preprocessors: {
-            'tests/*.js': ['rollup'],
+            'tests/*.ts': ['rollup'],
             'src/*.ts': ['rollup']
         },
         rollupPreprocessor: {
             plugins: [
-                resolve({
-                    extensions: [ '.mjs', '.js', '.jsx', '.json', '.ts' ]
-                }),
+                resolve(),
                 typescript()
             ],
             output: {

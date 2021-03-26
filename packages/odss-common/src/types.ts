@@ -46,30 +46,52 @@ export interface IEventListeners {
 
 export interface IBundle {
     readonly id: number;
-    readonly meta: any;
     readonly state: number;
+    readonly location: string;
     readonly context: IBundleContext;
+    readonly version: string;
+    // readonly meta: any;
 
-    start();
-    stop();
-    reload(autostart: boolean);
-    uninstall();
+    start(): Promise<void>;
+    stop(): Promise<void>;
+    reload(): Promise<void>;
+    uninstall(): Promise<void>;
+
+    /**
+     * Returns this bundle's {@code IServiceReference} list for all services it
+     * has registered.
+     */
+    getRegisteredServices(): IServiceReference[];
+
+    /**
+     * Returns this bundle's {@code IServiceReference} list for all services it
+     * is using.
+     */
+    getServicesInUse(): IServiceReference[];
+}
+export interface IServiceObject {
+    getService(): any;
+    ungetService(): void;
+    getServiceReference(): IServiceReference;
 }
 
 export interface IBundleContext {
-    getProperty(name: string, def: any): any;
-    getProperties(): Properties;
-    getService(reference: IServiceReference): any;
-    ungetService(reference: IServiceReference): any;
-    getServiceReferences(name: any, filter?: any): IServiceReference[];
-    getServiceReference(name: any, filter: any): IServiceReference;
-    getBundle(id: number): IBundle;
-    getBundles(): Array<IBundle>;
+    installBundle(location: string, autostart: boolean): Promise<IBundle>;
     registerService(
         name: any,
         service: any,
         properties?: Properties
     ): Promise<IServiceRegistration>;
+    getServiceReference(name: any, filter: any): IServiceReference;
+    getServiceReferences(name: any, filter?: any): IServiceReference[];
+    // getBundleServiceReferences(name: any, filter?: any): IServiceReference[];
+    getService(reference: IServiceReference): any;
+    getServiceObject(reference: IServiceReference): IServiceObject;
+    ungetService(reference: IServiceReference): any;
+    getBundle(id?: number): IBundle;
+    getBundles(): Array<IBundle>;
+    getProperty(name: string, def: any): any;
+
     addServiceListener(listener: IServiceListener, name: any, filter: string): IDisposable;
     addBundleListener(listener: IBundleListener): IDisposable;
     addFrameworkListener(listener: IFrameworkListener): IDisposable;
@@ -93,6 +115,7 @@ export interface IServiceReference {
 export interface IServiceRegistration {
     readonly reference: IServiceReference;
     unregister(): void;
+    setProperties(properties: Properties): void;
 }
 
 export interface IEvent {
@@ -110,9 +133,7 @@ export interface IBundleEvent extends IEvent {
 
 export interface IFrameworkEvent extends IBundleEvent {}
 
-export interface IListener {
-
-}
+export interface IListener {}
 
 export interface IBundleListener extends IListener {
     bundleEvent(event: IBundleEvent): void;

@@ -9,7 +9,7 @@ import {
     IServiceTrackerCustomizer,
     IBundleTrackerListener,
     IDisposable,
-} from './interfaces';
+} from './types';
 import { toDisposable } from './utils';
 import { ServiceEvent, BundleEvent } from './events';
 
