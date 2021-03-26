@@ -1,4 +1,5 @@
 import * as consts from './consts';
+import { QueryObject } from './types';
 import {
     IFilter,
     Filter,
@@ -12,35 +13,7 @@ import {
     ICompositeFilter,
 } from './filters';
 
-type QueryValue = string | Filter | Filter[];
-type QueryObject = Record<string, string>;
-type QueryType = QueryValue | QueryObject;
-
-export function squery(query: QueryType): IFilter {
-    let filter;
-    if (Array.isArray(query)) {
-        filter = new AndFilter(query);
-    } else {
-        if (Filter.isFilter(query)) {
-            filter = query;
-        } else if (typeof query === 'string') {
-            filter = parseString(query);
-        } else if (typeof query === 'object') {
-            filter = prepareObject(query as QueryObject);
-        }
-    }
-    if (!filter) {
-        throw new TypeError('Incorrect query type.');
-    }
-    if (filter.opt === consts.AND || filter.opt === consts.OR) {
-        if (Array.isArray(filter.filters) && filter.filters.length === 1) {
-            filter = filter.filters[0];
-        }
-    }
-    return filter;
-}
-
-function prepareObject(query: QueryObject): IFilter {
+export function prepareObject(query: QueryObject): IFilter {
     const filters: IFilter[] = [];
     for (const name of Object.keys(query)) {
         const values = query[name];
@@ -58,7 +31,7 @@ function prepareObject(query: QueryObject): IFilter {
     return filters.length === 1 ? filters[0] : new AndFilter(filters);
 }
 
-function parseString(query: string): IFilter {
+export function parseString(query: string): IFilter {
     query = query.trim();
     if (!query) {
         throw new TypeError('Empty query.');

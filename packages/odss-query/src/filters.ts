@@ -20,14 +20,13 @@ export interface ICompositeFilter extends IFilter {
 export abstract class Filter implements IFilter {
     constructor(public readonly opt: string) {}
 
-
     abstract match(params: Params): boolean;
 
     public toString(): string {
         return '[Filter opt=' + this.opt + ']';
     }
 
-    static isFilter(obj: any ): boolean {
+    static isFilter(obj): boolean {
         return obj && obj.opt && typeof obj.match === 'function';
     }
     static create(opt: string, name: string, value = ''): IFilter {
