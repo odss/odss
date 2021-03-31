@@ -7,20 +7,19 @@ import {
     IServiceListener,
     IServiceTrackerListener,
     IServiceTrackerCustomizer,
+    IServiceTrackerListenerType,
     IBundleTrackerListener,
     IDisposable,
-} from './types';
+    NamedServiceType,
+    FilterType,
+} from './types/core';
 import { toDisposable } from './utils';
 import { ServiceEvent, BundleEvent } from './events';
 
-class ServiceTracked implements IServiceListener {
-    private customizer: IServiceTrackerCustomizer;
-    private tracked: Map<IServiceReference, any>;
+class ServiceTracked<TService> implements IServiceListener {
+    private tracked: Map<IServiceReference, TService> = new Map();
 
-    constructor(customizer: IServiceTrackerCustomizer) {
-        this.tracked = new Map<IServiceReference, any>();
-        this.customizer = customizer;
-    }
+    constructor(private customizer: IServiceTrackerCustomizer<TService>) {}
     serviceEvent(event: ServiceEvent) {
         switch (event.type) {
             case Events.REGISTERED:
@@ -34,7 +33,7 @@ class ServiceTracked implements IServiceListener {
     }
     track(reference: IServiceReference) {
         if (this.tracked.has(reference)) {
-            const service = this.tracked.get(reference);
+            const service = this.tracked.get(reference) as TService;
             this.modified(reference, service);
         } else {
             const service = this.adding(reference);
@@ -45,7 +44,7 @@ class ServiceTracked implements IServiceListener {
     }
     untrack(reference: IServiceReference) {
         if (this.tracked.has(reference)) {
-            const service = this.tracked.get(reference);
+            const service = this.tracked.get(reference) as TService;
             this.tracked.delete(reference);
             this.removed(reference, service);
         }
@@ -59,16 +58,16 @@ class ServiceTracked implements IServiceListener {
     adding(reference: IServiceReference) {
         return this.customizer.adding(reference);
     }
-    modified(reference: IServiceReference, service: any): void {
+    modified(reference: IServiceReference, service: TService): void {
         this.customizer.modified(reference, service);
     }
-    removed(reference: IServiceReference, service: any): void {
+    removed(reference: IServiceReference, service: TService): void {
         this.customizer.removed(reference, service);
     }
     size(): number {
         return this.tracked.size;
     }
-    getServices(): Array<any> {
+    getServices(): Array<TService> {
         return Array.from(this.tracked.values());
     }
     getReferences(): Array<IServiceReference> {
@@ -76,32 +75,33 @@ class ServiceTracked implements IServiceListener {
     }
 }
 
-export class ServiceTracker implements IServiceTrackerCustomizer {
-    private _ctx: IBundleContext;
-    private _name: any;
-    private _filter?: any;
-    private _listener?: IServiceTrackerListener;
-    private _tracked?: ServiceTracked;
+class DummyServiceTrackerListener<TService> implements IServiceTrackerListener<TService> {
+    addingService(/* service: any, reference: IServiceReference */): void {
+        // do nothing
+    }
+    modifiedService(/* service: any, reference: IServiceReference */): void {
+        // do nothing
+    }
+    removedService(/* service: any, reference: IServiceReference */): void {
+        // do nothing
+    }
+}
+
+export class ServiceTracker<TService extends any> implements IServiceTrackerCustomizer<TService> {
+    private _tracked?: ServiceTracked<TService>;
     private _listenerDispose?: IDisposable;
 
     constructor(
-        ctx: IBundleContext,
-        name: any,
-        listener?: IServiceTrackerListener,
-        filter?: string
+        private _ctx: IBundleContext,
+        private _name: NamedServiceType,
+        private _listener: IServiceTrackerListenerType<TService> = new DummyServiceTrackerListener<TService>(),
+        private _filter: FilterType = ''
     ) {
-        if (!ctx) {
-            throw new Error('Not set bundle context');
+        if (!_name) {
+            throw new TypeError('Empty name');
         }
-        if (!name) {
-            throw new Error('Not set name');
-        }
-        this._ctx = ctx;
-        this._name = name;
-        this._filter = filter;
-        this._listener = listener;
     }
-    open() {
+    open(): this {
         if (!this._tracked) {
             this._tracked = new ServiceTracked(this);
             this._ctx.addServiceListener(this._tracked, this._name, this._filter);
@@ -112,7 +112,7 @@ export class ServiceTracker implements IServiceTrackerCustomizer {
         }
         return this;
     }
-    close() {
+    close(): this {
         if (this._tracked) {
             this._ctx.removeServiceListener(this._tracked);
             this._tracked.close();
@@ -120,7 +120,7 @@ export class ServiceTracker implements IServiceTrackerCustomizer {
         }
         return this;
     }
-    adding(reference: IServiceReference): any {
+    adding(reference: IServiceReference): TService {
         const service = this._ctx.getService(reference);
         if (this._listener) {
             if (typeof this._listener === 'function') {
@@ -131,12 +131,12 @@ export class ServiceTracker implements IServiceTrackerCustomizer {
         }
         return service;
     }
-    modified(reference: IServiceReference, service: any) {
+    modified(reference: IServiceReference, service: TService): void {
         if (this._listener && typeof this._listener !== 'function') {
             this._listener.modifiedService(service, reference);
         }
     }
-    removed(reference: IServiceReference, service: any) {
+    removed(reference: IServiceReference, service: TService): TService {
         if (this._listener) {
             if (typeof this._listener === 'function') {
                 if (this._listenerDispose) {
@@ -155,19 +155,14 @@ export class ServiceTracker implements IServiceTrackerCustomizer {
     getReference(): IServiceReference {
         return this.getReferences()[0];
     }
-    getReferences() {
+    getReferences(): IServiceReference[] {
         return this._tracked ? this._tracked.getReferences() : [];
     }
-    getService() {
+    getService(): TService {
         return this.getServices()[0];
     }
-    getServices() {
+    getServices(): TService[] {
         return this._tracked ? this._tracked.getServices() : [];
-    }
-    _extendCustomizer(customizer) {
-        if (customizer) {
-            // do nothing
-        }
     }
 }
 
@@ -190,16 +185,16 @@ class BundleTracked {
     }
     track(bundle: IBundle) {
         if (this.bundles.has(bundle)) {
-            this.modified(bundle);
+            this.listener.modifiedBundle(bundle);
         } else {
             this.bundles.add(bundle);
-            this.adding(bundle);
+            this.listener.addingBundle(bundle);
         }
     }
     untrack(bundle: IBundle) {
         if (this.bundles.has(bundle)) {
             this.bundles.delete(bundle);
-            this.removed(bundle);
+            this.listener.removedBundle(bundle);
         }
     }
     size() {
@@ -211,49 +206,46 @@ class BundleTracked {
     getBundles(): Array<IBundle> {
         return Array.from(this.bundles);
     }
-    removed(bundle: IBundle) {
-        this.listener.removedBundle(bundle);
+}
+
+class DummyListener implements IBundleTrackerListener {
+    addingBundle(/* bundle: IBundle */) {
+        //do nothing
     }
-    adding(bundle: IBundle) {
-        this.listener.addingBundle(bundle);
+    modifiedBundle(/* bundle: IBundle */) {
+        //do nothing
     }
-    modified(bundle: IBundle) {
-        this.listener.modifiedBundle(bundle);
+    removedBundle(/* bundle: IBundle */) {
+        //do nothing
     }
 }
 
-/**
- * @type {tracker.BundleTracker}
- * @constructor
- */
 export class BundleTracker implements IBundleTracker {
-    private _ctx: IBundleContext;
-    private mask: number;
-    private _listener?: IBundleTrackerListener;
     private _tracked?: BundleTracked;
 
-    constructor(ctx: IBundleContext, mask: number, listener?: IBundleTrackerListener) {
-        this._ctx = ctx;
-        if (!mask) {
+    constructor(
+        private _ctx: IBundleContext,
+        private _mask: number,
+        private _listener: IBundleTrackerListener = new DummyListener()
+    ) {
+        if (!_mask) {
             throw new Error('Not set mask for bundles');
         }
-        this.mask = mask;
-        this._listener = listener;
     }
-    open() {
+    open(): this {
         if (!this._tracked) {
-            this._tracked = new BundleTracked(this.mask, this._listener || this);
+            this._tracked = new BundleTracked(this._mask, this._listener);
             this._ctx.addBundleListener(this._tracked);
             const bundles = this._ctx.getBundles();
             for (let i = 0, j = bundles.length; i < j; i++) {
-                if (bundles[i].state && this.mask) {
+                if (bundles[i].state && this._mask) {
                     this._tracked.track(bundles[i]);
                 }
             }
         }
         return this;
     }
-    close() {
+    close(): this {
         if (this._tracked) {
             this._ctx.removeBundleListener(this._tracked);
             this._tracked.close();
@@ -266,14 +258,5 @@ export class BundleTracker implements IBundleTracker {
     }
     bundles(): IBundle[] {
         return this._tracked ? this._tracked.getBundles() : [];
-    }
-    addingBundle(bundle: IBundle) {
-        //do nothing
-    }
-    modifiedBundle(bundle: IBundle) {
-        //do nothing
-    }
-    removedBundle(bundle: IBundle) {
-        //do nothing
     }
 }

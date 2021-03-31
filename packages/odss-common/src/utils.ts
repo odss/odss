@@ -1,4 +1,4 @@
-import { IDisposable } from './interfaces';
+import { IDisposable } from './types/core';
 
 const __name__ = Symbol('odss.function.name');
 
@@ -60,7 +60,7 @@ function transformUnderline(name) {
     return name.replace(/_/g, '.');
 }
 
-export function toDisposable(dispose: IDisposable | any): IDisposable {
+export function toDisposable(dispose: IDisposable | (() => void) | undefined): IDisposable {
     if (typeof dispose === 'undefined') {
         return {
             dispose() {

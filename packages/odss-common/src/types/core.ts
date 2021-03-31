@@ -1,9 +1,23 @@
+export type NamedServiceType =
+    | string
+    | (() => void)
+    | {
+          name: string;
+      };
+export type ServiceType = any;
+
 export type Properties = {
     [key: string]: any;
 };
+
+export type FilterType = string | Properties;
+
+export type ModuleType = {
+    [key: string]: any;
+};
 export interface ILoader {
-    loadBundle(location: string): Promise<any>;
-    unloadBundle(location: string): Promise<any>;
+    loadBundle(location: string): Promise<ModuleType>;
+    unloadBundle(location: string): Promise<void>;
 }
 
 export interface IDisposable {
@@ -25,7 +39,7 @@ export interface IFramework extends IBundle {
     addServiceListener(
         bundle: IBundle,
         listener: IServiceListener,
-        name: any,
+        name: NamedServiceType,
         filter: string
     ): IDisposable;
     addBundleListener(bundle: IBundle, listener: IBundleListener): IDisposable;
@@ -77,13 +91,9 @@ export interface IServiceObject {
 
 export interface IBundleContext {
     installBundle(location: string, autostart: boolean): Promise<IBundle>;
-    registerService(
-        name: any,
-        service: any,
-        properties?: Properties
-    ): Promise<IServiceRegistration>;
-    getServiceReference(name: any, filter: any): IServiceReference;
-    getServiceReferences(name: any, filter?: any): IServiceReference[];
+    registerService(name: any, service: any, properties?: Properties): IServiceRegistration;
+    getServiceReference(name: NamedServiceType, filter?: FilterType): IServiceReference;
+    getServiceReferences(name: NamedServiceType, filter?: FilterType): IServiceReference[];
     // getBundleServiceReferences(name: any, filter?: any): IServiceReference[];
     getService(reference: IServiceReference): any;
     getServiceObject(reference: IServiceReference): IServiceObject;
@@ -92,30 +102,32 @@ export interface IBundleContext {
     getBundles(): Array<IBundle>;
     getProperty(name: string, def: any): any;
 
-    addServiceListener(listener: IServiceListener, name: any, filter: string): IDisposable;
+    addServiceListener(listener: IServiceListener, name: any, filter: FilterType): IDisposable;
     addBundleListener(listener: IBundleListener): IDisposable;
     addFrameworkListener(listener: IFrameworkListener): IDisposable;
     removeServiceListener(listener: IServiceListener): void;
     removeBundleListener(listener: IBundleListener): void;
     removeFrameworkListener(listener: IFrameworkListener): void;
 
-    serviceTracker(name: any, listener: IServiceTrackerListener, filter?: string);
+    serviceTracker<TService>(
+        name: NamedServiceType,
+        listener: IServiceTrackerListener<TService>,
+        filter?: FilterType
+    );
     bundleTracker(mask: number, listener: IBundleTrackerListener);
 }
 
 export interface IServiceReference {
-    readonly id: number;
-    readonly bundle: IBundle;
-
     getProperty(key: string): any;
     getProperties(): Properties;
+    getPropertyKeys(): string[];
     usingBundles(): IBundle[];
 }
 
 export interface IServiceRegistration {
-    readonly reference: IServiceReference;
-    unregister(): void;
+    getReference(): IServiceReference;
     setProperties(properties: Properties): void;
+    unregister(): void;
 }
 
 export interface IEvent {
@@ -131,19 +143,15 @@ export interface IBundleEvent extends IEvent {
     readonly bundle: IBundle;
 }
 
-export interface IFrameworkEvent extends IBundleEvent {}
-
-export interface IListener {}
-
-export interface IBundleListener extends IListener {
+export interface IBundleListener {
     bundleEvent(event: IBundleEvent): void;
 }
 
-export interface IFrameworkListener extends IListener {
-    frameworkEvent(event: IFrameworkEvent): void;
+export interface IFrameworkListener {
+    frameworkEvent(event: IBundleEvent): void;
 }
 
-export interface IServiceListener extends IListener {
+export interface IServiceListener {
     serviceEvent(event: IServiceEvent): void;
 }
 
@@ -158,27 +166,37 @@ export interface IBundleEvents {
 }
 
 export interface IServiceEvents {
-    add(listener: IServiceListener, name: any, filter: string): void;
+    add(listener: IServiceListener, name: NamedServiceType, filter: string): void;
     remove(listener: IServiceListener): void;
 }
 
-interface IServiceTrackerListenerObject {
-    addingService(service: any, reference: IServiceReference): void;
-    modifiedService(service: any, reference: IServiceReference): void;
-    removedService(service: any, reference: IServiceReference): void;
+export interface IServiceTracker<TService extends ServiceType> {
+    open(): void;
+    close(): void;
+    size(): number;
+    bundles(): IBundle[];
+    getReference(): IServiceReference;
+    getReferences(): IServiceReference[];
+    getService(): TService;
+    getServices(): TService[];
+}
+export interface IServiceTrackerListener<TService extends ServiceType> {
+    addingService(service: TService, reference: IServiceReference): void;
+    modifiedService(service: TService, reference: IServiceReference): void;
+    removedService(service: TService, reference: IServiceReference): void;
 }
 
-interface IServiceTrackerListenerFunction {
-    (service: any, reference: IServiceReference): IDisposable | undefined;
+export interface IServiceTrackerListenerFunction<TService> {
+    (service: TService, reference: IServiceReference): IDisposable | undefined;
 }
-export type IServiceTrackerListener =
-    | IServiceTrackerListenerObject
-    | IServiceTrackerListenerFunction;
+export type IServiceTrackerListenerType<TService extends ServiceType> =
+    | IServiceTrackerListener<TService>
+    | IServiceTrackerListenerFunction<TService>;
 
-export interface IServiceTrackerCustomizer {
-    adding(reference: IServiceReference): any;
-    modified(reference: IServiceReference, service: any): void;
-    removed(reference: IServiceReference, service: any): void;
+export interface IServiceTrackerCustomizer<TService> {
+    adding(reference: IServiceReference): TService;
+    modified(reference: IServiceReference, service: TService): void;
+    removed(reference: IServiceReference, service: TService): void;
 }
 
 export interface IBundleTrackerListener {
@@ -187,7 +205,7 @@ export interface IBundleTrackerListener {
     removedBundle(bundle: IBundle): void;
 }
 
-export interface IBundleTracker extends IBundleTrackerListener {
+export interface IBundleTracker {
     open(): void;
     close(): void;
     size(): number;

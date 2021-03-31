@@ -1,11 +1,14 @@
 {
     "compilerOptions": {
-      "target": "esnext",
+      "target": "ESNext",
       "module": "CommonJS",
       "noImplicitAny": false,
-      "strict": true,
+      "strict": true
     },
     "files": [
-        "src/index.ts",
+        "src/index.ts"
+    ],
+    "exclude": [
+        "node_modules"
     ]
-  }
+}

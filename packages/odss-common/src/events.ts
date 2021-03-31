@@ -1,11 +1,4 @@
-import {
-    IEvent,
-    IServiceEvent,
-    IBundleEvent,
-    IFrameworkEvent,
-    IBundle,
-    IServiceReference,
-} from './types';
+import { IEvent, IServiceEvent, IBundleEvent, IBundle, IServiceReference } from './types/core';
 
 export class Event implements IEvent {
     public type: number;
@@ -27,15 +20,11 @@ export class BundleEvent extends Event implements IBundleEvent {
         Object.freeze(this);
     }
     toString(): string {
-        return (
-            '[BundleEvent type=' +
-            this.type +
-            ']'
-        );
+        return '[BundleEvent type=' + this.type + ']';
     }
 }
 
-export class FrameworkEvent extends BundleEvent implements IFrameworkEvent {
+export class FrameworkEvent extends BundleEvent {
     toString(): string {
         return '[FrameworkEvent type=' + this.type + ']';
     }

@@ -25,3 +25,17 @@ export const Events = {
     UNREGISTERED: 4,
     MODIFIED_ENDMATCH: 8,
 };
+
+export const MetadataHandlers = {
+    COMPONENT: 'odss.handler.component',
+    PROVIDES: 'odss.hadler.provides',
+    PROPERTY: 'odss.hadler.property',
+    CONSTRUCTOR_DEPENDENCY: 'odss.hadler.params.dependency',
+    PROPERTIES_DEPENDENCY: 'odss.hadler.properties.dependency',
+    INVALIDATE_METHOD: 'odss.hadler.invalidate.method',
+    VALIDATE_METHOD: 'odss.hadler.validate.method',
+    BIND_DEPENDENCY: 'odss.hadler.bind',
+    UNBIND_DEPENDENCY: 'odss.hadler.unbind',
+    MODIFIED_DEPENDENCY: 'odss.hadler.modified',
+    UPDATE_DEPENDENCY: 'odss.hadler.update',
+};
