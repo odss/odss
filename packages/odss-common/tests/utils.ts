@@ -2,18 +2,18 @@ import { assert } from 'chai';
 
 import { getTokenType, getTokenTypes } from '../src/utils';
 
-describe('@odss/common::utils', () => {
-    it('import()', () => {
+describe('/utils', () => {
+    it('should import utils', () => {
         assert.ok(typeof getTokenType === 'function', 'getTokenType');
         assert.ok(typeof getTokenTypes === 'function', 'getTokenTypes');
     });
-    it('incorrect name type', () => {
+    it('should throw error for incorrect name types', () => {
         assert.throws(() => {
             getTokenType('');
         }, 'Empty function name');
     });
 
-    it('prepare function name', () => {
+    it('should prepare function name', () => {
         assert.equal(getTokenType('test'), 'test', 'Service name as string');
 
         let functionWithName = function functionWithName() {};
