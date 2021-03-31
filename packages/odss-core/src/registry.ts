@@ -14,13 +14,13 @@ import {
 } from '@odss/common';
 
 type TServiceInfo = {
-    sid: number,
-    bid: number,
-    clasess: string[],
-    service: any,
-    registration: ServiceRegistration,
-    using: Set<number>,
-    reference: ServiceReference,
+    sid: number;
+    bid: number;
+    clasess: string[];
+    service: any;
+    registration: ServiceRegistration;
+    using: Set<number>;
+    reference: ServiceReference;
 };
 
 const sortReferences = (ref1, ref2) => {
@@ -29,7 +29,7 @@ const sortReferences = (ref1, ref2) => {
     // const [rank1, id1] = ref1.getSortValues();
     // const [rank2, id2] = ref2.getSortValues();
     // return rank1 - rank2 || id1 - id2;
-}
+};
 
 export default class Registry {
     public events: any;
@@ -42,11 +42,16 @@ export default class Registry {
     constructor(events) {
         this.events = events;
     }
-    registerService(bundle: IBundle, clasess: any[], service: any, properties: Properties = {}): IServiceRegistration {
+    registerService(
+        bundle: IBundle,
+        clasess: any[],
+        service: any,
+        properties: Properties = {}
+    ): IServiceRegistration {
         clasess = getTokenTypes(clasess);
 
         //prepare properties
-        const sid = this._sid += 1;
+        const sid = (this._sid += 1);
         this._size += 1;
         properties[OBJECTCLASS] = clasess;
         properties[SERVICE_ID] = sid;
@@ -78,7 +83,7 @@ export default class Registry {
     registerStyle(bundle: IBundle, styles: string[]) {
         let elements = styles.map(createStyle);
         this._styles[bundle.id] = () => {
-            if(elements){
+            if (elements) {
                 delete this._styles[bundle.id];
                 removeStyles(elements);
                 elements = null;
@@ -95,7 +100,15 @@ export default class Registry {
                 const bundle = registration.getBundle();
                 this.events.service.fire(new ServiceEvent(Events.UNREGISTERED, info.reference));
                 if (info.using.size) {
-                    throw new Error('Service: "' + info.clasess + '" from bundle (id=' + info.bid + ') is using by bundle(s): (id=' + Array.from(info.using) + ')');
+                    throw new Error(
+                        'Service: "' +
+                            info.clasess +
+                            '" from bundle (id=' +
+                            info.bid +
+                            ') is using by bundle(s): (id=' +
+                            Array.from(info.using) +
+                            ')'
+                    );
                 }
                 this._services.delete(reference);
                 this._registrations.delete(registration);
@@ -157,7 +170,7 @@ export default class Registry {
      * @param {(object|string)} filters
      * @return {odss.core.service.Reference}
      */
-    findReference(name: any, filter:string = null): IServiceReference {
+    findReference(name: any, filter: string = null): IServiceReference {
         const references = this._specs.get(getTokenType(name));
         if (references && references.length) {
             if (!filter) {
@@ -240,14 +253,10 @@ export default class Registry {
 // }
 
 class ServiceReference implements IServiceReference {
-
     private _usingBundles: Set<IBundle> = new Set();
     private _sortValue: [number, number] = [0, 0];
 
-    constructor(
-        private _id: number,
-        private _properties: any,
-    ) {
+    constructor(private _id: number, private _properties: any) {
         this.checkSortValue();
     }
     getProperty(key: string) {
@@ -257,7 +266,7 @@ class ServiceReference implements IServiceReference {
         return Object.keys(this._properties);
     }
     getProperties(): any {
-        return {...this._properties};
+        return { ...this._properties };
     }
     usingBundles(): IBundle[] {
         return [...this._usingBundles];
@@ -288,16 +297,14 @@ class ServiceReference implements IServiceReference {
 }
 
 class ServiceRegistration implements IServiceRegistration {
-
     private _reference = new ServiceReference(this._id, this._properties);
 
     constructor(
         private _registry: Registry,
         private _bundle: IBundle,
         private _id: number,
-        private _properties: Properties,
-    ) {
-    }
+        private _properties: Properties
+    ) {}
     getBundle(): IBundle {
         return this._bundle;
     }
@@ -318,10 +325,10 @@ class ServiceRegistration implements IServiceRegistration {
         }
 
         let wasChange = false;
-        for(const [key, value] of Object.entries(properties)) {
+        for (const [key, value] of Object.entries(properties)) {
             if (this._properties[key] !== value) {
                 this._properties[key] = value;
-                wasChange = true
+                wasChange = true;
             }
         }
 
@@ -329,23 +336,20 @@ class ServiceRegistration implements IServiceRegistration {
             console.log('update');
             this._registry.updateProperties(this, oldProperties);
         }
-
     }
 }
 
 function removeStyles(elements) {
     if (document) {
-        elements.map(
-            element => document.head.removeChild(element)
-        );
+        elements.map(element => document.head.removeChild(element));
     }
 }
 
 function createStyle(source: string): HTMLStyleElement {
-    if (document){
+    if (document) {
         const element = document.createElement('style') as HTMLStyleElement;
-        element.setAttribute('type', 'text/css')
-        element.innerHTML = source
+        element.setAttribute('type', 'text/css');
+        element.innerHTML = source;
         document.head.appendChild(element);
         return element;
     }

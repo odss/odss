@@ -1,16 +1,15 @@
-import {FrameworkEvent, ServiceEvent, BundleEvent, IBundle} from '@odss/common';
-import {prepareFilter} from './utils';
+import { FrameworkEvent, ServiceEvent, BundleEvent, IBundle } from '@odss/common';
+import { prepareFilter } from './utils';
 
 const BUNDLE = 0;
 const LISTENER = 1;
 
-function createListeners<T>(callbackName: string): any{
-
+function createListeners<T>(callbackName: string): any {
     const listeners: any[] = [];
 
     return {
         contains(bundle: IBundle, listener) {
-            for(const info of listeners) {
+            for (const info of listeners) {
                 if (info[BUNDLE] === bundle && info[LISTENER] === listener) {
                     return true;
                 }
@@ -31,13 +30,13 @@ function createListeners<T>(callbackName: string): any{
             }
             return false;
         },
-        add(bundle: IBundle, listener, name, filter=null) {
-            for(const info of listeners) {
+        add(bundle: IBundle, listener, name, filter = null) {
+            for (const info of listeners) {
                 if (info[BUNDLE] === bundle && info[LISTENER] === listener) {
                     return false;
                 }
             }
-            if(name || filter){
+            if (name || filter) {
                 filter = prepareFilter(name, filter);
             }
             const info = [bundle, listener, filter];
@@ -65,7 +64,7 @@ function createListeners<T>(callbackName: string): any{
             }
         },
         clean(bundle: IBundle) {
-            for (let i = 0; i < listeners.length;) {
+            for (let i = 0; i < listeners.length; ) {
                 if (listeners[i][BUNDLE] === bundle) {
                     listeners.splice(i, 1);
                     continue;
@@ -75,7 +74,6 @@ function createListeners<T>(callbackName: string): any{
         },
     };
 }
-
 
 export default class EventDispatcher {
     public framework: any;

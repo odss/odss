@@ -1,7 +1,6 @@
 import { assert } from 'chai';
-import {OBJECTCLASS, SERVICE_ID} from '@odss/common';
+import { OBJECTCLASS, SERVICE_ID } from '@odss/common';
 import * as $utils from '../src/utils';
-
 
 describe('@odss/core/utils', () => {
     it('import', () => {

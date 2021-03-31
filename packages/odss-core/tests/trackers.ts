@@ -1,17 +1,10 @@
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import {
-    OBJECTCLASS,
-    Bundles,
-    ServiceTracker, BundleTracker
-} from '@odss/common';
+import { OBJECTCLASS, Bundles, ServiceTracker, BundleTracker } from '@odss/common';
 
 import tests from './core';
 
-
-
-describe("odss.tracker.getService() Tracker", () => {
-
+describe('odss.tracker.getService() Tracker', () => {
     const scope: any = {};
 
     beforeEach(async () => {
@@ -38,12 +31,10 @@ describe("odss.tracker.getService() Tracker", () => {
             addingService() {
                 counter |= 1;
             },
-            modifiedService() {
-
-            },
+            modifiedService() {},
             removedService() {
                 counter |= 2;
-            }
+            },
         });
         tracker.open();
         let reg = scope.ctx.registerService('test.tracker', 'test');
@@ -52,12 +43,15 @@ describe("odss.tracker.getService() Tracker", () => {
 
         assert.equal(counter & 1, 1, 'Not fire ServiceTracker.addingService(ref)');
         assert.equal(counter & 2, 2, 'Not fire ServiceTracker.removedService(ref)');
-
     });
     it('tracker properties', () => {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker');
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.getReferences().length, 0, 'Tracker references should return empty array');
+        assert.equal(
+            tracker.getReferences().length,
+            0,
+            'Tracker references should return empty array'
+        );
         assert.equal(tracker.getReference(), null, 'Tracker reference should assert.equal null');
         assert.equal(tracker.getServices().length, 0, 'Tracker services should return empty array');
         assert.equal(tracker.getService(), null, 'Tracker services should return empty array');
@@ -67,32 +61,54 @@ describe("odss.tracker.getService() Tracker", () => {
         let reg = scope.ctx.registerService('test.tracker', 'test');
 
         assert.equal(tracker.size(), 1, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.getReferences().length, 1, 'Tracker references should return not empty array');
+        assert.equal(
+            tracker.getReferences().length,
+            1,
+            'Tracker references should return not empty array'
+        );
         assert.equal(tracker.getService(), 'test', 'Tracker services should return: test');
-        assert.deepEqual(tracker.getServices(), ['test'], 'Tracker services should return array: [test]');
+        assert.deepEqual(
+            tracker.getServices(),
+            ['test'],
+            'Tracker services should return array: [test]'
+        );
 
         reg.unregister();
 
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.getReferences().length, 0, 'Tracker references should return not empty array');
+        assert.equal(
+            tracker.getReferences().length,
+            0,
+            'Tracker references should return not empty array'
+        );
         assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
         assert.equal(tracker.getService(), null, 'Tracker services should return: test');
-
 
         reg = scope.ctx.registerService('test.tracker', 'test');
 
         assert.equal(tracker.size(), 1, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.getReferences().length, 1, 'Tracker references should return not empty array');
+        assert.equal(
+            tracker.getReferences().length,
+            1,
+            'Tracker references should return not empty array'
+        );
         assert.equal(tracker.getService(), 'test', 'Tracker services should return: test');
-        assert.deepEqual(tracker.getServices(), ['test'], 'Tracker services should return array: [test]');
+        assert.deepEqual(
+            tracker.getServices(),
+            ['test'],
+            'Tracker services should return array: [test]'
+        );
 
         tracker.close();
 
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
-        assert.equal(tracker.getReferences().length, 0, 'Tracker references should return not empty array');
+        assert.equal(
+            tracker.getReferences().length,
+            0,
+            'Tracker references should return not empty array'
+        );
         assert.equal(tracker.getService(), null, 'Tracker services should return: test');
         assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
-
     });
 
     it('stop tracker', () => {
@@ -101,12 +117,10 @@ describe("odss.tracker.getService() Tracker", () => {
             addingService() {
                 counter |= 1;
             },
-            modifiedService() {
-
-            },
+            modifiedService() {},
             removedService() {
                 counter |= 2;
-            }
+            },
         });
         tracker.open();
         scope.ctx.registerService('test.tracker', 'test1');
@@ -117,15 +131,14 @@ describe("odss.tracker.getService() Tracker", () => {
     });
 
     it('start tracker after register service', () => {
-
         scope.ctx.registerService('test.tracker', 'test');
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
-            addingService: function(/* reference */) {
+            addingService: function (/* reference */) {
                 counter++;
             },
             modifiedService() {},
-            removedService() {}
+            removedService() {},
         });
 
         tracker.open();
@@ -133,7 +146,6 @@ describe("odss.tracker.getService() Tracker", () => {
 
         scope.ctx.registerService('test.tracker', 'test');
         assert.equal(counter, 2, 'Should find second register serivce');
-
     });
 
     it('ServiceTracker::reference', () => {
@@ -147,7 +159,6 @@ describe("odss.tracker.getService() Tracker", () => {
     });
 
     it('ServiceTracker::getServiceReferences()', () => {
-
         scope.ctx.registerService('test.tracker', 'test1');
         scope.ctx.registerService('test.tracker', 'test2');
 
@@ -158,10 +169,9 @@ describe("odss.tracker.getService() Tracker", () => {
         assert.equal(refs[0].getProperty(OBJECTCLASS), 'test.tracker');
         assert.equal(refs[1].getProperty(OBJECTCLASS), 'test.tracker');
     });
-
 });
-describe("odss.core.tracker.BundleTracker", () => {
-    const scope: any = {}
+describe('odss.core.tracker.BundleTracker', () => {
+    const scope: any = {};
     beforeEach(async () => {
         scope.factory = await tests.factory();
         scope.bundle = await scope.factory.bundle('service');
@@ -169,13 +179,13 @@ describe("odss.core.tracker.BundleTracker", () => {
         scope.ctx = scope.bundle.context;
 
         scope.listener = {
-            addingBundle: function(/* bundle */) {},
-            removedBundle: function(/* bundle */) {}
+            addingBundle: function (/* bundle */) {},
+            removedBundle: function (/* bundle */) {},
         };
         try {
             sinon.spy(scope.listener, 'addingBundle');
             sinon.spy(scope.listener, 'removedBundle');
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
     });
@@ -187,11 +197,9 @@ describe("odss.core.tracker.BundleTracker", () => {
     });
 
     it('bundle tracker properties', async () => {
-
         let bundle = await scope.factory.bundle('service.next', true);
 
         let tracker = new BundleTracker(scope.ctx, Bundles.INSTALLED);
-
 
         assert.equal(tracker.size(), 0, 'Tracker size should be 0');
         assert.equal(tracker.bundles().length, 0, 'Tracker bundles should return empty array');
@@ -217,22 +225,38 @@ describe("odss.core.tracker.BundleTracker", () => {
     it('custom listener', async () => {
         new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener).open();
 
-        assert.equal(scope.listener.addingBundle.callCount, 2, 'Not fire: addingBundle for installed bundles');
+        assert.equal(
+            scope.listener.addingBundle.callCount,
+            2,
+            'Not fire: addingBundle for installed bundles'
+        );
 
         let bundle = await scope.factory.bundle('service.next');
         await bundle.start();
 
-        assert.equal(scope.listener.addingBundle.callCount, 3, 'Not fire: addingBundle for new bundle');
+        assert.equal(
+            scope.listener.addingBundle.callCount,
+            3,
+            'Not fire: addingBundle for new bundle'
+        );
 
         await bundle.uninstall();
 
-        assert.equal(scope.listener.removedBundle.callCount, 1, 'Not fire: removeBundle in custom bundle tracker listener');
+        assert.equal(
+            scope.listener.removedBundle.callCount,
+            1,
+            'Not fire: removeBundle in custom bundle tracker listener'
+        );
     });
 
     it('notify listener on close tracker', () => {
         let tracker = new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener).open();
         tracker.close();
-        assert.equal(scope.listener.addingBundle.callCount, 2, 'Not fire: addingBundle after tracker close');
+        assert.equal(
+            scope.listener.addingBundle.callCount,
+            2,
+            'Not fire: addingBundle after tracker close'
+        );
         assert.equal(tracker.size(), 0);
     });
 });

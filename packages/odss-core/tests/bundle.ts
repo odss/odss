@@ -1,11 +1,10 @@
 import { assert } from 'chai';
 
-import {Bundles} from '@odss/common';
+import { Bundles } from '@odss/common';
 import Bundle from '../src/bundle';
 
-
 describe('core/bundle', () => {
-    it('imports()', () =>  {
+    it('imports()', () => {
         assert.ok(typeof Bundle === 'function', 'import Bundle');
         assert.ok(Bundles, 'import Bundles');
         assert.ok(Bundles.UNINSTALLED === 1, 'Bundle.UNINSTALLED');
@@ -15,10 +14,10 @@ describe('core/bundle', () => {
         assert.ok(Bundles.STOPPING === 16, 'Bundle.STOPPING');
         assert.ok(Bundles.ACTIVE === 32, 'Bundle.ACTIVE');
     });
-    it('meta', () =>  {
+    it('meta', () => {
         let bundle = new Bundle(123, undefined, {
             name: 'test',
-            namespace: 'ntest'
+            namespace: 'ntest',
         });
         assert.equal(bundle.meta.name, 'test');
         assert.equal(bundle.meta.namespace, 'ntest');

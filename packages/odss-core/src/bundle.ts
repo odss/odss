@@ -1,10 +1,9 @@
-import {Bundles, IBundle, IBundleContext, IFramework, IServiceReference} from '@odss/common';
+import { Bundles, IBundle, IBundleContext, IFramework, IServiceReference } from '@odss/common';
 import { Framework } from './framework';
 
 type TMeta = any;
 
 export default class Bundle implements IBundle {
-
     public readonly meta: TMeta;
 
     private _id: number;
@@ -15,13 +14,13 @@ export default class Bundle implements IBundle {
     constructor(id: number, framework: Framework, meta: TMeta) {
         this._id = id;
         this._framework = framework;
-        this.meta = Object.assign({}, {version: '0.0.0'}, meta);
+        this.meta = Object.assign({}, { version: '0.0.0' }, meta);
         Object.freeze(this.meta);
     }
-    get id(){
+    get id() {
         return this._id;
     }
-    get state(){
+    get state() {
         return this._state;
     }
     get context() {
@@ -34,7 +33,7 @@ export default class Bundle implements IBundle {
         return this.meta.location;
     }
 
-    updateState(state){
+    updateState(state) {
         this._state = state;
     }
     setContext(ctx) {
@@ -72,7 +71,7 @@ const STATES = [
     Bundles.RESOLVED,
     Bundles.STARTING,
     Bundles.STOPPING,
-    Bundles.ACTIVE
+    Bundles.ACTIVE,
 ];
 
 function isState(state) {

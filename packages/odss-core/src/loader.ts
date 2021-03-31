@@ -1,4 +1,4 @@
-import { ILoader } from "@odss/common";
+import { ILoader } from '@odss/common';
 
 class GenericLoader implements ILoader {
     private resolver: Function;
@@ -12,13 +12,11 @@ class GenericLoader implements ILoader {
         const module = typeof require === 'function' ? require(url) : await import(url);
         return { path, location, ...module };
     }
-    async unloadBundle(location): Promise<void> {
-
-    }
+    async unloadBundle(location): Promise<void> {}
     getUrl(path) {
         const time = new Date().getTime();
         const sign = path.includes('?') ? '&' : '?';
-        return [path, sign, time].join("");
+        return [path, sign, time].join('');
     }
 }
 

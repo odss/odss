@@ -1,123 +1,119 @@
 import * as sinon from 'sinon';
 import { Framework } from '../src/framework';
 
-
 let ACTIVATORS = {
-    event: function() {
+    event: function () {
         return {
-            start: function(ctx) {
+            start: function (ctx) {
                 ctx.on.framework.add(() => {});
                 ctx.on.bundle.add(() => {});
                 ctx.on.service.add(() => {});
                 ctx.registerService('test', 'service.test');
             },
-            stop: function(/* ctx */) {
-
-            }
+            stop: function (/* ctx */) {},
         };
     },
-    error_start: function() {
+    error_start: function () {
         return {
-            start: function(/* ctx */) {
+            start: function (/* ctx */) {
                 throw new Error('start');
-            }
+            },
         };
     },
-    error_stop: function() {
+    error_stop: function () {
         return {
-            stop: function(/* ctx */) {
+            stop: function (/* ctx */) {
                 throw new Error('stop');
-            }
+            },
         };
     },
-    service: function() {
+    service: function () {
         return {
-            start: function(ctx) {
+            start: function (ctx) {
                 this.reg = ctx.registerService('test', 'service-test');
             },
-            stop: function() {
+            stop: function () {
                 this.reg.unregister();
-            }
+            },
         };
     },
-    spy: function() {
+    spy: function () {
         return {
-            _spy: function() {
+            _spy: function () {
                 if (!this.spy) {
                     this.spy = {
                         start: sinon.spy(),
-                        stop: sinon.spy()
+                        stop: sinon.spy(),
                     };
                 }
                 return this.spy;
             },
-            start: function() {
+            start: function () {
                 this._spy().start();
             },
-            stop: function() {
+            stop: function () {
                 this._spy().stop();
-            }
+            },
         };
-    }
+    },
 };
 
 const CONFIGS = {
     event: {
-        'name': 'TestActivate',
-        'namespace': 'event',
-        'activator': 'event'
+        name: 'TestActivate',
+        namespace: 'event',
+        activator: 'event',
     },
     'error.start': {
-        'name': 'TestActivate',
-        'namespace': 'error.start',
-        'activator': 'error_start'
+        name: 'TestActivate',
+        namespace: 'error.start',
+        activator: 'error_start',
     },
     'error.stop': {
-        'name': 'TestActivate',
-        'namespace': 'error.stop',
-        'activator': 'error_stop'
+        name: 'TestActivate',
+        namespace: 'error.stop',
+        activator: 'error_stop',
     },
     spy: {
-        'name': 'SpyActivate',
-        'namespace': 'spy',
-        'activator': 'spy'
+        name: 'SpyActivate',
+        namespace: 'spy',
+        activator: 'spy',
     },
     service: {
-        'name': 'ServiceActivate',
-        'namespace': 'service',
-        'activator': 'service'
+        name: 'ServiceActivate',
+        namespace: 'service',
+        activator: 'service',
     },
     'service.next': {
-        'name': 'ServiceActivate',
-        'namespace': 'service.next',
-        'activator': 'service'
+        name: 'ServiceActivate',
+        namespace: 'service.next',
+        activator: 'service',
     },
     listeners: {
-        'name': 'TestActivate',
-        'namespace': 'listeners',
-        'activator': 'service'
+        name: 'TestActivate',
+        namespace: 'listeners',
+        activator: 'service',
     },
     def: {
-        'name': 'TestActivate',
-        'namespace': 'def',
-        'activator': 'event'
+        name: 'TestActivate',
+        namespace: 'def',
+        activator: 'event',
     },
     noactivator: {
-        'name': 'NotActivatorActivate',
-        'namespace': 'noactivator',
+        name: 'NotActivatorActivate',
+        namespace: 'noactivator',
     },
     api: {
-        'name': 'api',
-        'namespace': 'api'
+        name: 'api',
+        namespace: 'api',
     },
     include: {
-        'name': 'include',
-        'namespace': 'include'
-    }
+        name: 'include',
+        namespace: 'include',
+    },
 };
 
 function findConfig(location) {
-
     let config = location in CONFIGS ? CONFIGS[location] : CONFIGS.def;
     let buff: any = {};
     for (let i in config) {
@@ -126,11 +122,11 @@ function findConfig(location) {
     buff.name += '-' + location;
     buff.location = location;
     buff.version = '1.0.0';
-    buff.start = function() {};
-    buff.stop = function() {};
+    buff.start = function () {};
+    buff.stop = function () {};
     if (location in ACTIVATORS) {
-        buff.start = ACTIVATORS[location].start || function() {};
-        buff.stop = ACTIVATORS[location].stop || function() {};
+        buff.start = ACTIVATORS[location].start || function () {};
+        buff.stop = ACTIVATORS[location].stop || function () {};
     }
     return buff;
 }
@@ -143,17 +139,17 @@ class Loader {
         }
         return Promise.reject(`Not found: ${location}`);
     }
-    unloadBundle(){}
+    unloadBundle() {}
     loadStyles(/* bundle */) {}
     removeStyles(/* bundle */) {}
 }
 
 let tests = {
-    framework: async function(autoStart = false) {
+    framework: async function (autoStart = false) {
         let loader = new Loader();
         let framework = new Framework({
             prop1: 'test1',
-            prop2: 'test2'
+            prop2: 'test2',
         });
 
         framework.setLoader(loader as any);
@@ -162,34 +158,33 @@ let tests = {
         }
         return framework;
     },
-    bundle: async function(namespace, autoStart = false) {
+    bundle: async function (namespace, autoStart = false) {
         namespace = namespace || 'def';
         let framework = await this.framework(autoStart);
         await framework.installBundle(namespace, autoStart);
         return framework.getBundle(namespace);
     },
-    factory: async function() {
+    factory: async function () {
         let framework = await this.framework();
         return {
-            bundle: async function(namespace, autoStart = false) {
+            bundle: async function (namespace, autoStart = false) {
                 await framework.installBundle(namespace, autoStart);
                 return framework.getBundle(namespace);
             },
-            framework: async function(noStart=false) {
+            framework: async function (noStart = false) {
                 if (!noStart) {
                     await framework.start();
                 }
                 return framework;
             },
-            events: function() {
+            events: function () {
                 return framework.on;
             },
-            reg: function() {
+            reg: function () {
                 return framework.registry;
-            }
+            },
         };
-    }
+    },
 };
-
 
 export default tests;

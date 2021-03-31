@@ -1,18 +1,28 @@
-import {ILoader, IBundle, Events, Bundles, FrameworkEvent, ServiceEvent, BundleEvent, IBundleContext, IServiceReference, Properties} from '@odss/common';
+import {
+    ILoader,
+    IBundle,
+    Events,
+    Bundles,
+    FrameworkEvent,
+    ServiceEvent,
+    BundleEvent,
+    IBundleContext,
+    IServiceReference,
+    Properties,
+} from '@odss/common';
 import Bundle from './bundle';
 import BundleContext from './context';
 import { createDefaultLoader } from './loader';
 import Registry from './registry';
 import EventDispatcher from './events';
 
-const FRAMEWORK_ID = 0
+const FRAMEWORK_ID = 0;
 
 interface IActivator {
     start(ctx: IBundleContext): Promise<void>;
     stop(ctx: IBundleContext): Promise<void>;
 }
 export class Framework implements IBundle {
-
     readonly id: number = FRAMEWORK_ID;
     readonly location: string = 'odss.framework';
     readonly version: string = '0.0.0';
@@ -37,7 +47,7 @@ export class Framework implements IBundle {
     }
 
     private _nextSid() {
-        return this._SID += 1;
+        return (this._SID += 1);
     }
     getProperty(name, defaultProperty = undefined): any {
         if (this._properties.hasOwnProperty(name)) {
@@ -108,7 +118,7 @@ export class Framework implements IBundle {
         this.state = Bundles.ACTIVE;
         for (const [id, bundle] of this._bundles.entries()) {
             //framework bundle
-            if(id === 0){
+            if (id === 0) {
                 continue;
             }
             try {
@@ -144,7 +154,7 @@ export class Framework implements IBundle {
         throw new Error('Not allowed uninstall framework.');
     }
     async reload(): Promise<void> {
-        throw new Error("Not allowed reload framework");
+        throw new Error('Not allowed reload framework');
     }
 
     async installBundle(location: string, autostart = true): Promise<IBundle> {
@@ -170,7 +180,9 @@ export class Framework implements IBundle {
             return false;
         }
         if (state === Bundles.STARTING) {
-            throw new Error('Bundle ' + bundle.location + ' cannot be started, since it is stopping');
+            throw new Error(
+                'Bundle ' + bundle.location + ' cannot be started, since it is stopping'
+            );
         }
         if (state === Bundles.UNINSTALLED) {
             throw new Error('Cannot start uninstalled bundle: ' + bundle.location);
@@ -205,7 +217,9 @@ export class Framework implements IBundle {
             throw new Error('Cannot stop uninstalled bundle: ' + bundle.location);
         }
         if (state === Bundles.STOPPING) {
-            throw new Error('Bundle: ' + bundle.location + ' cannot be stopped since it is already stopping');
+            throw new Error(
+                'Bundle: ' + bundle.location + ' cannot be stopped since it is already stopping'
+            );
         }
 
         if (state !== Bundles.ACTIVE) {
@@ -236,7 +250,6 @@ export class Framework implements IBundle {
         if (await this.uninstallBundle(bundle)) {
             await this.installBundle(bundle.meta.location, autostart);
         }
-
     }
     async uninstallBundle(bundle: IBundle): Promise<boolean> {
         await sleep();
@@ -281,7 +294,7 @@ export class Framework implements IBundle {
 }
 
 function getActivator(config): IActivator {
-    if(config.hasOwnProperty('Activator')){
+    if (config.hasOwnProperty('Activator')) {
         return new config.Activator();
     }
     const fn = () => {};
@@ -289,17 +302,16 @@ function getActivator(config): IActivator {
     const stop = config.stop || fn;
     return {
         start,
-        stop
+        stop,
     };
 }
 
 export class FrameworkFactory {
-    create(properties: any = {}): Framework{
+    create(properties: any = {}): Framework {
         return new Framework(properties);
     }
 }
 
-
-function sleep(){
+function sleep() {
     return Promise.resolve();
 }

@@ -13,15 +13,13 @@ import {
     IDisposable,
     IServiceObject,
     IServiceRegistration,
-    FilterType
+    FilterType,
 } from '@odss/common';
 import { Framework } from './framework';
 import Bundle from './bundle';
 
 class ServiceObject implements IServiceObject {
-    constructor(private _ctx: IBundleContext, private _reference: IServiceReference) {
-
-    }
+    constructor(private _ctx: IBundleContext, private _reference: IServiceReference) {}
     getService(): any {
         this._ctx.getService(this._reference);
     }
@@ -58,7 +56,7 @@ export default class BundleContext implements IBundleContext {
     getBundles() {
         return this.framework.getBundles();
     }
-    async installBundle(location: string, autoStart=false) {
+    async installBundle(location: string, autoStart = false) {
         return await this.framework.installBundle(location, autoStart);
     }
     async uninstallBundle(bundle: IBundle) {
@@ -85,7 +83,11 @@ export default class BundleContext implements IBundleContext {
     registerStyle(...styles: string[]): { unregister: () => void } {
         return this.framework.registry.registerStyle(this.bundle, styles);
     }
-    serviceTracker<TService>(name: any, listener: IServiceTrackerListener<TService>, filter: FilterType = '') {
+    serviceTracker<TService>(
+        name: any,
+        listener: IServiceTrackerListener<TService>,
+        filter: FilterType = ''
+    ) {
         return new ServiceTracker(this, name, listener, filter).open();
     }
     bundleTracker(mask: number, listener: IBundleTrackerListener) {
@@ -124,17 +126,17 @@ function createEvents(framework: Framework, bundle: IBundle) {
     return Object.freeze({
         service: createEvent(framework.on.service, bundle),
         bundle: createEvent(framework.on.bundle, bundle),
-        framework: createEvent(framework.on.framework, bundle)
-    })
+        framework: createEvent(framework.on.framework, bundle),
+    });
 }
 
 function createEvent<T>(dispacher: any, bundle: IBundle) {
     return Object.freeze({
-        add(listener: any, name: any, filter='') {
+        add(listener: any, name: any, filter = '') {
             dispacher.add(bundle, listener, name, filter);
         },
         remove(listener: any) {
             dispacher.remove(bundle, listener);
-        }
+        },
     });
 }

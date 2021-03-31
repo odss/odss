@@ -1,24 +1,18 @@
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import {
-    Events,
-    Bundles
-}
-from '@odss/common';
+import { Events, Bundles } from '@odss/common';
 
-import {
-    Framework
-} from '../src/framework';
+import { Framework } from '../src/framework';
 
 import tests from './core';
 
 let self: any = {};
 
-describe("odss-core", () => {
-    beforeEach(async function() {
+describe('odss-core', () => {
+    beforeEach(async function () {
         self.bundle = await tests.bundle('event');
     });
-    afterEach(function() {
+    afterEach(function () {
         self.bundle = null;
     });
 
@@ -42,7 +36,6 @@ describe("odss-core", () => {
         await framework.uninstallBundle(bundle);
 
         assert.equal(3, framework.getBundles().length);
-
     });
     it('get unexists bundle', async () => {
         let framework = await tests.framework();
@@ -120,25 +113,47 @@ describe("odss-core", () => {
         let bundle, i;
         for (i = 0; i < bundles.length; i++) {
             bundle = bundles[1];
-            assert.equal(bundle.state, Bundles.INSTALLED, 'Bundle: ' + bundle.meta.name + ' have incorect state: ' + bundle.state + ' after install');
+            assert.equal(
+                bundle.state,
+                Bundles.INSTALLED,
+                'Bundle: ' +
+                    bundle.meta.name +
+                    ' have incorect state: ' +
+                    bundle.state +
+                    ' after install'
+            );
         }
 
         await framework.start();
         for (i = 0; i < bundles.length; i++) {
             bundle = bundles[1];
-            assert.equal(bundle.state, Bundles.ACTIVE, 'Bundle: ' + bundle.meta.name + ' have incorect state: ' + bundle.state + ' after install');
+            assert.equal(
+                bundle.state,
+                Bundles.ACTIVE,
+                'Bundle: ' +
+                    bundle.meta.name +
+                    ' have incorect state: ' +
+                    bundle.state +
+                    ' after install'
+            );
         }
 
         await framework.stop();
         for (i = 0; i < bundles.length; i++) {
             bundle = bundles[1];
-            assert.equal(bundle.state, Bundles.RESOLVED, 'Bundle: ' + bundle.meta.name + ' have incorect state: ' + bundle.state + ' after install');
+            assert.equal(
+                bundle.state,
+                Bundles.RESOLVED,
+                'Bundle: ' +
+                    bundle.meta.name +
+                    ' have incorect state: ' +
+                    bundle.state +
+                    ' after install'
+            );
         }
-
     });
 
     it('framework listeners', async () => {
-
         let framework = new Framework();
 
         let listener = sinon.spy();
@@ -149,15 +164,14 @@ describe("odss-core", () => {
         assert.equal(Events.STARTING, listener.args[0][0].type);
         assert.equal(Events.STARTED, listener.args[1][0].type);
         assert.equal(2, listener.callCount);
-
     });
     it('framework bundle listeners', async () => {
         let framework = await tests.framework();
 
         let events = [];
-        let listener = function(event){
+        let listener = function (event) {
             events.push(event);
-        }
+        };
         await framework.start();
 
         assert.equal(true, framework.on.bundle.add(self.bundle, listener));
@@ -184,7 +198,6 @@ describe("odss-core", () => {
         assert.equal(6, events.length);
 
         await framework.stop();
-
     });
 
     it('framework error listeners', async () => {
