@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "target": "ESNext",
+      "module": "ESNext",
+      "noImplicitAny": false,
+      "strict": false,
+    },
+    "files": [
+        "src/index.ts",
+    ]
+  }
