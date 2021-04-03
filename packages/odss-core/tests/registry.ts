@@ -136,21 +136,6 @@ describe('odss-framework.service', () => {
         assert.equal(0, self.registry.findBundleReferencesInUse(self.sbundle).length);
     });
 
-    it('register service with function namespace', () => {
-        let fn = function a_b_c_d_ITest() {};
-        let reg = self.registry.registerService(self.bundle, fn, 'testService');
-        assert.equal(
-            reg.getReference().getProperties()[OBJECTCLASS],
-            'a.b.c.d.ITest',
-            'Incorect service namesapce'
-        );
-        assert.equal(
-            reg.getReference().getProperty(OBJECTCLASS),
-            'a.b.c.d.ITest',
-            'Incorect service namesapce in reference'
-        );
-    });
-
     it('change properties', () => {
         let reg = self.registry.registerService(self.bundle, 'test', {
             key: 'value',

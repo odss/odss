@@ -4,12 +4,12 @@ import {
     ServiceEvent,
     IBundle,
     OBJECTCLASS,
+    OBJECTCLASS_NAME,
     SERVICE_ID,
     SERVICE_RANKING,
     getTokenTypes,
     IServiceReference,
     IServiceRegistration,
-    getTokenType,
     Properties,
 } from '@odss/common';
 
@@ -48,12 +48,12 @@ export default class Registry {
         service: any,
         properties: Properties = {}
     ): IServiceRegistration {
-        clasess = getTokenTypes(clasess);
-
-        //prepare properties
         const sid = (this._sid += 1);
         this._size += 1;
+        //prepare properties
+        clasess = Array.isArray(clasess) ? clasess : [clasess];
         properties[OBJECTCLASS] = clasess;
+        properties[OBJECTCLASS_NAME] = getTokenTypes(clasess);
         properties[SERVICE_ID] = sid;
         properties[SERVICE_RANKING] = properties[SERVICE_RANKING] || 0;
 
@@ -170,8 +170,8 @@ export default class Registry {
      * @param {(object|string)} filters
      * @return {odss.core.service.Reference}
      */
-    findReference(name: any, filter: string = null): IServiceReference {
-        const references = this._specs.get(getTokenType(name));
+    findReference(name: any = null, filter: string = null): IServiceReference {
+        const references = this._specs.get(name);
         if (references && references.length) {
             if (!filter) {
                 return references[0];
@@ -187,10 +187,20 @@ export default class Registry {
     }
     findReferences(name: any = null, filter = ''): IServiceReference[] {
         if (name === null) {
-            return [...this._services.keys()];
+            if (!filter) {
+                return [...this._services.keys()];
+            }
+            const buff = [];
+            for(const reference of this._services.keys()) {
+                const matcher = squery(filter);
+                if (matcher.match(reference.getProperties())) {
+                    buff.push(reference);
+                }
+            }
+            return buff;
         }
         const buff = [];
-        const references = this._specs.get(getTokenType(name));
+        const references = this._specs.get(name);
         if (references && references.length) {
             if (!filter) {
                 return [...references];
@@ -242,16 +252,6 @@ export default class Registry {
     }
 }
 
-// interface ISortedServiceReference extends IServiceReference {
-//     // getSortValues(): [number, number];
-//     needSortUpdate(): boolean;
-//     updateSortValue(): void;
-//     compare(ref: ISortedServiceReference): number;
-
-//     unusedBy(bundle: IBundle): void;
-//     usedBy(bundle: IBundle): void;
-// }
-
 class ServiceReference implements IServiceReference {
     private _usingBundles: Set<IBundle> = new Set();
     private _sortValue: [number, number] = [0, 0];
@@ -293,6 +293,10 @@ class ServiceReference implements IServiceReference {
     }
     private _computeSortValue(): [number, number] {
         return [this._properties[SERVICE_RANKING], this._id];
+    }
+    toString() {
+        const classes = this.getProperty(OBJECTCLASS).map(item => item.name ? item.name : item);
+        return `[Reference id=${this._id} classes=(${classes.join(',')})>`;
     }
 }
 

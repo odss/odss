@@ -62,7 +62,7 @@ export default class BundleContext implements IBundleContext {
     async uninstallBundle(bundle: IBundle) {
         return await this.framework.uninstallBundle(bundle as any);
     }
-    getServiceReferences(name: any, filter = '') {
+    getServiceReferences(name: any = null, filter = '') {
         return this.framework.registry.findReferences(name, filter);
     }
     getServiceReference(name: any, filter = '') {

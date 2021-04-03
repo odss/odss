@@ -287,9 +287,19 @@ export class Framework implements IBundle {
     }
     getRegisteredServices(): IServiceReference[] {
         return [];
-    }
+    };
+    /**
+     * Returns this bundle's {@code IServiceReference} list for all services it
+     * is using.
+     */
     getServicesInUse(): IServiceReference[] {
         return [];
+    }
+    getBundleServices(bundle: IBundle): IServiceReference[] {
+        return this.registry.findBundleReferences(bundle);
+    }
+    getBundelServicesInUse(bundle: IBundle): IServiceReference[] {
+        return this.registry.findBundleReferencesInUse(bundle);
     }
 }
 

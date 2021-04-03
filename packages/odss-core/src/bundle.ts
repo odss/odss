@@ -55,13 +55,13 @@ export default class Bundle implements IBundle {
         await this._framework.uninstallBundle(this);
     }
     getRegisteredServices(): IServiceReference[] {
-        return [];
+        return this._framework.getBundleServices(this);
     }
     getServicesInUse(): IServiceReference[] {
-        return [];
+        return this._framework.getBundelServicesInUse(this);
     }
     toString() {
-        return `odss-framework.Bundle(id=${this._id} name=${this.meta.name} namespace=${this.meta.namespace})`;
+        return `[Bundle id=${this._id} location=${this.location} state=${this.state}]`;
     }
 }
 

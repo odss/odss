@@ -1,16 +1,14 @@
-import { OBJECTCLASS, getTokenTypes } from '@odss/common';
-import { squery } from '@odss/query';
+import { OBJECTCLASS, OBJECTCLASS_NAME, getTokenTypes } from '@odss/common';
+import { squery, IFilter } from '@odss/query';
 
 /**
  * @param {String|Function|Filter} filter
  * @return Filter
  */
-export function prepareFilter(name: any, filter = '') {
+export function prepareFilter(name: any, filter = ''): IFilter {
     if (!name) {
         return squery(filter ? filter : '(*)');
     }
-
-    name = typeof name === 'string' ? name.trim() : getTokenTypes(name);
     const node = {
         [OBJECTCLASS]: name,
     };

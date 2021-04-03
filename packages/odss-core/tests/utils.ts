@@ -22,7 +22,7 @@ describe('@odss/core/utils', () => {
 
         let filter = $utils.prepareFilter(func);
         assert.equal(filter.name, OBJECTCLASS);
-        assert.equal(filter.value, 'some.simple.Test');
+        assert.equal(filter.value, func);
         assert.equal(filter.opt, 'eq');
     });
 
