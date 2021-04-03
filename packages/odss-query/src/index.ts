@@ -4,6 +4,8 @@ export { escape } from './utils';
 import { parseString, prepareObject } from './parser';
 import { IFilter, Filter, AndFilter } from './filters';
 
+export { IFilter };
+
 export function squery(query: QueryType): IFilter {
     let filter;
     if (Array.isArray(query)) {

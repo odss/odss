@@ -23,7 +23,8 @@
   },
   "files": [
     "README.md",
-    "dist/**/*.*"
+    "dist/*.*",
+    "dist/types/*.d.ts"
   ],
   "devDependencies": {
     "@types/qunit": "^2.11.1",
