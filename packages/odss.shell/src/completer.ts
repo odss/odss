@@ -1,8 +1,9 @@
-import { IShell } from "@odss/api";
+import { IShell } from "@odss/common";
 
 export default class Completer {
     constructor(private shell: IShell) {
     }
+
     async complete(line: string): Promise<string[]> {
         let args = line.trim().split(' ');
         let names = this.shell.getCommandsName();
@@ -12,43 +13,23 @@ export default class Completer {
         if (!name) {
             return names;
         }
-        return [];
-    }
 
-    async complete3(line: string): Promise<any> {
-        let args = line.trim().split(' ');
-        let names = this.shell.getCommandsName();
-
-        //all commands
-        let name = args.shift();
-        if (!name) {
-            return names;
-        }
-
-        let command = this.shell.getCommand(name);
-        if (command) {
-            if (typeof command.complete === 'function') {
-                const options = await command.complete(args);
-                if (options.length === 1) {
-                    return {
-                        names: name + ' ' + options[0],
-                    };
-                } else if (options.length > 1) {
-                    return [name + ' ' + intersection(options)]
-                }
-            }
+        if (this.shell.hasCommand(name)) {
+            let command = this.shell.getCommand(name);
+            // if (typeof command.complete === 'function') {
+            //     return await command.complete(args);
+            // }
         } else {
             //need suggest something
-            let founded: string[] = [],
-                cname;
+            const founded: string[] = [];
             for (let i = 0; i < names.length; i++) {
-                cname = names[i];
+                const cname = names[i];
                 if (cname.indexOf(name) === 0) {
                     founded.push(cname);
                 }
             }
-
-            // resolve([intersection(founded), founded.length > 1 ? founded : []]);
+            return founded;
+            // return await ([intersection(founded), founded.length > 1 ? founded : []]);
         }
         return [];
     }

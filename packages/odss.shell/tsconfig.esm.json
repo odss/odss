@@ -9,13 +9,13 @@
       "experimentalDecorators": true,
       "outDir": "./dist/esm/",
       "declaration": true,
-      "declarationDir":"./types"
+      "declarationDir":"./dist/types/"
   },
   "files": [
       "src/index.ts"
   ],
   "exclude": [
       "node_modules",
-      "dist/*"
+      "dist/**/*.*"
   ]
 }

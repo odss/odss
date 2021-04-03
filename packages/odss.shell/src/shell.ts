@@ -1,68 +1,71 @@
-import { IShell, ICommand } from '@odss/api';
+import { IShell, ICommand, ICommands, ICommandOptions, HandlersContext, HandlerTypes, ICommandHandler } from '@odss/common';
 
 import Completer from './completer';
 
+interface ICommandOptionsHandler {
+    key: string,
+    options: ICommandOptions,
+}
 export default class Shell implements IShell {
-    private _commands: ICommand[] = [];
+    private _handlers: Map<ICommands, ICommand[]> = new Map();
+    private _commands: Map<string, ICommand> = new Map();
     private _completer = new Completer(this);
 
-    hasCommand(id: string): boolean {
-        for (let i = 0; i < this._commands.length; i++) {
-            if (this._commands[i].id === id) {
-                return true;
+
+    bindCommands(command: ICommands) {
+        const metadata = HandlersContext.get<ICommandOptionsHandler[]>(command.constructor).getHandler(HandlerTypes.SHELL_COMMAND) || [];
+        const handlers: ICommand[] = [];
+        for(const { key, options } of metadata) {
+            const execute = command[key].bind(command) as ICommandHandler;
+            const cmd = {
+                ...options,
+                execute,
             }
+            this.addCommand(cmd);
+            handlers.push(cmd);
         }
-        return false;
+        this._handlers.set(command, handlers);
+    }
+    unbindCommands(command: ICommands) {
+        const cmds = this._handlers.get(command) || [];
+        for( const cmd of cmds) {
+            this.removeCommand(cmd);
+        }
+        this._handlers.delete(command);
+
+    }
+    hasCommand(name: string): boolean {
+        return this._commands.has(name);
     }
 
     addCommand(command: ICommand): void {
-        if (this.hasCommand(command.id)) {
-            throw new Error('Command(id= ' + command.id + ') is already registered');
+        if (this._commands.has(command.name)) {
+            throw new Error('Command(id= ' + command.name + ') is already registered');
         }
-        this._commands.push(command);
+        this._commands.set(command.name, command);
     }
-    /**
-     *
-     * @param {String|odss-api.Command} cmd Command or command id
-     */
-    removeCommand(cmd: ICommand) {
-        for (let i = 0; this._commands.length; i++) {
-            if (this._commands[i] === cmd) {
-                this._commands.splice(i, 1);
-                return true;
-            }
+
+    removeCommand(command: ICommand) {
+        if (this._commands.has(command.name)) {
+            this._commands.delete(command.name);
+        } else {
+            throw new Error(`Not found command: ${command.name}`);
         }
-        throw new Error(`Not found command: ${cmd}`);
     }
-    /**
-     * @return {Array} Return list of commands services
-     */
+
     getCommands(): ICommand[] {
-        return this._commands.concat();
+        return [...this._commands.values()];
     }
 
-    /**
-     * @return {Array} Return list of commands services id
-     */
     getCommandsName(): string[] {
-        let buff: string[] = [];
-        for (let i = 0, j = this._commands.length; i < j; i++) {
-            buff.push(this._commands[i].id);
-        }
-        return buff;
+        return [...this._commands.keys()];
     }
 
-    /**
-     * @param {String} id Command id
-     */
-    getCommand(id): ICommand {
-        for (let i = 0, j = this._commands.length; i < j; i++) {
-            let command = this._commands[i];
-            if (command.id === id) {
-                return command;
-            }
+    getCommand(name: string): ICommand {
+        if (this._commands.has(name)) {
+            return this._commands.get(name) as ICommand;
         }
-        throw new Error(`Not found command: ${id}`);
+        throw new Error(`Not found command: ${name}`);
     }
 
     /**
@@ -73,7 +76,7 @@ export default class Shell implements IShell {
     getCommandUsage(id: string): string {
         let command = this.getCommand(id);
         if (command) {
-            return command.id;
+            return command.name;
         }
         return '';
     }
@@ -86,7 +89,7 @@ export default class Shell implements IShell {
     getCommandDescription(id: string): string {
         let command = this.getCommand(id);
         if (command) {
-            return command.id;
+            return command.description || '';
         }
         return '';
     }
@@ -102,12 +105,15 @@ export default class Shell implements IShell {
         let cmdName = args.shift();
         if (cmdName) {
             let command = this.getCommand(cmdName);
-            return command.execute(args);
+            const result = await command.execute(args);
+            if (result ) {
+                return result;
+            }
+            return ''
         }
         throw Error(`Not found`);
     }
-    complete(cmdLine: string): Promise<string[]> {
-        return this._completer.complete(cmdLine);
+    async complete(cmdLine: string): Promise<string[]> {
+        return await this._completer.complete(cmdLine);
     }
 }
-

@@ -1,8 +1,8 @@
-import { IServiceReference, IBundleContext } from '@odss/common';
-import { ICommand, ShellService, CommandService } from '@odss/api';
+import { ShellService, ShellCommandsService, ICommand, IBundleContext, IServiceReference } from '@odss/common';
 
 import Shell from './shell';
-import { AllCommands } from './commands';
+import { Commands } from './commands';
+// import { Bind, Component, Invalidate, Provides, Validate } from '../../odss-decorators/dist/types';
 
 
 let shell;
@@ -12,22 +12,20 @@ export function start(ctx: IBundleContext) {
     shell = new Shell();
 
     ctx.registerService(ShellService, shell);
-
-    tracker = ctx.serviceTracker(CommandService, {
-        addingService: function(reference: IServiceReference, command: object) {
-            shell.addCommand(command);
+    tracker = ctx.serviceTracker(ShellCommandsService, {
+        addingService: function(command: ICommand) {
+            shell.bindCommands(command);
         },
-        modifiedService(reference: IServiceReference, service: Object): void { },
+        modifiedService(): void { },
 
-        removedService: function(reference: IServiceReference, command: object) {
-            shell.removeCommand(command);
+        removedService: function(command: ICommand) {
+            shell.unbindCommands(command);
         }
     }).open();
 
     //create and register all core commands
-    AllCommands.forEach(Command => {
-        ctx.registerService(CommandService, new Command(ctx, shell));
-    });
+    ctx.registerService(ShellCommandsService, new Commands(ctx, shell));
+
 
 }
 
@@ -35,3 +33,27 @@ export function stop() {
     tracker.close();
     shell = null;
 }
+
+// @Component()
+// @Provides(ShellService)
+// class ShellComponent extends Shell {
+
+//     @Validate()
+//     validate() {
+
+//     }
+//     @Invalidate()
+//     invalidate() {
+
+//     }
+//     @Bind()
+//     bindCommand(command: ShellCommandService, ref: IServiceReference) {
+//         const props = ref.getProperties<ICommandInfo>()
+//         this.addCommand(command, props);
+//     }
+//     @Unbind()
+//     unbindCommand(command: ShellCommandService, ref: IServiceReference) {
+//         const { name } = ref.getProperties()
+//         this.removeCommand(name);
+//     }
+// }
