@@ -3,17 +3,22 @@
   "version": "1.0.0",
   "description": "odss bootstrap",
   "license": "MIT",
-  "main": "src/index.js",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/odss/odss"
+  "type": "commonjs",
+  "module": "./src/index.mjs",
+  "bin": {
+    "sboot": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/boot.mjs"
+    }
   },
   "files": [
     "README.md",
-    "src/index.js"
+    "src/*.mjs"
   ],
   "dependencies": {
-    "@stool/dom": "2.2.0",
-    "@odss/framework": "^1.0.0"
+    "@odss/core": "^1.0.0",
+    "resolve": "^1.17.0"
   }
 }
