@@ -1,4 +1,5 @@
 export const OBJECTCLASS = 'objectclass';
+export const OBJECTCLASS_NAME = 'objectclassname';
 export const SERVICE_ID = 'service_id';
 export const SERVICE_RANKING = 'service_ranking';
 
@@ -26,16 +27,18 @@ export const Events = {
     MODIFIED_ENDMATCH: 8,
 };
 
-export const MetadataHandlers = {
+export const HandlerTypes = {
+    FACTORY_HANDLER: 'odss.factory.handler',
     COMPONENT: 'odss.handler.component',
-    PROVIDES: 'odss.hadler.provides',
-    PROPERTY: 'odss.hadler.property',
-    CONSTRUCTOR_DEPENDENCY: 'odss.hadler.params.dependency',
-    PROPERTIES_DEPENDENCY: 'odss.hadler.properties.dependency',
-    INVALIDATE_METHOD: 'odss.hadler.invalidate.method',
-    VALIDATE_METHOD: 'odss.hadler.validate.method',
-    BIND_DEPENDENCY: 'odss.hadler.bind',
-    UNBIND_DEPENDENCY: 'odss.hadler.unbind',
-    MODIFIED_DEPENDENCY: 'odss.hadler.modified',
-    UPDATE_DEPENDENCY: 'odss.hadler.update',
+    PROVIDES: 'odss.handler.provides',
+    PROPERTY: 'odss.handler.property',
+    CONSTRUCTOR_DEPENDENCY: 'odss.handler.constructor.dependency',
+    PROPERTIES_DEPENDENCY: 'odss.handler.properties.dependency',
+    BIND_DEPENDENCY: 'odss.handler.bind',
+    UNBIND_DEPENDENCY: 'odss.handler.unbind',
+    MODIFIED_DEPENDENCY: 'odss.handler.modified',
+    UPDATE_DEPENDENCY: 'odss.handler.update',
+    INVALIDATE_METHOD: 'odss.handler.invalidate.method',
+    VALIDATE_METHOD: 'odss.handler.validate.method',
+    SHELL_COMMAND: "odss.shell.command",
 };

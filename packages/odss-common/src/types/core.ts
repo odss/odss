@@ -1,5 +1,6 @@
 export type NamedServiceType =
     | string
+    | null
     | (() => void)
     | {
           name: string;
@@ -25,8 +26,8 @@ export interface IDisposable {
 }
 
 export interface IFramework extends IBundle {
-    getProperty(name: string, defaultValue: any): any;
-    getProperties(): Properties;
+    getProperty<T>(name: string, defaultValue: T): T;
+    getProperties<T extends Properties>(): T;
     hasBundle(bundle: IBundle): boolean;
     getBundle(bundleId: number): IBundle;
     getBundles(): Array<IBundle>;
@@ -92,15 +93,15 @@ export interface IServiceObject {
 export interface IBundleContext {
     installBundle(location: string, autostart: boolean): Promise<IBundle>;
     registerService(name: any, service: any, properties?: Properties): IServiceRegistration;
-    getServiceReference(name: NamedServiceType, filter?: FilterType): IServiceReference;
-    getServiceReferences(name: NamedServiceType, filter?: FilterType): IServiceReference[];
+    getServiceReference(name?: NamedServiceType, filter?: FilterType): IServiceReference;
+    getServiceReferences(name?: NamedServiceType, filter?: FilterType): IServiceReference[];
     // getBundleServiceReferences(name: any, filter?: any): IServiceReference[];
     getService(reference: IServiceReference): any;
     getServiceObject(reference: IServiceReference): IServiceObject;
     ungetService(reference: IServiceReference): any;
     getBundle(id?: number): IBundle;
     getBundles(): Array<IBundle>;
-    getProperty(name: string, def: any): any;
+    getProperty<T extends any>(name: string, def: T): T;
 
     addServiceListener(listener: IServiceListener, name: any, filter: FilterType): IDisposable;
     addBundleListener(listener: IBundleListener): IDisposable;

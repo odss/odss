@@ -12,6 +12,10 @@ module.exports = function(config) {
         karmaTypescriptConfig: {
             compilerOptions: {
                 module: "commonjs",
+                baseUrl: ".",
+                paths: {
+                    "@odss/common": ["src/index"]
+                }
             },
         },
         // reporters: ['progress'],

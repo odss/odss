@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-      "target": "ESNext",
-      "module": "CommonJS",
-      "noImplicitAny": false,
-      "strict": true
+        "target": "ESNext",
+        "module": "CommonJS",
+        "noImplicitAny": false,
+        "strict": false,
     },
     "files": [
         "src/index.ts"

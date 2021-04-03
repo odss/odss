@@ -4,18 +4,19 @@
   "description": "ODSS Common",
   "license": "MIT",
   "source": "src/index.ts",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "dist/common.js",
+  "module": "dist/common.mjs",
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/common.mjs",
+      "require": "./dist/common.js"
     }
   },
   "scripts": {
     "build": "microbundle build --no-compress --no-sourcemap --external=reflect-metadata --target=node -f es,cjs",
-    "test": "mocha --require ts-node/register tests/*.ts",
+    "dev": "microbundle build --watch --no-compress --no-sourcemap --external=reflect-metadata --target=node -f es,cjs",
+    "test": "mocha --require ts-node/register tests/*.ts tests/**/*.ts",
     "karma": "karma start --single-run",
     "lint": "eslint src/*",
     "format": "prettier src/ tests/ --write",
