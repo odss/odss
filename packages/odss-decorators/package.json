@@ -1,0 +1,54 @@
+{
+  "name": "@odss/decorators",
+  "version": "1.0.0",
+  "description": "ODSS default decorators",
+  "license": "MIT",
+  "source": "src/index.ts",
+  "main": "dist/decorators.js",
+  "module": "dist/decorators.mjs",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/decorators.mjs",
+      "require": "./dist/decorators.js"
+    }
+  },
+  "scripts": {
+    "build": "microbundle build --no-compress --no-sourcemap --external=reflect-metadata,@odss/common --target=node -f es,cjs",
+    "test": "mocha --require ts-node/register tests/*.ts",
+    "karma": "karma start --single-run",
+    "lint": "eslint src/*",
+    "format": "prettier src/ tests/ --write",
+    "prepare": "npm run build"
+  },
+  "files": [
+    "README.md",
+    "dist/*.js",
+    "dist/*.mjs",
+    "dist/types/*.d.ts"
+  ],
+  "dependencies": {
+    "@odss/common": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.15",
+    "@types/mocha": "^8.2.2",
+    "@types/reflect-metadata": "^0.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/parser": "^4.20.0",
+    "chai": "^4.3.4",
+    "eslint": "^7.23.0",
+    "karma": "^6.3.2",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^2.1.0",
+    "karma-mocha": "^2.0.1",
+    "karma-typescript": "^5.5.1",
+    "microbundle": "^0.13.0",
+    "mocha": "^8.3.2",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  }
+}
