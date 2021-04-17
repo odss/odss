@@ -1,55 +1,38 @@
-import { IShell, ICommand, ICommands, ICommandOptions, HandlersContext, HandlerTypes, ICommandHandler } from '@odss/common';
+import { IShell, ICommand } from '@odss/common';
 
 import Completer from './completer';
 
-interface ICommandOptionsHandler {
-    key: string,
-    options: ICommandOptions,
-}
-export default class Shell implements IShell {
-    private _handlers: Map<ICommands, ICommand[]> = new Map();
+const DEFAULT_NAMESPACE = 'default';
+
+export class Shell implements IShell {
     private _commands: Map<string, ICommand> = new Map();
     private _completer = new Completer(this);
 
-
-    bindCommands(command: ICommands) {
-        const metadata = HandlersContext.get<ICommandOptionsHandler[]>(command.constructor).getHandler(HandlerTypes.SHELL_COMMAND) || [];
-        const handlers: ICommand[] = [];
-        for(const { key, options } of metadata) {
-            const execute = command[key].bind(command) as ICommandHandler;
-            const cmd = {
-                ...options,
-                execute,
-            }
-            this.addCommand(cmd);
-            handlers.push(cmd);
-        }
-        this._handlers.set(command, handlers);
-    }
-    unbindCommands(command: ICommands) {
-        const cmds = this._handlers.get(command) || [];
-        for( const cmd of cmds) {
-            this.removeCommand(cmd);
-        }
-        this._handlers.delete(command);
-
-    }
     hasCommand(name: string): boolean {
         return this._commands.has(name);
     }
 
     addCommand(command: ICommand): void {
-        if (this._commands.has(command.name)) {
-            throw new Error('Command(id= ' + command.name + ') is already registered');
+        for (const name of getCommandNames(command)) {
+            this._addCommand(name, command);
         }
-        this._commands.set(command.name, command);
     }
-
-    removeCommand(command: ICommand) {
-        if (this._commands.has(command.name)) {
-            this._commands.delete(command.name);
+    private _addCommand(name: string, command: ICommand): void {
+        if (this._commands.has(name)) {
+            throw new Error(`Command: ${name} is already registered`);
+        }
+        this._commands.set(name, command);
+    }
+    removeCommand(command: ICommand): void {
+        for (const name of getCommandNames(command)) {
+            this._removeCommand(name);
+        }
+    }
+    private _removeCommand(name: string): void {
+        if (this._commands.has(name)) {
+            this._commands.delete(name);
         } else {
-            throw new Error(`Not found command: ${command.name}`);
+            throw new Error(`Not found command: ${name}`);
         }
     }
 
@@ -68,52 +51,52 @@ export default class Shell implements IShell {
         throw new Error(`Not found command: ${name}`);
     }
 
-    /**
-     *
-     * @param {String} id Command id
-     * @return {String} Command usage
-     */
-    getCommandUsage(id: string): string {
-        let command = this.getCommand(id);
+    getCommandUsage(name: string): string {
+        const command = this.getCommand(name);
         if (command) {
             return command.name;
         }
         return '';
     }
 
-    /**
-     *
-     * @param {String} id Command id
-     * @return {String} Command description
-     */
-    getCommandDescription(id: string): string {
-        let command = this.getCommand(id);
+    getCommandDescription(name: string): string {
+        const command = this.getCommand(name);
         if (command) {
             return command.description || '';
         }
         return '';
     }
 
-    /**
-     *
-     * @param {String} cmdLine
-     * @param {Callback} out
-     * @param {Callback} err
-     */
     async execute(cmdLine: string): Promise<string> {
-        let args = cmdLine.split(' ');
-        let cmdName = args.shift();
+        const args = cmdLine.split(' ');
+        const cmdName = args.shift();
         if (cmdName) {
-            let command = this.getCommand(cmdName);
+            const command = this.getCommand(cmdName);
             const result = await command.execute(args);
-            if (result ) {
+            if (result) {
                 return result;
             }
-            return ''
+            return '';
         }
-        throw Error(`Not found`);
+        throw Error('Not found');
     }
+
     async complete(cmdLine: string): Promise<string[]> {
         return await this._completer.complete(cmdLine);
+    }
+}
+
+function* getCommandNames({ name, alias, namespace }: ICommand): Iterable<string> {
+    const names = [name];
+    if (alias) {
+        if (!Array.isArray(alias)) {
+            alias = [alias];
+        }
+        names.push(...alias);
+    }
+
+    namespace = namespace || DEFAULT_NAMESPACE;
+    for (const name of names) {
+        yield namespace == DEFAULT_NAMESPACE ? name : `${namespace}:${name}`;
     }
 }

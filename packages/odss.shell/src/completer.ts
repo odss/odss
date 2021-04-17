@@ -1,24 +1,23 @@
-import { IShell } from "@odss/common";
+import { IShell } from '@odss/common';
 
 export default class Completer {
-    constructor(private shell: IShell) {
-    }
+    constructor(private shell: IShell) {}
 
     async complete(line: string): Promise<string[]> {
-        let args = line.trim().split(' ');
-        let names = this.shell.getCommandsName();
+        const args = line.trim().split(' ');
+        const names = this.shell.getCommandsName();
 
         //all commands
-        let name = args.shift();
+        const name = args.shift();
         if (!name) {
             return names;
         }
 
         if (this.shell.hasCommand(name)) {
-            let command = this.shell.getCommand(name);
-            // if (typeof command.complete === 'function') {
-            //     return await command.complete(args);
-            // }
+            const command = this.shell.getCommand(name);
+            if (typeof command === 'function') {
+                //     return await command.complete(args);
+            }
         } else {
             //need suggest something
             const founded: string[] = [];
@@ -65,7 +64,6 @@ function intersection(items: string[]): string {
                 letter = '';
                 break;
             }
-
         }
         buff += letter;
         ++pos;
