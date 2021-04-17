@@ -2,3 +2,4 @@ dist
 .history
 .vscode
 package-lock.json
+coverage
