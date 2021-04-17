@@ -1,17 +1,18 @@
+import { IComponent } from '@odss/cdi-common';
 import {
     IServiceReference,
     IServiceTrackerListener,
     ServiceTracker,
-    IBundleContext
-} from "@odss/common";
-import { InstanceWrapper } from "./instance-wrapper";
+    IBundleContext,
+} from '@odss/common';
+// import { InstanceWrapper } from "./instance-wrapper";
 
-interface ICardinality extends IServiceTrackerListener {
+interface ICardinality extends IServiceTrackerListener<any> {
     isSatisfied(): boolean;
 }
 
-interface IDependency extends IServiceTrackerListener{
-    open(): void
+interface IDependency extends IServiceTrackerListener<any> {
+    open(): void;
     close(): void;
     isSatisfied(): boolean;
 }
@@ -20,26 +21,25 @@ interface IDependency extends IServiceTrackerListener{
  * Candinality: 0..1
  */
 export class OptionalCardinality implements ICardinality {
-
-    protected serviceId: number = 0;
+    protected ref: IServiceReference = null;
 
     constructor(private dependency: IDependency) {}
 
-    addingService(reference: IServiceReference, service: any) {
-        if (this.serviceId === null) {
-            this.serviceId = reference.id;
-            this.dependency.addingService(reference, service);
+    addingService(service: any, reference: IServiceReference) {
+        if (this.ref === null) {
+            this.ref = reference;
+            this.dependency.addingService(service, reference);
         }
     }
-    modifiedService(reference: IServiceReference, service: any) {
-        if (this.serviceId === reference.id) {
-            this.dependency.modifiedService(reference, service);
+    modifiedService(service: any, reference: IServiceReference) {
+        if (this.ref === reference) {
+            this.dependency.modifiedService(service, reference);
         }
     }
-    removedService(reference: IServiceReference, service: any) {
-        if (this.serviceId === reference.id) {
-            this.serviceId = 0;
-            this.dependency.removedService(reference, service);
+    removedService(service: any, reference: IServiceReference) {
+        if (this.ref === reference) {
+            this.dependency.removedService(service, reference);
+            this.ref = null;
         }
     }
 
@@ -52,9 +52,8 @@ export class OptionalCardinality implements ICardinality {
  * Candinality: 1..1
  */
 class MandatoryCardinality extends OptionalCardinality {
-
     isSatisfied() {
-        return this.serviceId !== null;
+        return this.ref !== null;
     }
 }
 
@@ -62,22 +61,21 @@ class MandatoryCardinality extends OptionalCardinality {
  * Candinality: 0..n
  */
 class MultipleCardinality implements ICardinality {
-
     protected counter: number = 0;
 
     constructor(private dependency: IDependency) {}
 
-    addingService(reference: IServiceReference, service: any) {
+    addingService(service: any, reference: IServiceReference) {
         this.counter += 1;
-        this.dependency.addingService(reference, service);
+        this.dependency.addingService(service, reference);
     }
 
-    modifiedService(reference: IServiceReference, service: any) {
-        this.dependency.modifiedService(reference, service);
+    modifiedService(service: any, reference: IServiceReference) {
+        this.dependency.modifiedService(service, reference);
     }
 
-    removedService(reference: IServiceReference, service: any) {
-        this.dependency.removedService(reference, service);
+    removedService(service: any, reference: IServiceReference) {
+        this.dependency.removedService(service, reference);
         this.counter -= 1;
     }
 
@@ -89,7 +87,6 @@ class MultipleCardinality implements ICardinality {
  * Candinality: 1..n
  */
 class MandatoryMultipleCardinality extends MultipleCardinality {
-
     isSatisfied() {
         return this.counter > 0;
     }
@@ -109,20 +106,15 @@ export function getCardinality(dependency: IDependency, cardinality: string): IC
     throw new Error(`Unknown candinality: ${cardinality}`);
 }
 
-
 export class ConstructorDependency implements IDependency {
-
-    private tracker: ServiceTracker
+    private tracker: ServiceTracker;
     private cardinality: ICardinality;
     private _service: any = null;
 
-    constructor(
-        private ctx: IBundleContext,
-        private config: any,
-    ) {
-        const { type } = config;
+    constructor(private ctx: IBundleContext, config: any, private notifier: () => void) {
+        const { token } = config;
         this.cardinality = getCardinality(this, '1..1');
-        this.tracker = ctx.serviceTracker(type, this.cardinality);
+        this.tracker = new ServiceTracker(ctx, token, this.cardinality);
     }
     open() {
         this.tracker.open();
@@ -130,15 +122,15 @@ export class ConstructorDependency implements IDependency {
     close() {
         this.tracker.close();
     }
-    addingService(reference: IServiceReference, service: any) {
+    addingService(service: any) {
         this._service = service;
     }
 
-    modifiedService(reference: IServiceReference, service: any) {
-    }
+    modifiedService(service: any) {}
 
-    removedService(reference: IServiceReference, service: any) {
+    removedService(service: any) {
         this._service = null;
+
     }
     get service() {
         return this._service;
@@ -149,18 +141,14 @@ export class ConstructorDependency implements IDependency {
 }
 
 export class ParamDependency implements IDependency {
-
-    private tracker: ServiceTracker
+    private tracker: ServiceTracker;
     private cardinality: ICardinality;
     private _service: any = null;
 
-    constructor(
-        ctx: IBundleContext,
-        private config: any,
-    ) {
-        const { type } = config;
+    constructor(ctx: IBundleContext, private config: any, private notifier: () => void) {
+        const { token } = config;
         this.cardinality = getCardinality(this, '1..1');
-        this.tracker = ctx.serviceTracker(type, this.cardinality);
+        this.tracker = new ServiceTracker(ctx, token, this.cardinality);
     }
     get service() {
         return this._service;
@@ -174,15 +162,16 @@ export class ParamDependency implements IDependency {
     close() {
         this.tracker.close();
     }
-    addingService(reference: IServiceReference, service: any) {
+    addingService(service: any) {
         this._service = service;
+        this.notifier();
     }
 
-    modifiedService(reference: IServiceReference, service: any) {
-    }
+    modifiedService(service: any) {}
 
-    removedService(reference: IServiceReference, service: any) {
+    removedService(service: any) {
         this._service = null;
+        this.notifier();
     }
     isSatisfied() {
         return this.cardinality.isSatisfied();
@@ -190,18 +179,13 @@ export class ParamDependency implements IDependency {
 }
 
 export class ReferenceDependency implements IDependency {
-
-    private tracker: ServiceTracker
+    private tracker: ServiceTracker;
     private cardinality: ICardinality;
 
-    constructor(
-        private instanceWrapper: InstanceWrapper,
-        private ctx: IBundleContext,
-        private config: any,
-    ) {
-        const { type } = config;
+    constructor(private ctx: IBundleContext, private component: IComponent, private config: any) {
+        const { token } = config;
         this.cardinality = getCardinality(this, '0..n');
-        this.tracker = ctx.serviceTracker(type, this.cardinality);
+        this.tracker = new ServiceTracker(ctx, token, this.cardinality);
     }
     public open() {
         this.tracker.open();
@@ -209,15 +193,19 @@ export class ReferenceDependency implements IDependency {
     public close() {
         this.tracker.close();
     }
-    addingService(reference: IServiceReference, service: any) {
-        this.instanceWrapper.invoke(this.config.bind, reference, service);
+    addingService(service: any, reference: IServiceReference) {
+        console.log('addingService')
+        const { bind } = this.config;
+        if (bind) {
+            this.component.invoke(bind, [service, reference]);
+        }
     }
-
-    modifiedService(reference: IServiceReference, service: any) {
-    }
-
-    removedService(reference: IServiceReference, service: any) {
-        this.instanceWrapper.invoke(this.config.unbind, reference, service);
+    modifiedService(service: any) {}
+    removedService(service: any, reference: IServiceReference) {
+        const { unbind } = this.config;
+        if (unbind) {
+            this.component.invoke(unbind, [service, reference]);
+        }
     }
     public isSatisfied() {
         return this.cardinality.isSatisfied();

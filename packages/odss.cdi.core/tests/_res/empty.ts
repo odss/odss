@@ -1,5 +1,3 @@
 function test() {}
 
-class Test {
-
-}
+class Test {}

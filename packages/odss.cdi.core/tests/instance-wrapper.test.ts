@@ -1,14 +1,14 @@
-import { MetadataScanner, Metadata } from '../src/metadata';
-import * as componentsModule from './_res/components';
-import { InstanceWrapper } from '../src/instance-wrapper';
+import { assert } from 'chai';
 
-QUnit.module('@odss/cdi.core/instance-wrapper', hooks => {
+import { Component } from '../src/component';
+
+describe('@odss/cdi.core/instance-wrapper', () => {
     const ARGS = [];
-    hooks.beforeEach(() => {
+    beforeEach(() => {
         ARGS.length = 0;
-    })
+    });
 
-    class Component {
+    class TextComponent {
         constructor(...args) {
             ARGS.push({
                 name: 'constructor',
@@ -22,30 +22,54 @@ QUnit.module('@odss/cdi.core/instance-wrapper', hooks => {
             });
         }
     }
-    const metadata = MetadataScanner.scan(Component);
-
-    QUnit.test('invoke(name, ...args)', assert => {
-        const wrapper = new InstanceWrapper(Component, metadata);
-
-        assert.notOk(wrapper.isCreated())
-        wrapper.create();
-
-        assert.ok(wrapper.isCreated())
-
-        wrapper.invoke('add', 1);
-        wrapper.invoke('add', 2);
-
-        const expected = [{
-            name: 'constructor',
-            args: [],
-        },{
-            name: 'add',
-            args: [1],
-        }, {
-            name: 'add',
-            args: [2],
-        }];
+    it('create()', () => {
+        const wrapper = new Component(TextComponent);
+        assert.notOk(wrapper.isCreated());
+        wrapper.create([1, 2, 3, 4]);
+        assert.isOk(wrapper.isCreated());
+        const expected = [
+            {
+                name: 'constructor',
+                args: [1, 2, 3, 4],
+            },
+        ];
         assert.deepEqual(ARGS, expected);
     });
+    it('set(name, value)', () => {
+        const wrapper = new Component(TextComponent);
+        assert.notOk(wrapper.isCreated());
+        const instance = wrapper.create();
+        wrapper.set('name', 'value');
+        assert.equal(instance.name, 'value');
+        assert.throws(() => {
+            instance.name = 'test';
+        });
+    });
+    it('invoke(name, [args])', () => {
+        const wrapper = new Component(TextComponent);
 
+        assert.notOk(wrapper.isCreated());
+        wrapper.create();
+
+        assert.ok(wrapper.isCreated());
+
+        wrapper.invoke('add', [1, 2, 3]);
+        wrapper.invoke('add', [2, 3, 4]);
+
+        const expected = [
+            {
+                name: 'constructor',
+                args: [],
+            },
+            {
+                name: 'add',
+                args: [1, 2, 3],
+            },
+            {
+                name: 'add',
+                args: [2, 3, 4],
+            },
+        ];
+        assert.deepEqual(ARGS, expected);
+    });
 });

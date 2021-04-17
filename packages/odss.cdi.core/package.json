@@ -1,39 +1,55 @@
 {
-  "name": "@odss/cdi.core",
-  "version": "1.0.0",
-  "license": "MIT",
-  "author": "smialy",
-  "main": "dist/node/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
-  "scripts": {
-    "build": "npm run build:clean && npm run build:all",
-    "build:all": "tsc && tsc -p tsconfig.esm.json",
-    "build:clean": "rm -rf dist/ && rm -rf types",
-    "test": "qunit --require ts-node/register tests/*",
-    "karma_": "karma start --single-run",
-    "lint": "tslint src/* tests/*",
-    "prepare": "npm run build"
-  },
-  "dependencies": {
-    "@odss/common": "^1.0.0",
-    "@odss/cdi": "^1.0.0"
-  },
-  "devDependencies": {
-    "@types/qunit": "^2.9.0",
-    "@types/reflect-metadata": "^0.1.0",
-    "eslint": "^6.1.0",
-    "karma": "^4.2.0",
-    "karma-chrome-launcher": "^3.0.0",
-    "karma-firefox-launcher": "^1.2.0",
-    "karma-qunit": "^4.0.0",
-    "karma-typescript": "^4.1.1",
-    "qunit": "^2.9.2",
-    "renamer": "^1.1.2",
-    "sinon": "^7.4.1",
-    "ts-node": "^8.3.0",
-    "tslib": "^1.10.0",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.3"
-  }
+    "name": "@odss/cdi.core",
+    "version": "1.0.0",
+    "description": "Odss Cdi Core",
+    "license": "MIT",
+    "source": "src/index.ts",
+    "main": "dist/cdi.js",
+    "module": "dist/cdi.mjs",
+    "types": "dist/types/index.d.ts",
+    "scripts": {
+        "build": "microbundle build --no-compress --no-sourcemap --external @odss/common --external @odss/cdi-common --target=node -f es,cjs",
+        "build:dev": "npm run build -- --watch",
+        "test": "mocha --require ts-node/register tests/*.ts",
+        "karma": "karma start --single-run",
+        "lint": "eslint src/*",
+        "format": "prettier src/ tests --write",
+        "prepare": "npm run build"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/cdi.mjs",
+            "require": "./dist/cdi.js"
+        }
+    },
+    "dependencies": {
+        "@odss/cdi-common": "1.0.0",
+        "@odss/common": "1.0.0"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.15",
+        "@types/mocha": "^8.2.2",
+        "@types/node": "^14.14.37",
+        "@types/reflect-metadata": "^0.1.0",
+        "@typescript-eslint/eslint-plugin": "^4.20.0",
+        "eslint": "^7.23.0",
+        "karma": "^6.3.2",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-firefox-launcher": "^2.1.0",
+        "karma-mocha": "^2.0.1",
+        "karma-typescript": "^5.5.1",
+        "microbundle": "^0.13.0",
+        "mocha": "^8.3.2",
+        "prettier": "^2.2.1",
+        "reflect-metadata": "^0.1.13",
+        "sinon": "^10.0.0",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.2.3"
+    },
+    "files": [
+        "dist/*.js",
+        "dist/*.mjs",
+        "dist/types/*.d.ts",
+        "README.md"
+    ]
 }

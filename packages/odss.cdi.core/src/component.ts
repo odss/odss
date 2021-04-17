@@ -1,23 +1,16 @@
-import { Metadata } from './metadata';
+import { IComponent } from '@odss/cdi-common';
 
-
-export class InstanceWrapper {
-
+export class Component implements IComponent {
     private instance: any = null;
 
-    constructor(
-        public readonly target: any,
-        public readonly metatada: Metadata
-    ) {
-
-    }
+    constructor(public readonly target: any) {}
     public isCreated() {
         return this.instance !== null;
     }
     public getInstance(): any {
         return this.instance;
     }
-    public create(dependencies=[]): void {
+    public create(dependencies = []): any {
         if (this.instance) {
             this.throwError('Object is created.');
         }
@@ -30,13 +23,16 @@ export class InstanceWrapper {
         } catch (ex) {
             this.throwError('Problem with creating object.', ex);
         }
+        return this.instance;
     }
-    public invoke(name: string, ...args: any[]): void {
+    public invoke(name: string, args: any[]): void {
         if (this.instance === null) {
-            this.throwError('Not created object.');
+            this.throwError(
+                `Cannot invoke method ${this.target.name}.${name}() because object wasn't created.`
+            );
         }
         if (typeof this.instance[name] !== 'function') {
-            this.throwError('Incorrect invoked method: ' + name);
+            this.throwError(`Incorrect invoked method: ${name}`);
         }
         return this.instance[name](...args);
     }
@@ -62,12 +58,4 @@ export class InstanceWrapper {
         // let name = this.metadata.name !== this.metadata.specifications ? this.metadata.name + '(' + (this.metadata.specifications) + ')' : this.metadata.name;
         // throw new Error('Some problem with this.component "' + name + '". ' + reason + ' (' + ex + ')', ex);
     }
-
-    private createError(reason: string, ex: any = null) {
-        // this.component = null;
-        // this.methods = [];
-        // let name = this.metadata.name !== this.metadata.specifications ? this.metadata.name + '(' + (this.metadata.specifications) + ')' : this.metadata.name;
-        // return new Error(`Can\'t create component ${name}. ${reason} (${ex})`, ex);
-    }
-
 }
