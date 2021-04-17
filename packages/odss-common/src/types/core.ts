@@ -11,14 +11,38 @@ export type Properties = {
     [key: string]: any;
 };
 
+export type Properties2<P> = {
+    [Property in keyof P]: P[Property];
+};
+
 export type FilterType = string | Properties;
 
-export type ModuleType = {
+export interface IActivator {
+    /**
+     * Called when this bundle is started
+     *
+     * @param ctx IBundleContext
+     */
+    start?(ctx: IBundleContext): Promise<void>;
+
+    /**
+     * Called when this bundle is stopped
+     *
+     * @param ctx IBundleContext
+     */
+    stop?(ctx: IBundleContext): Promise<void>;
+}
+
+export interface IModule extends IActivator {
+    path: string;
+    name: string;
+    Activator?: new () => IActivator;
     [key: string]: any;
-};
+}
+
 export interface ILoader {
-    loadBundle(location: string): Promise<ModuleType>;
-    unloadBundle(location: string): Promise<void>;
+    loadBundle(name: string): Promise<IModule>;
+    unloadBundle(name: string): Promise<void>;
 }
 
 export interface IDisposable {
@@ -26,12 +50,12 @@ export interface IDisposable {
 }
 
 export interface IFramework extends IBundle {
-    getProperty<T>(name: string, defaultValue: T): T;
-    getProperties<T extends Properties>(): T;
+    getProperty<T, K extends keyof T>(name: K, defaultValue: T): T;
+    getProperties<P extends Properties>(): P;
     hasBundle(bundle: IBundle): boolean;
     getBundle(bundleId: number): IBundle;
     getBundles(): Array<IBundle>;
-    installBundle(location: string, autostart: boolean): Promise<IBundle>;
+    installBundle(name: string, autostart: boolean): Promise<IBundle>;
     uninstallBundle(bundle: IBundle): Promise<boolean>;
     startBundle(bundle: IBundle): Promise<void>;
     stopBundle(bundle: IBundle): Promise<void>;
@@ -62,10 +86,10 @@ export interface IEventListeners {
 export interface IBundle {
     readonly id: number;
     readonly state: number;
-    readonly location: string;
+    readonly name: string;
     readonly context: IBundleContext;
     readonly version: string;
-    // readonly meta: any;
+    readonly module: IModule;
 
     start(): Promise<void>;
     stop(): Promise<void>;
@@ -84,23 +108,27 @@ export interface IBundle {
      */
     getServicesInUse(): IServiceReference[];
 }
-export interface IServiceObject {
-    getService(): any;
+export interface IServiceObject<S> {
+    getService(): S;
     ungetService(): void;
     getServiceReference(): IServiceReference;
 }
 
 export interface IBundleContext {
-    installBundle(location: string, autostart: boolean): Promise<IBundle>;
-    registerService(name: any, service: any, properties?: Properties): IServiceRegistration;
+    installBundle(name: string, autostart: boolean): Promise<IBundle>;
+    registerService<S extends any>(
+        name: NamedServiceType,
+        service: S,
+        properties?: Properties
+    ): IServiceRegistration;
     getServiceReference(name?: NamedServiceType, filter?: FilterType): IServiceReference;
     getServiceReferences(name?: NamedServiceType, filter?: FilterType): IServiceReference[];
     // getBundleServiceReferences(name: any, filter?: any): IServiceReference[];
-    getService(reference: IServiceReference): any;
-    getServiceObject(reference: IServiceReference): IServiceObject;
-    ungetService(reference: IServiceReference): any;
+    getService<S extends any>(reference: IServiceReference): S;
+    getServiceObject<S extends any>(reference: IServiceReference): IServiceObject<S>;
+    ungetService(reference: IServiceReference): void;
     getBundle(id?: number): IBundle;
-    getBundles(): Array<IBundle>;
+    getBundles(): IBundle[];
     getProperty<T extends any>(name: string, def: T): T;
 
     addServiceListener(listener: IServiceListener, name: any, filter: FilterType): IDisposable;
@@ -109,18 +137,11 @@ export interface IBundleContext {
     removeServiceListener(listener: IServiceListener): void;
     removeBundleListener(listener: IBundleListener): void;
     removeFrameworkListener(listener: IFrameworkListener): void;
-
-    serviceTracker<TService>(
-        name: NamedServiceType,
-        listener: IServiceTrackerListener<TService>,
-        filter?: FilterType
-    );
-    bundleTracker(mask: number, listener: IBundleTrackerListener);
 }
 
 export interface IServiceReference {
-    getProperty(key: string): any;
-    getProperties(): Properties;
+    getProperty<T extends any>(key: string): T;
+    getProperties<P extends Properties>(): P;
     getPropertyKeys(): string[];
     usingBundles(): IBundle[];
 }

@@ -27,7 +27,7 @@ export const Events = {
     MODIFIED_ENDMATCH: 8,
 };
 
-export const HandlerTypes = {
+export const MetadataTypes = {
     FACTORY_HANDLER: 'odss.factory.handler',
     COMPONENT: 'odss.handler.component',
     PROVIDES: 'odss.handler.provides',
@@ -40,5 +40,8 @@ export const HandlerTypes = {
     UPDATE_DEPENDENCY: 'odss.handler.update',
     INVALIDATE_METHOD: 'odss.handler.invalidate.method',
     VALIDATE_METHOD: 'odss.handler.validate.method',
-    SHELL_COMMAND: "odss.shell.command",
+    SHELL_COMMAND: 'odss.shell.command',
+    SHELL_COMMANDS: 'odss.shell.commands',
+    SHELL_COMMANDS_HANDLER: 'odss.shell.commands.handler',
+
 };

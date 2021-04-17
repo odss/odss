@@ -4,11 +4,16 @@
         "module": "CommonJS",
         "noImplicitAny": false,
         "strict": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "files": [
         "src/index.ts"
     ],
     "exclude": [
         "node_modules"
-    ]
+    ],
+    "ts-node": {
+        "transpileOnly": true
+    }
 }

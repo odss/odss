@@ -12,9 +12,15 @@ export interface ICommands {
     [key: string]: ICommandHandler;
 }
 export interface ICommand extends ICommandOptions {
-    execute: ICommandHandler,
+    execute: ICommandHandler;
 }
-
+export interface ICommandHandlerMetadata {
+    key: string;
+    options: ICommandOptions;
+}
+export interface ICommandsMetadata {
+    namespace: string;
+}
 export interface IShell {
     hasCommand(name: string): boolean;
     addCommand(cmd: ICommand): void;
@@ -34,8 +40,8 @@ export class ShellCommandService implements ICommand {
     alias?: string | string[];
     description?: string;
 
-    execute(cmdLine: string[]): Promise<string> {
-        throw new TypeError("Method not implemented.");
+    execute(): Promise<string> {
+        throw new TypeError('Method not implemented.');
     }
 }
 export class ShellCommandsService implements ICommands {
@@ -43,34 +49,34 @@ export class ShellCommandsService implements ICommands {
 }
 
 export abstract class ShellService implements IShell {
-    hasCommand(name: string): boolean {
-        throw new Error("Method not implemented.");
+    hasCommand(): boolean {
+        throw new Error('Method not implemented.');
     }
-    addCommand(cmd: ICommand): void {
-        throw new Error("Method not implemented.");
+    addCommand(): void {
+        throw new Error('Method not implemented.');
     }
-    removeCommand(cmd: ICommand): void {
-        throw new Error("Method not implemented.");
+    removeCommand(): void {
+        throw new Error('Method not implemented.');
     }
     getCommands(): ICommand[] {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     getCommandsName(): string[] {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
-    getCommand(name: string): ICommand {
-        throw new Error("Method not implemented.");
+    getCommand(): ICommand {
+        throw new Error('Method not implemented.');
     }
-    getCommandUsage(name: string): string {
-        throw new Error("Method not implemented.");
+    getCommandUsage(): string {
+        throw new Error('Method not implemented.');
     }
-    getCommandDescription(name: string): string {
-        throw new Error("Method not implemented.");
+    getCommandDescription(): string {
+        throw new Error('Method not implemented.');
     }
-    execute(line: string): Promise<string> {
-        throw new Error("Method not implemented.");
+    execute(): Promise<string> {
+        throw new Error('Method not implemented.');
     }
-    complete(line: string): Promise<string[]> {
-        throw new Error("Method not implemented.");
+    complete(): Promise<string[]> {
+        throw new Error('Method not implemented.');
     }
 }

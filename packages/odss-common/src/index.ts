@@ -1,8 +1,6 @@
-import 'reflect-metadata';
-
+export * from './types/index';
 export * from './consts';
 export * from './events';
-export * from './cdi';
+export * from './metadata';
 export * from './trackers';
 export * from './utils';
-export * from './types/index';
