@@ -6,7 +6,7 @@ const DEFAULT_CONFIG = {
 };
 
 export async function boot({ properties, bundles }, runner=syncRunner) {
-    console.log({ properties, bundles});
+    // console.log({ properties, bundles});
     let framework = new FrameworkFactory().create(properties || {});
     await framework.start();
     await runner(framework, bundles || []);
@@ -14,8 +14,8 @@ export async function boot({ properties, bundles }, runner=syncRunner) {
 }
 
 export async function asyncRunner(framework, bundles) {
-    await Promise.all(bundles.map(location =>
-        framework.installBundle(location, true)
+    await Promise.all(bundles.map(name =>
+        framework.installBundle(name, true)
     ));
 }
 

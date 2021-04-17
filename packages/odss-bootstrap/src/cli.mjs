@@ -20,7 +20,6 @@ program.parse(process.argv);
 (async function() {
       try {
         const options = program.opts();
-        console.log(options);
 
         const root = await run(process.cwd(), options);
         let shuttingDown = false;

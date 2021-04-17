@@ -15,12 +15,12 @@ export async function run(basedir, { bundles, properties, ...options }) {
     };
     config.properties.loader = {
         async resolver(id) {
-            const location = await resolvePromise(id, {
+            const name = await resolvePromise(id, {
                 basedir,
                 packageFilter,
                 extensions: ['.mjs']
             });
-            return location;
+            return name;
         }
     }
     return await boot(config, syncRunner);
