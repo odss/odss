@@ -1,27 +1,20 @@
 import {
-    ServiceTracker,
-    BundleTracker,
     IBundleContext,
     IBundle,
-    IFramework,
     IServiceReference,
     IServiceListener,
     IBundleListener,
     IFrameworkListener,
-    IBundleTrackerListener,
-    IServiceTrackerListener,
     IDisposable,
     IServiceObject,
     IServiceRegistration,
-    FilterType,
 } from '@odss/common';
 import { Framework } from './framework';
-import Bundle from './bundle';
 
-class ServiceObject implements IServiceObject {
+class ServiceObject<S> implements IServiceObject<S> {
     constructor(private _ctx: IBundleContext, private _reference: IServiceReference) {}
-    getService(): any {
-        this._ctx.getService(this._reference);
+    getService(): S {
+        return this._ctx.getService(this._reference);
     }
     ungetService() {
         this._ctx.ungetService(this._reference);
@@ -56,8 +49,8 @@ export default class BundleContext implements IBundleContext {
     getBundles() {
         return this.framework.getBundles();
     }
-    async installBundle(location: string, autoStart = false) {
-        return await this.framework.installBundle(location, autoStart);
+    async installBundle(name: string, autoStart = false) {
+        return await this.framework.installBundle(name, autoStart);
     }
     async uninstallBundle(bundle: IBundle) {
         return await this.framework.uninstallBundle(bundle as any);
@@ -71,7 +64,7 @@ export default class BundleContext implements IBundleContext {
     getService(reference: IServiceReference): any {
         return this.framework.registry.find(this.bundle, reference);
     }
-    getServiceObject(reference: IServiceReference): ServiceObject {
+    getServiceObject<S>(reference: IServiceReference): ServiceObject<S> {
         return new ServiceObject(this, reference);
     }
     ungetService(reference: IServiceReference) {
@@ -79,19 +72,6 @@ export default class BundleContext implements IBundleContext {
     }
     registerService(name: any, service: any, properties: object = {}): IServiceRegistration {
         return this.framework.registry.registerService(this.bundle, name, service, properties);
-    }
-    registerStyle(...styles: string[]): { unregister: () => void } {
-        return this.framework.registry.registerStyle(this.bundle, styles);
-    }
-    serviceTracker<TService>(
-        name: any,
-        listener: IServiceTrackerListener<TService>,
-        filter: FilterType = ''
-    ) {
-        return new ServiceTracker(this, name, listener, filter).open();
-    }
-    bundleTracker(mask: number, listener: IBundleTrackerListener) {
-        return new BundleTracker(this, mask, listener);
     }
     onService(listener: IServiceListener, name: any, filter = '') {
         // return this.framework.onService(listener, name, filter);

@@ -117,7 +117,7 @@ describe('odss-core', () => {
                 bundle.state,
                 Bundles.INSTALLED,
                 'Bundle: ' +
-                    bundle.meta.name +
+                    bundle.name +
                     ' have incorect state: ' +
                     bundle.state +
                     ' after install'
@@ -131,7 +131,7 @@ describe('odss-core', () => {
                 bundle.state,
                 Bundles.ACTIVE,
                 'Bundle: ' +
-                    bundle.meta.name +
+                    bundle.name +
                     ' have incorect state: ' +
                     bundle.state +
                     ' after install'
@@ -145,7 +145,7 @@ describe('odss-core', () => {
                 bundle.state,
                 Bundles.RESOLVED,
                 'Bundle: ' +
-                    bundle.meta.name +
+                    bundle.name +
                     ' have incorect state: ' +
                     bundle.state +
                     ' after install'

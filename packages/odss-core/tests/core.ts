@@ -113,31 +113,31 @@ const CONFIGS = {
     },
 };
 
-function findConfig(location) {
-    let config = location in CONFIGS ? CONFIGS[location] : CONFIGS.def;
+function findConfig(name) {
+    let config = name in CONFIGS ? CONFIGS[name] : CONFIGS.def;
     let buff: any = {};
     for (let i in config) {
         buff[i] = config[i];
     }
-    buff.name += '-' + location;
-    buff.location = location;
+    buff.name += '-' + name;
+    buff.name = name;
     buff.version = '1.0.0';
     buff.start = function () {};
     buff.stop = function () {};
-    if (location in ACTIVATORS) {
-        buff.start = ACTIVATORS[location].start || function () {};
-        buff.stop = ACTIVATORS[location].stop || function () {};
+    if (name in ACTIVATORS) {
+        buff.start = ACTIVATORS[name].start || function () {};
+        buff.stop = ACTIVATORS[name].stop || function () {};
     }
     return buff;
 }
 
 class Loader {
-    loadBundle(location) {
-        let config = findConfig(location);
+    loadBundle(name) {
+        let config = findConfig(name);
         if (config) {
             return Promise.resolve(config);
         }
-        return Promise.reject(`Not found: ${location}`);
+        return Promise.reject(`Not found: ${name}`);
     }
     unloadBundle() {}
     loadStyles(/* bundle */) {}

@@ -1,21 +1,19 @@
-import { Bundles, IBundle, IBundleContext, IFramework, IServiceReference } from '@odss/common';
+import { Bundles, IBundle, IBundleContext, IModule, IServiceReference } from '@odss/common';
 import { Framework } from './framework';
 
-type TMeta = any;
-
 export default class Bundle implements IBundle {
-    public readonly meta: TMeta;
+
+    public readonly module: IModule;
 
     private _id: number;
     private _state: number = Bundles.INSTALLED;
     private _ctx?: IBundleContext = null;
-    private _framework: Framework;
+    private _framework?: Framework = null;
 
-    constructor(id: number, framework: Framework, meta: TMeta) {
+    constructor(id: number, framework: Framework, module: IModule) {
         this._id = id;
         this._framework = framework;
-        this.meta = Object.assign({}, { version: '0.0.0' }, meta);
-        Object.freeze(this.meta);
+        this.module = module;
     }
     get id() {
         return this._id;
@@ -29,8 +27,8 @@ export default class Bundle implements IBundle {
     get version(): string {
         return '0.0.0';
     }
-    get location(): string {
-        return this.meta.location;
+    get name(): string {
+        return this.module.name;
     }
 
     updateState(state) {
@@ -61,7 +59,7 @@ export default class Bundle implements IBundle {
         return this._framework.getBundelServicesInUse(this);
     }
     toString() {
-        return `[Bundle id=${this._id} location=${this.location} state=${this.state}]`;
+        return `[Bundle id=${this._id} name=${this.name} state=${this.state}]`;
     }
 }
 

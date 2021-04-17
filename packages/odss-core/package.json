@@ -9,6 +9,7 @@
   "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "microbundle build --no-compress --no-sourcemap --external @odss/common --target=node -f es,cjs",
+    "build:dev": "npm run build -- --watch",
     "test": "mocha --require ts-node/register tests/*.ts",
     "karma": "karma start --single-run",
     "lint": "eslint src/*",

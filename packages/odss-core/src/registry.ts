@@ -296,7 +296,7 @@ class ServiceReference implements IServiceReference {
     }
     toString() {
         const classes = this.getProperty(OBJECTCLASS).map(item => item.name ? item.name : item);
-        return `[Reference id=${this._id} classes=(${classes.join(',')})>`;
+        return `[Reference id=${this._id} classes=(${classes.join(',')})]`;
     }
 }
 
@@ -337,7 +337,6 @@ class ServiceRegistration implements IServiceRegistration {
         }
 
         if (wasChange) {
-            console.log('update');
             this._registry.updateProperties(this, oldProperties);
         }
     }

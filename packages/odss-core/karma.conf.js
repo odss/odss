@@ -10,6 +10,9 @@ module.exports = function(config) {
             "**/*.ts": ["karma-typescript"]
         },
         karmaTypescriptConfig: {
+            coverageOptions: {
+                instrumentation: false,
+            },
             compilerOptions: {
                 target: "ESNext",
                 module: "commonjs",

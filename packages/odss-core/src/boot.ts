@@ -16,7 +16,7 @@ export async function boot({ properties, bundles } = DEFAULT_CONFIG, runner = as
 }
 
 export async function asyncRunner(framework: Framework, bundles: string[]): Promise<void> {
-    await Promise.all(bundles.map(location => framework.installBundle(location, true)));
+    await Promise.all(bundles.map(name => framework.installBundle(name, true)));
 }
 
 export async function syncRunner(framework: Framework, bundles: string[]): Promise<void> {

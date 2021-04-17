@@ -1,4 +1,5 @@
-import { ILoader } from '@odss/common';
+import { IModule, ILoader } from '@odss/common';
+
 
 class GenericLoader implements ILoader {
     private resolver: Function;
@@ -6,13 +7,14 @@ class GenericLoader implements ILoader {
     constructor({ resolver }) {
         this.resolver = resolver ? resolver : name => name;
     }
-    async loadBundle(location): Promise<any> {
-        const path = await this.resolver(location);
+    async loadBundle(name: string): Promise<IModule> {
+        const path = await this.resolver(name);
         const url = this.getUrl(path);
         const module = typeof require === 'function' ? require(url) : await import(url);
-        return { path, location, ...module };
+        return Object.freeze({ path, name, ...module });
     }
-    async unloadBundle(location): Promise<void> {}
+    async unloadBundle(name): Promise<void> {}
+
     getUrl(path) {
         const time = new Date().getTime();
         const sign = path.includes('?') ? '&' : '?';

@@ -16,11 +16,11 @@ describe('core/bundle', () => {
     });
     it('meta', () => {
         let bundle = new Bundle(123, undefined, {
-            name: 'test',
-            namespace: 'ntest',
+            path: 'test',
+            name: 'ntest',
         });
-        assert.equal(bundle.meta.name, 'test');
-        assert.equal(bundle.meta.namespace, 'ntest');
+        assert.equal(bundle.module.path, 'test');
+        assert.equal(bundle.module.name, 'ntest');
         assert.equal(bundle.version, '0.0.0');
     });
 });
