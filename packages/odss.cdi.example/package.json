@@ -1,11 +1,32 @@
 {
-  "name": "odss.cdi.test",
+  "name": "@odss/cdi.example",
   "version": "1.0.0",
   "license": "MIT",
   "author": "smialy",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/odss/cdi"
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   },
-  "main": "index.js"
+  "scripts": {
+    "build": "microbundle build --no-compress --no-sourcemap --target=node -f es,cjs"
+  },
+  "dependencies": {
+      "@odss/common": "^1.0.0",
+      "@odss/cdi-decorators": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.36",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "eslint": "^7.23.0",
+    "microbundle": "^0.13.0",
+    "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  }
 }
