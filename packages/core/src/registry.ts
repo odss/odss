@@ -191,7 +191,7 @@ export default class Registry {
                 return [...this._services.keys()];
             }
             const buff = [];
-            for(const reference of this._services.keys()) {
+            for (const reference of this._services.keys()) {
                 const matcher = squery(filter);
                 if (matcher.match(reference.getProperties())) {
                     buff.push(reference);
@@ -295,7 +295,7 @@ class ServiceReference implements IServiceReference {
         return [this._properties[SERVICE_RANKING], this._id];
     }
     toString() {
-        const classes = this.getProperty(OBJECTCLASS).map(item => item.name ? item.name : item);
+        const classes = this.getProperty(OBJECTCLASS).map(item => (item.name ? item.name : item));
         return `[Reference id=${this._id} classes=(${classes.join(',')})]`;
     }
 }

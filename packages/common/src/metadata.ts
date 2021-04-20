@@ -29,12 +29,11 @@ export interface MetadataScanKeys<M> {
 }
 
 export class Metadata {
-
     static scan<I, R = any>(instance: I, prototype: any, callback: MetadataScanCallback<R>): R[] {
         const proto =
-        typeof prototype === 'undefined' || prototype === null
-        ? Object.getPrototypeOf(instance)
-        : prototype;
+            typeof prototype === 'undefined' || prototype === null
+                ? Object.getPrototypeOf(instance)
+                : prototype;
         return scanMetadata<R>(proto, callback);
     }
     static scanByKey<I, M = any>(instance: I, prototype: any, key: string): MetadataScanKeys<M>[] {

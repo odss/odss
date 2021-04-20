@@ -16,7 +16,8 @@ import {
 import { toDisposable } from './utils';
 import { ServiceEvent, BundleEvent } from './events';
 
-export class ServiceTracker<S = any> implements IServiceTrackerListener<S>, IServiceTrackerCustomizer<S> {
+export class ServiceTracker<S = any>
+    implements IServiceTrackerListener<S>, IServiceTrackerCustomizer<S> {
     private _tracked?: ServiceTracked<S>;
     private _listenerDispose?: IDisposable;
 
@@ -32,7 +33,6 @@ export class ServiceTracker<S = any> implements IServiceTrackerListener<S>, ISer
         if (this._listener === null) {
             this._listener = this;
         }
-
     }
     open(): this {
         if (!this._tracked) {
@@ -223,11 +223,7 @@ class ServiceTracked<TService> implements IServiceListener {
 class BundleTracked {
     private bundles: Set<IBundle> = new Set();
 
-    constructor(
-        private mask: number,
-        private listener: IBundleTrackerListener
-    ) {
-    }
+    constructor(private mask: number, private listener: IBundleTrackerListener) {}
     bundleEvent(event: BundleEvent) {
         if (event.bundle.state & this.mask) {
             this.track(event.bundle);

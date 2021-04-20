@@ -1,20 +1,20 @@
 {
-  "name": "@odss/cdi-decorators",
+  "name": "@odss/cdi",
   "version": "1.0.0",
   "description": "ODSS CDI",
   "license": "MIT",
-  "source": "src/cdi.decorators.ts",
-  "main": "dist/decorators.js",
-  "module": "dist/decorators.mjs",
+  "source": "src/index.ts",
+  "main": "dist/cdi.js",
+  "module": "dist/cdi.mjs",
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/decorators.mjs",
-      "require": "./dist/decorators.js"
+      "import": "./dist/cdi.mjs",
+      "require": "./dist/cdi.js"
     }
   },
   "scripts": {
-    "build": "microbundle build --no-compress --no-sourcemap --external=@odss/common --target=node -f es,cjs",
+    "build": "microbundle build --no-compress --no-sourcemap --external=@odss/common,@odss/cdi-common --target=node -f es,cjs",
     "build:dev": "npm run build -- --watch",
     "test": "mocha --require ts-node/register tests/*.ts",
     "karma": "karma start --single-run",

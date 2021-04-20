@@ -2,7 +2,6 @@ import { Bundles, IBundle, IBundleContext, IModule, IServiceReference } from '@o
 import { Framework } from './framework';
 
 export default class Bundle implements IBundle {
-
     public readonly module: IModule;
 
     private _id: number;

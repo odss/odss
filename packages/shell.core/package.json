@@ -1,18 +1,18 @@
 {
-  "name": "@odss/shell",
+  "name": "@odss/shell.core",
   "version": "1.0.0",
-  "description": "ODSS Shell",
+  "description": "ODSS Shell Core",
   "license": "MIT",
   "author": "smialy",
   "type": "module",
   "source": "src/index.ts",
-  "main": "dist/shell.js",
-  "module": "dist/shell.mjs",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/shell.mjs",
-      "require": "./dist/shell.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "scripts": {
@@ -25,9 +25,10 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@odss/common": "1.0.0"
-  },
-  "devDependencies": {
+    "@odss/common": "1.0.0",
+    "@odss/shell": "1.0.0"
+},
+"devDependencies": {
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.2",
     "@typescript-eslint/eslint-plugin": "^4.20.0",
@@ -42,7 +43,13 @@
     "microbundle": "^0.13.0",
     "mocha": "^8.3.2",
     "prettier": "^2.2.1",
+    "reflect-metadata": "^0.1.13",
     "typescript": "^4.2.3",
     "ts-node": "^9.1.1"
-  }
+  },
+  "files": [
+    "README.md",
+    "dist/*.*",
+    "dist/types/*.d.ts"
+  ]
 }

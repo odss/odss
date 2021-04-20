@@ -38,7 +38,7 @@ export class Framework extends Bundle implements IBundle {
     public registry: Registry;
 
     constructor(properties: any = {}) {
-        super(FRAMEWORK_ID, null, { path: "@odss/core", name: "@odss/core" });
+        super(FRAMEWORK_ID, null, { path: '@odss/core', name: '@odss/core' });
         this._properties = properties;
         this._bundles.set(this.id, this);
         this.on = new EventDispatcher();
@@ -48,8 +48,8 @@ export class Framework extends Bundle implements IBundle {
     private _nextSid() {
         return (this._SID += 1);
     }
-    getProperty(name, defaultProperty = undefined): any {
-        if (this._properties.hasOwnProperty(name)) {
+    getProperty(name, defaultProperty = null): any {
+        if (Object.prototype.hasOwnProperty.call(this._properties, name)) {
             return this._properties[name];
         }
         if (defaultProperty !== undefined) {
@@ -179,9 +179,7 @@ export class Framework extends Bundle implements IBundle {
             return false;
         }
         if (state === Bundles.STARTING) {
-            throw new Error(
-                'Bundle ' + bundle.name + ' cannot be started, since it is stopping'
-            );
+            throw new Error('Bundle ' + bundle.name + ' cannot be started, since it is stopping');
         }
         if (state === Bundles.UNINSTALLED) {
             throw new Error('Cannot start uninstalled bundle: ' + bundle.name);
@@ -286,7 +284,7 @@ export class Framework extends Bundle implements IBundle {
     }
     getRegisteredServices(): IServiceReference[] {
         return [];
-    };
+    }
     getServicesInUse(): IServiceReference[] {
         return [];
     }
@@ -299,7 +297,7 @@ export class Framework extends Bundle implements IBundle {
 }
 
 function getActivator(config: IModule): IActivator {
-    if (config.hasOwnProperty('Activator')) {
+    if (Object.prototype.hasOwnProperty.call(config, 'Activator')) {
         return new config.Activator();
     }
     const fn = () => {};

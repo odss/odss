@@ -8,20 +8,15 @@ export function Command(options: string | ICommandOptions) /*: MethodDecorator *
         } as ICommandOptions;
     }
     return (target: object, key: string) => {
-        Metadata
-            .target(target, key)
-            .set(MetadataTypes.SHELL_COMMANDS_HANDLER, options);
+        Metadata.target(target, key).set(MetadataTypes.SHELL_COMMANDS_HANDLER, options);
     };
 }
-
 interface CommandsMetadata {
     namespace: string;
 }
 
-export function Commands(namespace="default"): ClassDecorator {
-   return (target: object) => {
-        Metadata
-            .target(target)
-            .set<CommandsMetadata>(MetadataTypes.SHELL_COMMAND, { namespace });
-    }
+export function Commands(namespace = 'default'): ClassDecorator {
+    return (target: object) => {
+        Metadata.target(target).set<CommandsMetadata>(MetadataTypes.SHELL_COMMAND, { namespace });
+    };
 }

@@ -9,7 +9,7 @@
         "types": ["mocha"]
     },
     "files": [
-        "src/cdi.decorators.ts"
+        "src/index.ts"
     ],
     "exclude": [
         "node_modules"

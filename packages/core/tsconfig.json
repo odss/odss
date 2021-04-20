@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "esnext",
-        "module": "ESNext",
+        "module": "CommonJS",
         "moduleResolution": "node",
         "noImplicitAny": false,
         "removeComments": true,

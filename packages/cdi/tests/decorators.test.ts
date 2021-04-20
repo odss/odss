@@ -14,7 +14,7 @@ import {
     Unbind,
     Modified,
     Update,
-} from '../src/cdi.decorators';
+} from '../src/decorators';
 
 
 describe('@Component()', () => {
