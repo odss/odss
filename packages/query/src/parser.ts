@@ -1,7 +1,7 @@
+
 import * as consts from './consts';
-import { QueryObject } from './types';
+import { IFilter, ICompositeFilter, QueryObject } from './types';
 import {
-    IFilter,
     Filter,
     AndFilter,
     EqFilter,
@@ -10,7 +10,6 @@ import {
     NotFilter,
     AllFilter,
     PresentFilter,
-    ICompositeFilter,
 } from './filters';
 
 export function prepareObject(query: QueryObject): IFilter {
@@ -40,7 +39,7 @@ export function parseString(query: string): IFilter {
         query = `(${query})`;
     }
     if (query.charAt(0) !== '(') {
-        throw new TypeError('Miss startring: (');
+        throw new TypeError('Miss starting: (');
     }
     if (query.charAt(query.length - 1) !== ')') {
         throw new TypeError('Miss ending: )');
@@ -119,7 +118,7 @@ function subquery(query: string, start: number, end: number): IFilter {
         return new AllFilter();
     }
     if (!sub) {
-        throw new Error('Empty query');
+        throw new Error('Empty query.');
     }
     if (!/[~$^<>=*]/.test(query)) {
         return new PresentFilter(sub);

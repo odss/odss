@@ -3,8 +3,6 @@ import {
     ICommand,
     ICommands,
     ICommandHandler,
-    ICommandsMetadata,
-    ICommandHandlerMetadata,
     IShell,
     Metadata,
     ServiceTracker,
@@ -20,13 +18,13 @@ export class CommandsTracker extends ServiceTracker {
         super(ctx, ShellCommandService);
     }
 
-    addingService(command: ICommand): void {
-        this.shell.addCommand(command);
+    async addingService(command: ICommand): Promise<void> {
+        await this.shell.addCommand(command);
     }
-    modifiedService(): void {}
+    async modifiedService(): Promise<void> {}
 
-    removedService(command: ICommand): void {
-        this.shell.removeCommand(command);
+    async removedService(command: ICommand): Promise<void> {
+        await this.shell.removeCommand(command);
     }
 }
 
@@ -37,15 +35,19 @@ export class CommandHandlersTracker extends ServiceTracker {
         super(ctx, ShellCommandsService);
     }
 
-    addingService(command: ICommands): void {
-        this.bindCommands(command);
+    async addingService(command: ICommands): Promise<void> {
+        // throw new Error(`kaboom`);
+        await this.bindCommands(command);
     }
-    modifiedService(): void {}
+    async modifiedService(): Promise<void> {}
 
-    removedService(command: ICommands): void {
-        this.unbindCommands(command);
+    async removedService(command: ICommands): Promise<void> {
+        await this.unbindCommands(command);
     }
     bindCommands(command: ICommands): void {
+        if (this._handlers.has(command)) {
+            throw new Error(`Command: ${command.constructor.name} is already registered`);
+        }
         const { namespace } =
             Metadata.target(command.constructor).get(MetadataTypes.SHELL_COMMANDS) || [];
 
@@ -55,6 +57,7 @@ export class CommandHandlersTracker extends ServiceTracker {
                 MetadataTypes.SHELL_COMMANDS_HANDLER
             ) || [];
         const handlers: ICommand[] = [];
+
         for (const { method, metadata } of metadataHandlers) {
             const execute = method.bind(command) as ICommandHandler;
             const cmd = {

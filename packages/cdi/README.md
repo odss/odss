@@ -1,2 +1,2 @@
-ODSS Common
+ODSS CDI 
 ===

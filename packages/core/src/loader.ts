@@ -14,7 +14,7 @@ class GenericLoader implements ILoader {
         const path = await this.resolver(name);
         const url = this.getUrl(path);
         const module = typeof require === 'function' ? require(url) : await import(url);
-        return Object.freeze({ path, name, ...module });
+        return Object.freeze({ path, name, url, ...module });
     }
     async unloadBundle(): Promise<void> {
         // pass

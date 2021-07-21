@@ -4,10 +4,10 @@ import {
     ServiceEvent,
     IBundle,
     OBJECTCLASS,
-    OBJECTCLASS_NAME,
     SERVICE_ID,
     SERVICE_RANKING,
     getTokenTypes,
+    getTokenType,
     IServiceReference,
     IServiceRegistration,
     Properties,
@@ -32,28 +32,27 @@ const sortReferences = (ref1, ref2) => {
 };
 
 export default class Registry {
-    public events: any;
     private _services: Map<ServiceReference, TServiceInfo> = new Map();
     private _specs: Map<string, ServiceReference[]> = new Map();
     private _registrations: WeakMap<ServiceRegistration, ServiceReference> = new WeakMap();
     private _styles: any = {};
     private _size = 0;
     private _sid = 0;
-    constructor(events) {
-        this.events = events;
+    constructor(public events: any) {
     }
-    registerService(
+    async registerService(
         bundle: IBundle,
         clasess: any[],
         service: any,
         properties: Properties = {}
-    ): IServiceRegistration {
+    ): Promise<IServiceRegistration> {
         const sid = (this._sid += 1);
         this._size += 1;
         //prepare properties
-        clasess = Array.isArray(clasess) ? clasess : [clasess];
+        clasess = getTokenTypes(clasess)
+        // clasess = Array.isArray(clasess) ? clasess : [clasess];
         properties[OBJECTCLASS] = clasess;
-        properties[OBJECTCLASS_NAME] = getTokenTypes(clasess);
+        // properties[OBJECTCLASS_NAME] = getTokenTypes(clasess);
         properties[SERVICE_ID] = sid;
         properties[SERVICE_RANKING] = properties[SERVICE_RANKING] || 0;
 
@@ -77,7 +76,7 @@ export default class Registry {
             refs.sort(sortReferences);
             this._specs.set(token, refs);
         }
-        this.events.service.fire(new ServiceEvent(Events.REGISTERED, registration.getReference()));
+        await this.events.service.fire(new ServiceEvent(Events.REGISTERED, registration.getReference()));
         return registration;
     }
     registerStyle(bundle: IBundle, styles: string[]) {
@@ -92,13 +91,13 @@ export default class Registry {
         return this._styles[bundle.id];
     }
 
-    unregister(registration: ServiceRegistration) {
+    async unregister(registration: ServiceRegistration): Promise<boolean> {
         const reference = this._registrations.get(registration);
         if (reference) {
             const info = this._services.get(reference);
             if (info) {
                 const bundle = registration.getBundle();
-                this.events.service.fire(new ServiceEvent(Events.UNREGISTERED, info.reference));
+                await this.events.service.fire(new ServiceEvent(Events.UNREGISTERED, info.reference));
                 if (info.using.size) {
                     throw new Error(
                         'Service: "' +
@@ -127,11 +126,11 @@ export default class Registry {
         return false;
     }
 
-    unregisterAll(bundle) {
+    async unregisterAll(bundle): Promise<void> {
         const bid = bundle.id;
         for (const info of this._services.values()) {
             if (info.bid === bid) {
-                this.unregister(info.registration);
+                await this.unregister(info.registration);
             }
         }
         // if(this._styles[bid]){
@@ -171,7 +170,7 @@ export default class Registry {
      * @return {odss.core.service.Reference}
      */
     findReference(name: any = null, filter: string = null): IServiceReference {
-        const references = this._specs.get(name);
+        const references = this._specs.get(getTokenType(name));
         if (references && references.length) {
             if (!filter) {
                 return references[0];
@@ -200,7 +199,7 @@ export default class Registry {
             return buff;
         }
         const buff = [];
-        const references = this._specs.get(name);
+        const references = this._specs.get(getTokenType(name));
         if (references && references.length) {
             if (!filter) {
                 return [...references];
@@ -238,7 +237,7 @@ export default class Registry {
     size() {
         return this._size;
     }
-    updateProperties(registration: ServiceRegistration, oldProps: Properties) {
+    async updateProperties(registration: ServiceRegistration, oldProps: Properties): Promise<void> {
         const reference = registration.getReference();
         if (reference.checkSortValue()) {
             const specs = reference.getProperty(OBJECTCLASS);
@@ -248,7 +247,7 @@ export default class Registry {
                 this._specs.set(token, refs);
             }
         }
-        this.events.service.fire(new ServiceEvent(Events.MODIFIED, reference, oldProps));
+        await this.events.service.fire(new ServiceEvent(Events.MODIFIED, reference, oldProps));
     }
 }
 
@@ -259,8 +258,14 @@ class ServiceReference implements IServiceReference {
     constructor(private _id: number, private _properties: any) {
         this.checkSortValue();
     }
-    getProperty(key: string) {
-        return this._properties[key];
+    getProperty<T = any>(name: string, defaultProperty: T = null): T {
+        if (this._properties.hasOwnProperty(name)) {
+            return this._properties[name];
+        }
+        if (defaultProperty !== null) {
+            return defaultProperty;
+        }
+        return null;
     }
     getPropertyKeys(): string[] {
         return Object.keys(this._properties);
@@ -301,24 +306,26 @@ class ServiceReference implements IServiceReference {
 }
 
 class ServiceRegistration implements IServiceRegistration {
-    private _reference = new ServiceReference(this._id, this._properties);
+    private _reference: ServiceReference;
 
     constructor(
         private _registry: Registry,
         private _bundle: IBundle,
         private _id: number,
         private _properties: Properties
-    ) {}
+    ) {
+        this._reference = new ServiceReference(this._id, this._properties);
+    }
     getBundle(): IBundle {
         return this._bundle;
     }
     getReference(): ServiceReference {
         return this._reference;
     }
-    unregister(): void {
+    async unregister(): Promise<void> {
         this._registry.unregister(this);
     }
-    setProperties(properties: Properties): void {
+    async setProperties(properties: Properties): Promise<void> {
         const oldProperties = { ...this._properties };
 
         const keys = Object.keys(properties);
@@ -337,7 +344,7 @@ class ServiceRegistration implements IServiceRegistration {
         }
 
         if (wasChange) {
-            this._registry.updateProperties(this, oldProperties);
+            await this._registry.updateProperties(this, oldProperties);
         }
     }
 }

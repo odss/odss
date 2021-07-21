@@ -1,4 +1,4 @@
-import { OBJECTCLASS } from '@odss/common';
+import { getTokenTypes, OBJECTCLASS } from '@odss/common';
 import { squery, IFilter } from '@odss/query';
 
 /**
@@ -9,6 +9,7 @@ export function prepareFilter(token: any, filter = ''): IFilter {
     if (!token) {
         return squery(filter ? filter : '(*)');
     }
+    token = getTokenTypes(token);
     const node = {
         [OBJECTCLASS]: token,
     };

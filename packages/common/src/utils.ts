@@ -45,7 +45,7 @@ function extractName(fn: TokenType): string {
 
 function extractNamespace(fn: TokenType): string {
     const namespace = fn['NAMESPACE'] || fn['$namespace'] || '';
-    return namespace ? `${namespace}.` : '';
+    return namespace ? `${namespace}/` : '';
 }
 
 /**

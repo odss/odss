@@ -1,3 +1,5 @@
+import { getLogger } from '@stool/logging';
+
 import {
     ILoader,
     IBundle,
@@ -19,17 +21,11 @@ import EventDispatcher from './events';
 
 const FRAMEWORK_ID = 0;
 
+const logger = getLogger('@odss/core');
+
 export class Framework extends Bundle implements IBundle {
-    // readonly id: number = FRAMEWORK_ID;
-    // readonly name: string = 'odss.framework';
-    // readonly version: string = '0.0.0';
-    // readonly meta: any = {};
-
-    // context: IBundleContext;
-    // state: number = Bundles.INSTALLED;
-
     private _SID = 0;
-    private _loader?: ILoader;
+    private _loader: ILoader;
     private _bundles: Map<number, Bundle> = new Map();
     private _properties: any = {};
     private _activators: Map<number, IActivator> = new Map();
@@ -38,7 +34,10 @@ export class Framework extends Bundle implements IBundle {
     public registry: Registry;
 
     constructor(properties: any = {}) {
-        super(FRAMEWORK_ID, null, { path: '@odss/core', name: '@odss/core' });
+        super(FRAMEWORK_ID, null, {
+            path: '@odss/core',
+            name: '@odss/core'
+        });
         this._properties = properties;
         this._bundles.set(this.id, this);
         this.on = new EventDispatcher();
@@ -48,11 +47,11 @@ export class Framework extends Bundle implements IBundle {
     private _nextSid() {
         return (this._SID += 1);
     }
-    getProperty(name, defaultProperty = null): any {
-        if (Object.prototype.hasOwnProperty.call(this._properties, name)) {
+    getProperty(name: string, defaultProperty: any = null): any {
+        if (this._properties.hasOwnProperty(name)) {
             return this._properties[name];
         }
-        if (defaultProperty !== undefined) {
+        if (defaultProperty !== null) {
             return defaultProperty;
         }
         return null;
@@ -60,11 +59,9 @@ export class Framework extends Bundle implements IBundle {
     getProperties(): Properties {
         return { ...this._properties };
     }
-
-    setLoader(loader: ILoader) {
+    useLoader(loader: ILoader): void {
         this._loader = loader;
     }
-
     getLoader(): ILoader {
         if (!this._loader) {
             const properties = this.getProperty('loader', {});
@@ -72,8 +69,7 @@ export class Framework extends Bundle implements IBundle {
         }
         return this._loader;
     }
-
-    hasBundle(bundleId) {
+    hasBundle(bundleId: number | string): boolean {
         if (typeof bundleId === 'number') {
             if (this._bundles.has(bundleId)) {
                 return true;
@@ -87,7 +83,7 @@ export class Framework extends Bundle implements IBundle {
         }
         return false;
     }
-    getBundle(identifier: string | number): IBundle {
+    getBundle(identifier: number | string): IBundle {
         if (typeof identifier === 'number') {
             if (this._bundles.has(identifier)) {
                 return this._bundles.get(identifier);
@@ -113,7 +109,8 @@ export class Framework extends Bundle implements IBundle {
         if (this.state === Bundles.STOPPING) {
             throw new Error('Cannot start stoping bundle');
         }
-        this._fireBundleEvent(Events.STARTING, this);
+        logger.debug('Starting framework bundle');
+        await this._fireBundleEvent(Events.STARTING, this);
         this.updateState(Bundles.ACTIVE);
         for (const [id, bundle] of this._bundles.entries()) {
             //framework bundle
@@ -123,17 +120,19 @@ export class Framework extends Bundle implements IBundle {
             try {
                 await this.startBundle(bundle);
             } catch (e) {
-                console.error(`Problem with start a bundle: ${bundle.name}`, e);
+                logger.error(`Problem with start a bundle: ${bundle.name}`, e);
             }
         }
-        this._fireBundleEvent(Events.STARTED, this);
+        await this._fireBundleEvent(Events.STARTED, this);
+        logger.debug('Framework bundle started');
     }
     async stop(): Promise<void> {
         if (this.state !== Bundles.ACTIVE) {
             return;
         }
+        logger.debug('Stoping framework');
         this.updateState(Bundles.STOPPING);
-        this._fireBundleEvent(Events.STOPPING, this);
+        await this._fireBundleEvent(Events.STOPPING, this);
 
         this.updateState(Bundles.RESOLVED);
         const bundles = Array.from(this._bundles.values()).reverse();
@@ -147,7 +146,9 @@ export class Framework extends Bundle implements IBundle {
                 console.error(`Problem with stop a bundle: ${bundle.name}`, e);
             }
         }
-        this._fireBundleEvent(Events.STOPPED, this);
+        await this._fireBundleEvent(Events.STOPPED, this);
+        this.on.reset();
+        logger.debug('Framework stoped');
     }
     async uninstall(): Promise<void> {
         throw new Error('Not allowed uninstall framework.');
@@ -157,11 +158,12 @@ export class Framework extends Bundle implements IBundle {
     }
 
     async installBundle(name: string, autostart = true): Promise<IBundle> {
+        logger.debug(`Install bundle ${name} (autostart=${autostart})`);
         const module = await this.getLoader().loadBundle(name);
         const bundle = new Bundle(this._nextSid(), this, module);
         this._bundles.set(bundle.id, bundle);
         this._activators.set(bundle.id, getActivator(module));
-        this._fireBundleEvent(Events.INSTALLED, bundle);
+        await this._fireBundleEvent(Events.INSTALLED, bundle);
         if (autostart) {
             await bundle.start();
         }
@@ -175,7 +177,7 @@ export class Framework extends Bundle implements IBundle {
         const state = bundle.state;
 
         if (state === Bundles.ACTIVE) {
-            console.warn(`'Bundle: ${bundle.name} already active`);
+            logger.warn(`'Bundle: ${bundle.name} already active`);
             return false;
         }
         if (state === Bundles.STARTING) {
@@ -187,7 +189,7 @@ export class Framework extends Bundle implements IBundle {
 
         bundle.setContext(new BundleContext(this, bundle));
         bundle.updateState(Bundles.STARTING);
-        this._fireBundleEvent(Events.STARTING, bundle);
+        await this._fireBundleEvent(Events.STARTING, bundle);
 
         try {
             const activator = this._activators.get(bundle.id);
@@ -197,9 +199,9 @@ export class Framework extends Bundle implements IBundle {
         } catch (e) {
             bundle.unsetContext();
             bundle.updateState(state);
-            this.registry.unregisterAll(bundle);
+            await this.registry.unregisterAll(bundle);
             this.registry.ungetAll(bundle);
-            this.on.removeAll(bundle);
+            this.on.cleanBundle(bundle);
             throw e;
         }
         return true;
@@ -224,7 +226,7 @@ export class Framework extends Bundle implements IBundle {
         }
 
         bundle.updateState(Bundles.STOPPING);
-        this._fireBundleEvent(Events.STOPPING, bundle);
+        await this._fireBundleEvent(Events.STOPPING, bundle);
         try {
             const activator = this._activators.get(bundle.id);
             await activator.stop(bundle.context);
@@ -233,8 +235,8 @@ export class Framework extends Bundle implements IBundle {
             bundle.updateState(Bundles.RESOLVED);
             this.registry.unregisterAll(bundle);
             this.registry.ungetAll(bundle);
-            this.on.removeAll(bundle);
-            this._fireBundleEvent(Events.STOPPED, bundle);
+            this.on.cleanBundle(bundle);
+            await this._fireBundleEvent(Events.STOPPED, bundle);
         } catch (e) {
             bundle.updateState(state);
             console.error(`Activator stop error in : ${bundle.name}`, e);
@@ -249,7 +251,7 @@ export class Framework extends Bundle implements IBundle {
         }
     }
     async uninstallBundle(bundle: Bundle): Promise<boolean> {
-        await sleep();
+        logger.debug(`Uninstall bundle ${bundle.name}`);
         if (bundle.id === FRAMEWORK_ID) {
             console.error(`Cannot uninstall main bundle: ${bundle.name}`);
             return false;
@@ -262,22 +264,22 @@ export class Framework extends Bundle implements IBundle {
                 bundles.delete(bundle.id);
                 this._bundles.delete(bundle.id);
                 bundle.updateState(Bundles.UNINSTALLED);
-                this._fireBundleEvent(Events.UNINSTALLED, bundle);
+                await this._fireBundleEvent(Events.UNINSTALLED, bundle);
             }
         }
         return true;
     }
-    _fireBundleEvent(type: number, bundle: IBundle): void {
+    async _fireBundleEvent(type: number, bundle: IBundle): Promise<void> {
         if (this === bundle) {
-            this.on.framework.fire(new FrameworkEvent(type, bundle));
+            await this.on.framework.fire(new FrameworkEvent(type, bundle));
         }
-        this.on.bundle.fire(new BundleEvent(type, bundle));
+        await this.on.bundle.fire(new BundleEvent(type, bundle));
     }
-    _fireServiceEvent(type: number, ref: any): void {
-        this.on.service.fite(new ServiceEvent(type, ref));
+    async _fireServiceEvent(type: number, ref: IServiceReference): Promise<void> {
+        await this.on.service.fite(new ServiceEvent(type, ref));
     }
-    _fireFrameworkEvent(type: number): void {
-        this.on.framework.fire(new FrameworkEvent(type, this));
+    async _fireFrameworkEvent(type: number): Promise<void> {
+        await this.on.framework.fire(new FrameworkEvent(type, this));
     }
     getService(bundle: IBundle, reference: IServiceReference): any {
         return this.registry.find(bundle, reference);
@@ -300,7 +302,9 @@ function getActivator(config: IModule): IActivator {
     if (Object.prototype.hasOwnProperty.call(config, 'Activator')) {
         return new config.Activator();
     }
-    const fn = () => {};
+    const fn = () => {
+        // do nothing
+    };
     const start = config.start || fn;
     const stop = config.stop || fn;
     return {

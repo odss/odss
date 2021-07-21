@@ -25,7 +25,6 @@ describe('@Command()', () => {
         assert.deepEqual(main, {
             namespace: "default"
         });
-        console.log(BasicCommands);
         const meta1 = Metadata
             .target(BasicCommands.prototype, 'installCommand')
             .get(MetadataTypes.SHELL_COMMANDS_HANDLER);

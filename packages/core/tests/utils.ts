@@ -11,7 +11,6 @@ describe('@odss/core/utils', () => {
 
     it('prepare filter from class name', () => {
         let filter = $utils.prepareFilter('some.simple.test');
-
         assert.equal(filter.name, OBJECTCLASS);
         assert.equal(filter.value, 'some.simple.test');
         assert.equal(filter.opt, 'eq');
@@ -19,10 +18,9 @@ describe('@odss/core/utils', () => {
 
     it('prepare filter from function', () => {
         let func = function some_simple_Test() {};
-
         let filter = $utils.prepareFilter(func);
         assert.equal(filter.name, OBJECTCLASS);
-        assert.equal(filter.value, func);
+        assert.equal(filter.value, 'some.simple.Test');
         assert.equal(filter.opt, 'eq');
     });
 

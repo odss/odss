@@ -1,14 +1,11 @@
 {
     "compilerOptions": {
-        "allowJs": true,
         "target": "esnext",
-        "module": "commonjs",
+        "module": "CommonJS",
         "moduleResolution": "node",
         "noImplicitAny": false,
         "removeComments": true,
-        "experimentalDecorators": true,
-        "strict": true,
-        "outDir": "./dist/node",
+        "strict": false
     },
     "files": [
         "src/index.ts"
@@ -19,5 +16,5 @@
     ],
     "ts-node": {
         "transpileOnly": true
-    },
+    }
 }

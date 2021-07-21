@@ -197,19 +197,19 @@ describe('core/events', () => {
         assert.equal(1, ed.bundle.size());
         assert.equal(1, ed.service.size());
 
-        ed.removeAll(bundle);
+        ed.cleanBundle(bundle);
 
         assert.equal(0, ed.framework.size());
         assert.equal(0, ed.bundle.size());
         assert.equal(0, ed.service.size());
     });
 
-    it('service filters', () => {
+    it('should notify listener with simple filters', async () => {
         let spy = sinon.spy();
 
         ed.service.add(bundle, spy, 'filter');
 
-        ed.service.fire(
+        await ed.service.fire(
             new ServiceEvent(123, {
                 bundle: bundle,
                 name: 'test',
@@ -218,7 +218,7 @@ describe('core/events', () => {
                 },
             } as any)
         );
-        ed.service.fire(
+        await ed.service.fire(
             new ServiceEvent(123, {
                 bundle: bundle,
                 name: 'filter',
@@ -228,8 +228,10 @@ describe('core/events', () => {
             } as any)
         );
         assert.equal(2, spy.callCount);
+    });
+    it('should notify listener with filter: *', async () => {
 
-        spy = sinon.spy();
+        const spy = sinon.spy();
 
         //catch all - *
         ed.service.add(bundle, spy);

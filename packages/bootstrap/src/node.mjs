@@ -1,30 +1,71 @@
-import { promises as fs } from 'fs';
+import { link, lstat, promises as fs } from 'fs';
 import util from 'util';
 import path from 'path';
 import resolve from 'resolve';
 
-import { boot, syncRunner } from './boot.mjs';
+import { getLogger } from '@stool/logging';
+import { boot, syncRunner } from '@odss/core';
+import { installPackage } from './packages.mjs';
+import { ROOT, SHELL_BUNDLES } from './consts.mjs';
 
-const resolvePromise = util.promisify(resolve);
+const presolve = util.promisify(resolve);
 
-export async function run(basedir, { bundles, properties, ...options }) {
-    const { dependencies = {} } = await findConfigFile(basedir);
-    const config = {
-        properties,
-        bundles: [...Object.keys(dependencies), ...bundles ],
-    };
-    config.properties.loader = {
+const logger = getLogger('odss.bootstrap.node');
+
+const resolver = (cwd, paths, install) => ({
+    loader: {
         async resolver(id) {
-            const name = await resolvePromise(id, {
-                basedir,
-                packageFilter,
-                extensions: ['.mjs']
-            });
-            return name;
+            for(const root of [cwd, ...paths]) {
+                // console.debug(`Resolve: "${id}"`);
+                try {
+                    const path = await findPackageName(root, id);
+                    logger.debug(`Find ${id} as path: "${path}"`);
+                    return path;
+                } catch(e) {}
+            }
+            if (install) {
+                logger.debug(`Not found ${id}. Trying install it.`);
+                const status = await installPackage([id], cwd);
+                if (status) {
+                    try {
+                        return await findPackageName(cwd, id);
+                    } catch(ex) {
+                        console.log(ex);
+                    }
+                }
+            }
+            throw new TypeError(`Not found path: ${id}`);
         }
     }
+});
+
+export async function run(cwd, { bundles, properties: props, ...options }) {
+    const {
+        dependencies = {},
+        properties = {},
+        paths = []
+    } = await findConfigFile(cwd);
+    if (options.shell) {
+        paths.push(ROOT);
+        bundles.push(...SHELL_BUNDLES);
+    }
+    const config = {
+        properties: {
+            ...resolver(cwd, paths, options.npmInstall),
+            ...properties,
+            ...props
+        },
+        bundles: [...Object.keys(dependencies), ...bundles ],
+    };
     return await boot(config, syncRunner);
 }
+
+const findPackageName = async (basedir, id) => presolve(id, {
+    basedir,
+    packageFilter,
+    extensions: ['.mjs']
+});
+
 
 function packageFilter({...pkg}) {
     for (let name of ['module', 'esnext', 'main']) {
@@ -43,6 +84,7 @@ const LOADERS = {
 async function readJson(filePath) {
     return JSON.parse(await fs.readFile(filePath));
 }
+
 async function fileExists(filePath) {
     try {
         const stat = await fs.stat(filePath)

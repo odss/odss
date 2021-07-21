@@ -14,13 +14,13 @@ export default class Bundle implements IBundle {
         this._framework = framework;
         this.module = module;
     }
-    get id() {
+    get id(): number {
         return this._id;
     }
-    get state() {
+    get state(): number {
         return this._state;
     }
-    get context() {
+    get context(): IBundleContext {
         return this._ctx;
     }
     get version(): string {
@@ -30,25 +30,25 @@ export default class Bundle implements IBundle {
         return this.module.name;
     }
 
-    updateState(state) {
+    updateState(state: number): void {
         this._state = state;
     }
-    setContext(ctx) {
+    setContext(ctx: IBundleContext): void {
         this._ctx = ctx;
     }
-    unsetContext() {
+    unsetContext(): void {
         this._ctx = null;
     }
-    async start() {
+    async start(): Promise<void> {
         await this._framework.startBundle(this);
     }
-    async stop() {
+    async stop(): Promise<void> {
         await this._framework.stopBundle(this);
     }
     async reload(): Promise<void> {
         await this._framework.reloadBundle(this, true);
     }
-    async uninstall() {
+    async uninstall(): Promise<void> {
         await this._framework.uninstallBundle(this);
     }
     getRegisteredServices(): IServiceReference[] {
@@ -57,20 +57,25 @@ export default class Bundle implements IBundle {
     getServicesInUse(): IServiceReference[] {
         return this._framework.getBundelServicesInUse(this);
     }
-    toString() {
-        return `[Bundle id=${this._id} name=${this.name} state=${this.state}]`;
+    toString(): string {
+        return `Bundle[id=${this._id} name=${this.name} state=${STATES[this.state]}]`;
     }
 }
 
-const STATES = [
-    Bundles.UNINSTALLED,
-    Bundles.INSTALLED,
-    Bundles.RESOLVED,
-    Bundles.STARTING,
-    Bundles.STOPPING,
-    Bundles.ACTIVE,
-];
+const STATES = [...Object.entries(Bundles)].reduce((acc, [name, value]) => {
+    acc[value] = name;
+    return acc;
+}, {});
 
-function isState(state) {
-    return STATES.indexOf(state) !== -1;
-}
+// const STATES = [
+//     Bundles.UNINSTALLED,
+//     Bundles.INSTALLED,
+//     Bundles.RESOLVED,
+//     Bundles.STARTING,
+//     Bundles.STOPPING,
+//     Bundles.ACTIVE,
+// ];
+
+// function isState(state) {
+//     return STATES.indexOf(state) !== -1;
+// }

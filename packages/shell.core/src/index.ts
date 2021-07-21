@@ -14,12 +14,12 @@ export class Activator {
     start(ctx: IBundleContext): void {
         this.shell = new Shell();
 
-        new CommandsTracker(ctx, this.shell).open();
-        new CommandHandlersTracker(ctx, this.shell).open();
-
         //create and register all core commands
         ctx.registerService(ShellCommandsService, new BasicCommands(ctx, this.shell));
         ctx.registerService(ShellService, this.shell);
+
+        new CommandsTracker(ctx, this.shell).open();
+        new CommandHandlersTracker(ctx, this.shell).open();
     }
     stop(): void {
         this.shell = null;

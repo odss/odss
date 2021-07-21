@@ -8,7 +8,7 @@
   "source": "src/index.ts",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "types": "dist/types/index.d.ts",
+  "types2": "dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -16,9 +16,8 @@
     }
   },
   "scripts": {
-    "build": "microbundle build --no-compress --no-sourcemap --target=node -f es,cjs",
-    "build:dev": "npm run build:core -- --watch",
-    "test": "mocha --require ts-node/register tests/*.ts tests/**/*.ts",
+    "build": "micropack",
+    "build:dev": "npm run build -- --watch",
     "karma": "karma start --single-run",
     "lint": "eslint src/*",
     "format": "prettier src/ --write",
@@ -27,25 +26,24 @@
   "dependencies": {
     "@odss/common": "1.0.0",
     "@odss/shell": "1.0.0"
-},
-"devDependencies": {
-    "@types/chai": "^4.2.15",
-    "@types/mocha": "^8.2.2",
-    "@typescript-eslint/eslint-plugin": "^4.20.0",
-    "@typescript-eslint/parser": "^4.20.0",
-    "chai": "^4.3.4",
-    "eslint": "^7.23.0",
-    "karma": "^6.3.2",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-firefox-launcher": "^2.1.0",
-    "karma-mocha": "^2.0.1",
-    "karma-typescript": "^5.5.1",
-    "microbundle": "^0.13.0",
-    "mocha": "^8.3.2",
-    "prettier": "^2.2.1",
-    "reflect-metadata": "^0.1.13",
-    "typescript": "^4.2.3",
-    "ts-node": "^9.1.1"
+  },
+  "devDependencies": {
+    "@stool/micropack": "0.3.0",
+    "@types/chai": "4.2.21",
+    "@types/mocha": "8.2.3",
+    "@types/node": "16.3.1",
+    "@typescript-eslint/eslint-plugin": "4.28.3",
+    "eslint": "7.30.0",
+    "karma": "6.3.4",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-firefox-launcher": "2.1.1",
+    "karma-mocha": "2.0.1",
+    "karma-typescript": "5.5.1",
+    "mocha": "9.0.2",
+    "prettier": "2.3.2",
+    "sinon": "11.1.1",
+    "ts-node": "10.1.0",
+    "typescript": "4.3.5"
   },
   "files": [
     "README.md",

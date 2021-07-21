@@ -45,10 +45,14 @@ export class ShellCommandService implements ICommand {
     }
 }
 export class ShellCommandsService implements ICommands {
+    static NAMESPACE = "@odss/common";
+
     [key: string]: ICommandHandler;
 }
 
 export abstract class ShellService implements IShell {
+    static NAMESPACE = "@odss/common";
+
     hasCommand(): boolean {
         throw new Error('Method not implemented.');
     }

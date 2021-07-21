@@ -4,3 +4,5 @@ export * from './events';
 export * from './metadata';
 export * from './trackers';
 export * from './utils';
+export * from './cdi';
+export * from './decorators';

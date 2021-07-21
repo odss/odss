@@ -1,21 +1,15 @@
 import * as consts from './consts';
+import { IFilter, QueryType, QueryObject, Params, INamedsFilter, ICompositeFilter } from './types';
 
-export type PValue = string | string[] | number | number[];
-export type Params = {
-    [key: string]: PValue;
-};
+function normalizeFilter(filter): IFilter {
+    if (filter.opt === consts.AND || filter.opt === consts.OR) {
+        if (Array.isArray(filter.filters) && filter.filters.length === 1) {
+            return normalizeFilter(filter.filters[0]);
+        }
+    }
+    return filter;
+}
 
-export interface IFilter {
-    readonly opt: string;
-    match(params: Params): boolean;
-}
-export interface INamedsFilter extends IFilter {
-    readonly name: string;
-    readonly value: string;
-}
-export interface ICompositeFilter extends IFilter {
-    filters: IFilter[];
-}
 
 export abstract class Filter implements IFilter {
     constructor(public readonly opt: string) {}

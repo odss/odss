@@ -4,6 +4,17 @@ export interface MetadataScanCallback<R> {
     (name: string, prototype: any): R;
 }
 
+export interface IMetadata {
+    [key: string]: any;
+}
+
+export interface MetadataScanKeys<M> {
+    name: string;
+    metadata: M;
+    method: (...args: any[]) => any;
+}
+
+
 function scanMetadata<R>(prototype: any, callback: MetadataScanCallback<R>): R[] {
     const isMethod = name => typeof prototype[name] === 'function' && name !== 'constructor';
     let result: R[] = [];
@@ -17,17 +28,6 @@ function scanMetadata<R>(prototype: any, callback: MetadataScanCallback<R>): R[]
     }
     return result;
 }
-
-export interface IMetadata {
-    [key: string]: any;
-}
-
-export interface MetadataScanKeys<M> {
-    name: string;
-    metadata: M;
-    method: (...args: any[]) => any;
-}
-
 export class Metadata {
     static scan<I, R = any>(instance: I, prototype: any, callback: MetadataScanCallback<R>): R[] {
         const proto =
@@ -39,11 +39,13 @@ export class Metadata {
     static scanByKey<I, M = any>(instance: I, prototype: any, key: string): MetadataScanKeys<M>[] {
         return Metadata.scan<I, MetadataScanKeys<M>>(instance, prototype, (name, p) => {
             const metadata = Reflect.getMetadata(key, p, name);
-            return {
-                name,
-                metadata,
-                method: instance[name],
-            };
+            if (metadata) {
+                return {
+                    name,
+                    metadata,
+                    method: instance[name],
+                };
+            }
         });
     }
     static target(obj: any, name: string | symbol = undefined): Metadata {

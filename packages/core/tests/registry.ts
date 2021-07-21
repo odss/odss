@@ -40,57 +40,57 @@ describe('odss-framework.service', () => {
         self.registry = null;
     });
 
-    it('register service and check registration', () => {
-        let reg1 = self.registry.registerService(self.bundle, 'test', 'service');
+    it('register service and check registration', async () => {
+        let reg1 = await self.registry.registerService(self.bundle, 'test', 'service');
 
         assert.notEqual(reg1, null);
         assert.equal(1, self.registry.size());
         assert.equal(1, self.registry.findBundleReferences(self.bundle).length);
         assert.equal(0, self.registry.findBundleReferencesInUse(self.bundle).length);
 
-        self.registry.registerService(self.bundle, 'test', 'service');
+        await self.registry.registerService(self.bundle, 'test', 'service');
         assert.equal(2, self.registry.size());
         assert.equal(2, self.registry.findBundleReferences(self.bundle).length);
         assert.equal(0, self.registry.findBundleReferencesInUse(self.bundle).length);
     });
 
-    it('unregister service by registration object', () => {
-        let reg1 = self.registry.registerService(self.bundle, 'test1', 'service');
-        let reg2 = self.registry.registerService(self.bundle, 'test2', 's2');
+    it('unregister service by registration object', async () => {
+        let reg1 = await self.registry.registerService(self.bundle, 'test1', 'service');
+        let reg2 = await self.registry.registerService(self.bundle, 'test2', 's2');
 
         assert.equal(2, self.registry.size());
 
-        reg1.unregister();
+        await reg1.unregister();
         assert.equal(1, self.registry.size());
 
-        reg2.unregister();
+        await reg2.unregister();
         assert.equal(0, self.registry.size());
     });
 
-    it('unregister all bundle services', () => {
-        self.registry.registerService(self.sbundle, 'test', 'service');
-        self.registry.registerService(self.bundle, 'test', 's2');
+    it('unregister all bundle services', async () => {
+        await self.registry.registerService(self.sbundle, 'test', 'service');
+        await self.registry.registerService(self.bundle, 'test', 's2');
 
         assert.equal(2, self.registry.size());
 
-        self.registry.unregisterAll(self.bundle);
+        await self.registry.unregisterAll(self.bundle);
         assert.equal(1, self.registry.size());
 
-        self.registry.unregisterAll(self.sbundle);
+        await self.registry.unregisterAll(self.sbundle);
         assert.equal(0, self.registry.size());
     });
 
-    it('get service', () => {
-        let reg = self.registry.registerService(self.bundle, 'test', 'service');
+    it('get service', async () => {
+        let reg = await self.registry.registerService(self.bundle, 'test', 'service');
         self.registry.find(self.sbundle, reg.getReference());
 
         assert.equal(0, self.registry.findBundleReferencesInUse(self.bundle).length);
         assert.equal(1, self.registry.findBundleReferencesInUse(self.sbundle).length);
     });
 
-    it('unget()', () => {
-        let reg1 = self.registry.registerService(self.bundle, 'test', 'service');
-        let reg2 = self.registry.registerService(self.bundle, 'test', 'service');
+    it('unget()', async () => {
+        let reg1 = await self.registry.registerService(self.bundle, 'test', 'service');
+        let reg2 = await self.registry.registerService(self.bundle, 'test', 'service');
 
         self.registry.find(self.sbundle, reg1.getReference());
         self.registry.find(self.sbundle, reg2.getReference());
@@ -113,9 +113,9 @@ describe('odss-framework.service', () => {
         assert.equal(0, self.registry.findBundleReferencesInUse(self.sbundle).length);
     });
 
-    it('ungetAll()', () => {
-        let reg1 = self.registry.registerService(self.bundle, 'test', 'service');
-        let reg2 = self.registry.registerService(self.bundle, 'test', 'service');
+    it('ungetAll()', async () => {
+        let reg1 = await self.registry.registerService(self.bundle, 'test', 'service');
+        let reg2 = await self.registry.registerService(self.bundle, 'test', 'service');
 
         const ref1 = reg1.getReference();
         const ref2 = reg2.getReference();
@@ -136,17 +136,17 @@ describe('odss-framework.service', () => {
         assert.equal(0, self.registry.findBundleReferencesInUse(self.sbundle).length);
     });
 
-    it('change properties', () => {
-        let reg = self.registry.registerService(self.bundle, 'test', {
+    it('change properties', async () => {
+        let reg = await self.registry.registerService(self.bundle, 'test', {
             key: 'value',
         });
         reg.setProperties({ key: 'test' });
         assert.equal('test', reg.getReference().getProperty('key'));
     });
 
-    it('change properties event', () => {
+    it('change properties event', async () => {
         let spy = sinon.spy();
-        let reg = self.registry.registerService(self.bundle, 'test', null, {
+        let reg = await self.registry.registerService(self.bundle, 'test', null, {
             key: 'value',
             foo: 'bar',
         });
@@ -161,8 +161,8 @@ describe('odss-framework.service', () => {
         assert.deepEqual(event.properties.key, 'value'); // old properties
     });
 
-    it('reference usingBundles()', () => {
-        let reg = self.registry.registerService(self.bundle, 'test', 'service');
+    it('reference usingBundles()', async () => {
+        let reg = await self.registry.registerService(self.bundle, 'test', 'service');
 
         const ref = reg.getReference();
 
@@ -180,9 +180,9 @@ describe('odss-framework.service', () => {
         assert.equal(0, ref.usingBundles().length);
     });
 
-    it('service default order', () => {
-        let reg1 = self.registry.registerService(self.bundle, 'spec', 'service1');
-        let reg2 = self.registry.registerService(self.bundle, 'spec', 'service2');
+    it('service default order', async () => {
+        let reg1 = await self.registry.registerService(self.bundle, 'spec', 'service1');
+        let reg2 = await self.registry.registerService(self.bundle, 'spec', 'service2');
 
         const refs = self.registry.findReferences('spec');
         assert.equal(2, refs.length);
@@ -191,11 +191,11 @@ describe('odss-framework.service', () => {
         assert.equal('service1', service1);
     });
 
-    it('service custom order', () => {
-        let reg1 = self.registry.registerService(self.bundle, 'spec', 'service1', {
+    it('service custom order', async () => {
+        let reg1 = await self.registry.registerService(self.bundle, 'spec', 'service1', {
             [SERVICE_RANKING]: 20,
         });
-        let reg2 = self.registry.registerService(self.bundle, 'spec', 'service2', {
+        let reg2 = await self.registry.registerService(self.bundle, 'spec', 'service2', {
             [SERVICE_RANKING]: 10,
         });
 

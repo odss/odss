@@ -1,14 +1,21 @@
 {
-    "compilerOptions": {
+  "compilerOptions": {
       "target": "esnext",
       "module": "CommonJS",
+      "moduleResolution": "node",
       "noImplicitAny": false,
-      "strict": true,
-    },
-    "files": [
-        "src/index.ts",
-    ],
-    "exclude": [
-        "tests/parser.ts"
-    ]
+      "removeComments": true,
+      "strict": false,
+      "outDir": "./dist"
+  },
+  "files": [
+      "src/index.ts"
+  ],
+  "exclude": [
+      "node_modules",
+      "dist/*"
+  ],
+  "ts-node": {
+      "transpileOnly": true
   }
+}

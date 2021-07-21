@@ -1,29 +1,46 @@
-import { IShell, IBundleContext, SERVICE_RANKING, OBJECTCLASS, SERVICE_ID } from '@odss/common';
+import { IShell, IBundleContext, SERVICE_RANKING, OBJECTCLASS, SERVICE_ID, ShellCommandsService, ShellService } from '@odss/common';
 import { Command, Commands } from '@odss/shell';
 
 const STATUSES = {
-    1: 'UNINSTALLED',
-    2: 'INSTALLED',
-    4: 'RESOLVED',
-    8: 'STARTING',
+    1:  'UNINSTALLED',
+    2:  'INSTALLED',
+    4:  'RESOLVED',
+    8:  'STARTING',
     16: 'STOPPING',
     32: 'ACTIVE',
 };
 
 @Commands()
 export class BasicCommands {
-    constructor(protected ctx: IBundleContext, protected shell: IShell) {}
 
-    // description: 'Install bundle',
-    // man: 'install <bundle.name> (--autostart, -a)',
+    constructor(private ctx: IBundleContext, protected shell: IShell) {}
+
+    @Command({
+        name: "properties",
+        description: "Show all properties",
+    })
+    properties(args: string[]) {
+        return this.ctx?.getProperties() || {};
+    }
+    @Command({
+        name: "property",
+        description: "Show property value",
+    })
+    property(args: string[]) {
+        return this.ctx?.getProperty(args[0], null);
+    }
     @Command({
         name: 'install',
         description: 'Install bundle',
+        // man: 'install <bundle.name> (--autostart, -a)',
     })
     async install(args: string[]): Promise<string> {
         const autostart = args.length === 2 ? args[1] === '-a' || args[1] === '--autostart' : false;
-        const bundle = await this.ctx.installBundle(args[0], autostart);
-        return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') installed';
+        const bundle = await this.ctx?.installBundle(args[0], autostart);
+        if (bundle) {
+            return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') installed';
+        }
+        return `Not found bundle id=${args[0]}`;
     }
 
     @Command('reload')
@@ -33,7 +50,7 @@ export class BasicCommands {
             if (!/([^0-9])/.test(sid)) {
                 sid = parseInt(sid, 10);
             }
-            await this.ctx.getBundle(sid as any).reload();
+            await this.ctx?.getBundle(sid as any).reload();
             return 'Bundle reloaded';
         } else {
             throw new Error('Expected bundle: "id" or "name"');
@@ -48,39 +65,16 @@ export class BasicCommands {
         if (!/([^0-9])/.test(sid)) {
             sid = parseInt(sid, 10);
         }
-        if (sid) {
+        if (!sid) {
             throw new Error('Incorrect bundle id');
         }
-        const bundle = this.ctx.getBundle(sid as any);
-        await bundle.uninstall();
-        return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') unistalled';
+        const bundle = this.ctx?.getBundle(sid as any);
+        if (bundle) {
+            await bundle.uninstall();
+            return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') unistalled';
+        }
+        return `Not found bundle id=${sid}`;
     }
-    // async complete(args: string[]): Promise<string[]> {
-    //     let ctx = this.ctx;
-    //     let getNames = function () {
-    //         let bundles = ctx.getBundles();
-    //         let buff: string[] = [];
-    //         for (const bundle of bundles) {
-    //             buff.push(bundle.name);
-    //         }
-    //         return buff;
-    //     };
-    //     if (args.length === 0) {
-    //         return getNames();
-    //     } else if (args.length === 1) {
-    //         const names: string[] = getNames();
-    //         const id = args[0];
-    //         const founded: string[] = [];
-
-    //         for (const name of names) {
-    //             if (name.indexOf(id) === 0) {
-    //                 founded.push(name);
-    //             }
-    //         }
-    //         return founded;
-    //     }
-    //     return [];
-    // }
 
     @Command('start')
     async start(args: string[]): Promise<string> {
@@ -90,9 +84,12 @@ export class BasicCommands {
         if (!/([^0-9])/.test(sid)) {
             sid = parseInt(sid, 10);
         }
-        const bundle = this.ctx.getBundle(sid as any);
-        await bundle.start();
-        return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') started';
+        const bundle = this.ctx?.getBundle(sid as any);
+        if (bundle) {
+            await bundle.start();
+            return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') started';
+        }
+        return `Not found bundle id=${sid}`;
     }
 
     @Command('stop')
@@ -104,9 +101,11 @@ export class BasicCommands {
             if (!/([^0-9])/.test(bid)) {
                 bid = parseInt(bid, 10);
             }
-            const bundle = this.ctx.getBundle(bid as any);
-            await bundle.stop();
-            return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') stopped';
+            const bundle = this.ctx?.getBundle(bid as any);
+            if (bundle) {
+                await bundle.stop();
+                return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') stopped';
+            }
         }
         throw Error('Not found param: <bundle_id>');
     }
@@ -114,61 +113,19 @@ export class BasicCommands {
         name: 'bl',
         description: 'List all installed bundles',
     })
-    list(): Promise<string> {
-        // description: 'List of bundles',
-        // man: 'ls',
-
-        const lengths = {
-            id: 5,
-            version: 10,
-            status: 10,
-            name: 20,
-        };
-        const space = function (len) {
-            let s = '';
-            while (len--) {
-                s += '=';
-            }
-            return s;
-        };
-        const pad = function (str, type) {
-            const len = lengths[type] || 10;
-            str += '';
-            while (str.length < len) {
-                str += ' ';
-            }
-            return str;
-        };
-        const line = function (id, version, status, name) {
-            return (
-                pad(id, 'id') +
-                ' ' +
-                pad(version, 'version') +
-                ' ' +
-                pad(status, 'status') +
-                ' ' +
-                pad(name, 'name') +
-                '\n'
-            );
-        };
-        const bundles = this.ctx.getBundles();
+    list(): string {
+        const header = ['ID', 'Version', 'Status', 'Name'];
+        const bundles = this.ctx?.getBundles() || [];
+        const records = [] as any;
         for (const bundle of bundles) {
-            lengths['id'] = Math.max(lengths['id'], (bundle.id + '').length);
-            lengths['version'] = Math.max(lengths['version'], bundle.version.length);
-            lengths['status'] = Math.max(lengths['status'], STATUSES[bundle.state].length);
-            lengths['name'] = Math.max(lengths['name'], bundle.name.length);
-        }
-        let s = line('ID', 'Version', 'Status', 'Namespace');
-        s += space(s.length) + '\n';
-        for (const bundle of bundles) {
-            s += line(
+            records.push([
                 bundle.id,
                 bundle.version,
                 STATUSES[bundle.state] || 'Unknown',
                 bundle.name
-            );
+            ]);
         }
-        return Promise.resolve(s);
+        return makeAsciiTable('Bundles', header, records);
     }
     @Command({
         name: 'bd',
@@ -178,7 +135,10 @@ export class BasicCommands {
         if (!/([^0-9])/.test(sid)) {
             sid = parseInt(sid, 10);
         }
-        const bundle = this.ctx.getBundle(sid as any);
+        const bundle = this.ctx?.getBundle(sid as any);
+        if (!bundle) {
+            return `Not found bundle id=${sid}`;
+        }
         const state = STATUSES[bundle.state];
 
         const buff = [
@@ -197,14 +157,14 @@ export class BasicCommands {
         name: 'sl',
     })
     serviceList(): string {
-        const bundles = this.ctx.getBundles();
+        const bundles = this.ctx?.getBundles() || [];
         const records: string[][] = [];
         for(const bundle of bundles) {
             const refs = bundle.getRegisteredServices();
             const lines = refs.map(ref => [
                 ref.getProperty(SERVICE_ID),
                 bundle.name,
-                ref.getProperty<any[]>(OBJECTCLASS).map(c => (c.name ? c.name : c)),
+                ref.getProperty(OBJECTCLASS),
                 ref.getProperty(SERVICE_RANKING),
             ]) as any;
             records.push(...lines);
@@ -217,12 +177,12 @@ export class BasicCommands {
     })
     serviceDetail(args: string[]): string {
         const id = args.shift();
-        const refs = this.ctx.getServiceReferences(null, {
+        const refs = this.ctx?.getServiceReferences(null, {
             [SERVICE_ID]: parseInt(id as string, 10),
-        });
+        }) || [];
         const ref = refs[0];
         const props = ref.getProperties();
-        const clasess = props[OBJECTCLASS].map(c => (c.name ? c.name : c));
+        const clasess = props[OBJECTCLASS];
         const lines = [
             `ID...........: ${props[SERVICE_ID]}`,
             `Classes......: ${clasess}`,
@@ -236,7 +196,7 @@ export class BasicCommands {
             return typeof val === 'function' || val.name ? val.name : val;
         };
         for (const [key, value] of Object.entries(props)) {
-            lines.push(`${key}  = ${toValue(value)}`);
+            lines.push(`    ${key} = ${toValue(value)}`);
         }
         lines.push('Bundles using this service:');
         for (const bundle of ref.usingBundles()) {
@@ -256,11 +216,10 @@ export class BasicCommands {
 
     @Command({
         name: 'help',
+        description: 'Show help for command',
         alias: ['?'],
     })
     async help(args: string[]): Promise<string> {
-        // description: 'Show help for command',
-        // man: 'help [bundle.id]',
         if (args.length === 1) {
             const name = args[0];
             for (const cmd of this.shell.getCommands()) {

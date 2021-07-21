@@ -8,7 +8,7 @@
         "removeComments": true,
         "experimentalDecorators": true,
         "strict": true,
-        "outDir": "./dist/node",
+        "outDir": "./dist/node"
     },
     "files": [
         "src/index.ts"

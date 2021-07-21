@@ -4,7 +4,7 @@ import { OBJECTCLASS, Bundles, ServiceTracker, BundleTracker } from '@odss/commo
 
 import tests from './core';
 
-describe('odss.tracker.getService() Tracker', () => {
+describe('@odss/core/tracker.getService()', () => {
     const scope: any = {};
 
     beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('odss.tracker.getService() Tracker', () => {
             new ServiceTracker(bundle.context, '');
         }, 'Empty name');
     });
-    it('register/unregister service', () => {
+    it('register/unregister service', async () => {
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
             addingService() {
@@ -37,14 +37,14 @@ describe('odss.tracker.getService() Tracker', () => {
             },
         });
         tracker.open();
-        let reg = scope.ctx.registerService('test.tracker', 'test');
+        let reg = await scope.ctx.registerService('test.tracker', 'test');
 
-        reg.unregister();
+        await reg.unregister();
 
         assert.equal(counter & 1, 1, 'Not fire ServiceTracker.addingService(ref)');
         assert.equal(counter & 2, 2, 'Not fire ServiceTracker.removedService(ref)');
     });
-    it('tracker properties', () => {
+    it('tracker properties', async () => {
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker');
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
         assert.equal(
@@ -56,9 +56,9 @@ describe('odss.tracker.getService() Tracker', () => {
         assert.equal(tracker.getServices().length, 0, 'Tracker services should return empty array');
         assert.equal(tracker.getService(), null, 'Tracker services should return empty array');
 
-        tracker.open();
+        await tracker.open();
 
-        let reg = scope.ctx.registerService('test.tracker', 'test');
+        let reg = await scope.ctx.registerService('test.tracker', 'test');
 
         assert.equal(tracker.size(), 1, 'Tracker size should assert.equal 0');
         assert.equal(
@@ -73,7 +73,7 @@ describe('odss.tracker.getService() Tracker', () => {
             'Tracker services should return array: [test]'
         );
 
-        reg.unregister();
+        await reg.unregister();
 
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
         assert.equal(
@@ -84,7 +84,7 @@ describe('odss.tracker.getService() Tracker', () => {
         assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
         assert.equal(tracker.getService(), null, 'Tracker services should return: test');
 
-        reg = scope.ctx.registerService('test.tracker', 'test');
+        reg = await scope.ctx.registerService('test.tracker', 'test');
 
         assert.equal(tracker.size(), 1, 'Tracker size should assert.equal 0');
         assert.equal(
@@ -99,7 +99,7 @@ describe('odss.tracker.getService() Tracker', () => {
             'Tracker services should return array: [test]'
         );
 
-        tracker.close();
+        await tracker.close();
 
         assert.equal(tracker.size(), 0, 'Tracker size should assert.equal 0');
         assert.equal(
@@ -111,7 +111,7 @@ describe('odss.tracker.getService() Tracker', () => {
         assert.deepEqual(tracker.getServices(), [], 'Tracker services should return array: [test]');
     });
 
-    it('stop tracker', () => {
+    it('stop tracker', async () => {
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
             addingService() {
@@ -122,15 +122,15 @@ describe('odss.tracker.getService() Tracker', () => {
                 counter |= 2;
             },
         });
-        tracker.open();
-        scope.ctx.registerService('test.tracker', 'test1');
+        await tracker.open();
+        await scope.ctx.registerService('test.tracker', 'test1');
         assert.equal(counter, 1, 'Tracker should run addingService listener methods');
-        tracker.close();
-        scope.ctx.registerService('test.tracker', 'test2');
+        await tracker.close();
+        await scope.ctx.registerService('test.tracker', 'test2');
         assert.equal(counter, 3);
     });
 
-    it('start tracker after register service', () => {
+    it('start tracker after register service', async () => {
         scope.ctx.registerService('test.tracker', 'test');
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
@@ -141,28 +141,28 @@ describe('odss.tracker.getService() Tracker', () => {
             removedService() {},
         });
 
-        tracker.open();
+        await tracker.open();
         assert.equal(counter, 1, 'Should find one register service');
 
-        scope.ctx.registerService('test.tracker', 'test');
+        await scope.ctx.registerService('test.tracker', 'test');
         assert.equal(counter, 2, 'Should find second register serivce');
     });
 
-    it('ServiceTracker::reference', () => {
-        scope.ctx.registerService('test.tracker', 'test1');
-        scope.ctx.registerService('test.tracker', 'test2');
+    it('ServiceTracker::reference', async () => {
+        await scope.ctx.registerService('test.tracker', 'test1');
+        await scope.ctx.registerService('test.tracker', 'test2');
 
-        let tracker = new ServiceTracker(scope.ctx, 'test.tracker').open();
+        let tracker = await new ServiceTracker(scope.ctx, 'test.tracker').open();
         assert.equal(tracker.size(), 2, 'Found 2 services');
         let ref = tracker.getReference();
         assert.equal(ref.getProperty(OBJECTCLASS), 'test.tracker');
     });
 
-    it('ServiceTracker::getServiceReferences()', () => {
-        scope.ctx.registerService('test.tracker', 'test1');
-        scope.ctx.registerService('test.tracker', 'test2');
+    it('ServiceTracker::getServiceReferences()', async () => {
+        await scope.ctx.registerService('test.tracker', 'test1');
+        await scope.ctx.registerService('test.tracker', 'test2');
 
-        let tracker = new ServiceTracker(scope.ctx, 'test.tracker').open();
+        let tracker = await new ServiceTracker(scope.ctx, 'test.tracker').open();
         assert.equal(tracker.size(), 2, 'Found 2 services');
 
         let refs = tracker.getReferences();
@@ -179,11 +179,13 @@ describe('odss.core.tracker.BundleTracker', () => {
         scope.ctx = scope.bundle.context;
 
         scope.listener = {
-            addingBundle: function (/* bundle */) {},
-            removedBundle: function (/* bundle */) {},
+            addingBundle(/* bundle: IBundle */) {},
+            modifiedBundle(/* bundle: IBundle */) {},
+            removedBundle(/* bundle: IBundle */) {},
         };
         try {
             sinon.spy(scope.listener, 'addingBundle');
+            sinon.spy(scope.listener, 'modifiedBundle');
             sinon.spy(scope.listener, 'removedBundle');
         } catch (e) {
             console.log(e);
@@ -204,17 +206,17 @@ describe('odss.core.tracker.BundleTracker', () => {
         assert.equal(tracker.size(), 0, 'Tracker size should be 0');
         assert.equal(tracker.bundles().length, 0, 'Tracker bundles should return empty array');
 
-        tracker.open(); //after start shoud found bundles: system and service
+        await tracker.open(); //after start shoud found bundles: system and service
 
         assert.equal(tracker.size(), 3, 'Tracker size should be 3');
         assert.equal(tracker.bundles().length, 3, 'Tracker bundles should return array');
 
-        tracker.close();
+        await tracker.close();
 
         assert.equal(tracker.size(), 0, 'Tracker size should be 0');
         assert.equal(tracker.bundles().length, 0, 'Tracker bundles should return empty array');
 
-        tracker.open();
+        await tracker.open();
 
         await bundle.uninstall();
 
@@ -223,7 +225,7 @@ describe('odss.core.tracker.BundleTracker', () => {
     });
 
     it('custom listener', async () => {
-        new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener).open();
+        await new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener).open();
 
         assert.equal(
             scope.listener.addingBundle.callCount,
@@ -249,9 +251,10 @@ describe('odss.core.tracker.BundleTracker', () => {
         );
     });
 
-    it('notify listener on close tracker', () => {
-        let tracker = new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener).open();
-        tracker.close();
+    it('notify listener on close tracker', async () => {
+        let tracker = new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener)
+        await tracker.open();
+        await tracker.close();
         assert.equal(
             scope.listener.addingBundle.callCount,
             2,

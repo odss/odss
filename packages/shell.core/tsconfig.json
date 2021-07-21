@@ -2,13 +2,14 @@
     "compilerOptions": {
         "allowJs": true,
         "target": "esnext",
-        "module": "commonjs",
+        "module": "ESNext",
         "moduleResolution": "node",
         "noImplicitAny": false,
         "removeComments": true,
         "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "strict": true,
-        "outDir": "./dist/node",
+        "outDir": "./dist/"
     },
     "files": [
         "src/index.ts"
@@ -19,5 +20,5 @@
     ],
     "ts-node": {
         "transpileOnly": true
-    },
+    }
 }

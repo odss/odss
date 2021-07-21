@@ -9,6 +9,7 @@ import {
     IServiceObject,
     IServiceRegistration,
 } from '@odss/common';
+import { ILogger } from '@stool/logging';
 import { Framework } from './framework';
 
 class ServiceObject<S> implements IServiceObject<S> {
@@ -16,10 +17,10 @@ class ServiceObject<S> implements IServiceObject<S> {
     getService(): S {
         return this._ctx.getService(this._reference);
     }
-    ungetService() {
+    ungetService(): void {
         this._ctx.ungetService(this._reference);
     }
-    getServiceReference() {
+    getServiceReference(): IServiceReference {
         return this._reference;
     }
 }
@@ -36,29 +37,28 @@ export default class BundleContext implements IBundleContext {
         Object.freeze(this);
     }
 
-    getProperty(name: string, def: any) {
+    getProperty(name: string, def: any = null): any {
         return this.framework.getProperty(name, def);
     }
     getProperties(): any {
         return this.framework.getProperties();
     }
-
-    getBundle(bundleId: number) {
+    getBundle(bundleId: number): IBundle {
         return this.framework.getBundle(bundleId);
     }
-    getBundles() {
+    getBundles(): IBundle[] {
         return this.framework.getBundles();
     }
-    async installBundle(name: string, autoStart = false) {
+    async installBundle(name: string, autoStart = false): Promise<IBundle> {
         return await this.framework.installBundle(name, autoStart);
     }
-    async uninstallBundle(bundle: IBundle) {
+    async uninstallBundle(bundle: IBundle): Promise<boolean> {
         return await this.framework.uninstallBundle(bundle as any);
     }
-    getServiceReferences(name: any = null, filter = '') {
+    getServiceReferences(name: any = null, filter = ''): IServiceReference[] {
         return this.framework.registry.findReferences(name, filter);
     }
-    getServiceReference(name: any, filter = '') {
+    getServiceReference(name: any, filter = ''): IServiceReference {
         return this.framework.registry.findReference(name, filter);
     }
     getService(reference: IServiceReference): any {
@@ -67,21 +67,21 @@ export default class BundleContext implements IBundleContext {
     getServiceObject<S>(reference: IServiceReference): ServiceObject<S> {
         return new ServiceObject(this, reference);
     }
-    ungetService(reference: IServiceReference) {
-        return this.framework.registry.unget(this.bundle, reference);
+    ungetService(reference: IServiceReference): void {
+        this.framework.registry.unget(this.bundle, reference);
     }
-    registerService(name: any, service: any, properties: object = {}): IServiceRegistration {
+    async registerService(name: any, service: any, properties: any = {}): Promise<IServiceRegistration> {
         return this.framework.registry.registerService(this.bundle, name, service, properties);
     }
-    onService(listener: IServiceListener, name: any, filter = '') {
-        // return this.framework.onService(listener, name, filter);
-    }
-    onBundle(listener: IBundleListener) {
-        // return this.framework.onBundle(listener);
-    }
-    onFramework(listener: IFrameworkListener) {
-        // return this.framework.onFramework(listener);
-    }
+    // onService(listener: IServiceListener, name: any, filter = ''): void {
+    //     // return this.framework.onService(listener, name, filter);
+    // }
+    // onBundle(listener: IBundleListener): void {
+    //     // return this.framework.onBundle(listener);
+    // }
+    // onFramework(listener: IFrameworkListener): void {
+    //     // return this.framework.onFramework(listener);
+    // }
     addServiceListener(listener: IServiceListener, name: any, filter: string): IDisposable {
         return this.framework.on.service.add(this.bundle, listener, name, filter);
     }
@@ -110,7 +110,7 @@ function createEvents(framework: Framework, bundle: IBundle) {
     });
 }
 
-function createEvent<T>(dispacher: any, bundle: IBundle) {
+function createEvent(dispacher: any, bundle: IBundle) {
     return Object.freeze({
         add(listener: any, name: any, filter = '') {
             dispacher.add(bundle, listener, name, filter);

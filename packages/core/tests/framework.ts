@@ -60,7 +60,6 @@ describe('odss-core', () => {
 
     it('state on start/stop framework', async () => {
         let framework = await tests.framework();
-        console.log(framework.state, Bundles.INSTALLED);
         assert.equal(framework.state, Bundles.INSTALLED, 'installed');
 
         await framework.start();

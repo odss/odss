@@ -152,7 +152,7 @@ let tests = {
             prop2: 'test2',
         });
 
-        framework.setLoader(loader as any);
+        framework.useLoader(loader as any);
         if (autoStart) {
             await framework.start();
         }

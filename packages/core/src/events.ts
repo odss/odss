@@ -43,8 +43,12 @@ function createListeners<T>(callbackName: string): any {
             listeners.push(info);
             return true;
         },
-        fire(event: T) {
+        async fire(event: T) {
             const cbn = callbackName;
+            const run = () => {
+
+            };
+            listeners.filter(info => {})
             for (const info of listeners) {
                 if (event instanceof ServiceEvent) {
                     if (info[2] && !info[2].match(event.reference.getProperties())) {
@@ -54,9 +58,9 @@ function createListeners<T>(callbackName: string): any {
                 const listener = info[LISTENER];
                 try {
                     if (typeof listener[cbn] === 'function') {
-                        listener[cbn].call(listener, event);
+                        await listener[cbn].call(listener, event);
                     } else {
-                        listener(event);
+                        await listener(event);
                     }
                 } catch (e) {
                     console.error(`Error with listener: ${cbn}`, e);
@@ -72,6 +76,9 @@ function createListeners<T>(callbackName: string): any {
                 i++;
             }
         },
+        reset() {
+            listeners.length = 0;
+        }
     };
 }
 
@@ -85,19 +92,25 @@ export default class EventDispatcher {
         this.service = createListeners<ServiceEvent>('serviceEvent');
         Object.freeze(this);
     }
-    fireEvent(event) {
+    async fireEvent(event) {
         if (event instanceof BundleEvent) {
-            this.bundle.fire(event);
+            await this.bundle.fire(event);
         } else if (event instanceof FrameworkEvent) {
-            this.framework.fire(event);
+            await this.framework.fire(event);
         } else if (event instanceof ServiceEvent) {
-            this.service.fire(event);
+            await this.service.fire(event);
         }
         throw new Error('Expected one of event: ServiceEvent, BundleEvent, FrameworkEvent');
     }
-    removeAll(bundle) {
+    cleanBundle(bundle) {
         this.framework.clean(bundle);
         this.bundle.clean(bundle);
         this.service.clean(bundle);
     }
+    reset() {
+        this.framework.reset();
+        this.bundle.reset();
+        this.service.reset();
+    }
+
 }

@@ -1,10 +1,5 @@
 import { IBundleContext, IServiceReference } from '@odss/common';
-import { Component, Bind, Unbind, Provides, Validate, Invalidate, Property } from '@odss/cdi-decorators';
-
-
-class ISpellDictionaryService {};// = 'odss.cdi.example.ISpellDictionary';
-class ISpellCheckerService{};// = 'odss.cdi.example.Checker';
-
+import { Component, Bind, Unbind, Provides, Validate, Invalidate, Property } from '@odss/cdi';
 
 interface ISpellDictionary {
     checkWord(word: string): boolean;
@@ -12,10 +7,28 @@ interface ISpellDictionary {
 
 interface ISpellChecker {
     check(massage: string, language: string): boolean;
+    getSupportLanguages(): string[];
 }
 
+abstract class SpellDictionaryService implements ISpellDictionary {
+    checkWord(word: string): boolean {
+        throw new Error('Method not implemented.');
+    }
+
+};// = 'odss.cdi.example.ISpellDictionary';
+class SpellCheckerService implements ISpellChecker {
+    check(massage: string, language: string): boolean {
+        throw new Error('Method not implemented.');
+    }
+    getSupportLanguages(): string[] {
+        throw new Error('Method not implemented.');
+    }
+
+};// = 'odss.cdi.example.Checker';
+
+
 @Component()
-@Provides(ISpellDictionaryService, {language:'en'})
+@Provides(SpellDictionaryService, {language:'en'})
 export class EnglishSpellDictionary {
 
     // @Property('a.b.c')
@@ -40,13 +53,13 @@ export class EnglishSpellDictionary {
 }
 
 @Component()
-@Provides(ISpellDictionaryService, {'language': 'pl'})
+@Provides(SpellDictionaryService, {'language': 'pl'})
 export class PolishSpellDictionary {
     private dictionary: string[] = [];
 
     @Validate()
     activate(ctx: IBundleContext){
-        this.dictionary = ["witaj", "świecie", "witaj", "w", "odss", "tescie"];
+        this.dictionary = ["witaj", "świecie", "witaj", "w", "odss", "test"];
         console.log('A PolishSpellDictionary has been started');
     }
     @Invalidate()
@@ -60,19 +73,19 @@ export class PolishSpellDictionary {
 
 
 @Component()
-@Provides(ISpellCheckerService)
+@Provides(SpellCheckerService)
 export class SpellChecker {
 
     private languages: Map<string, ISpellDictionary> = new Map();
 
-    @Bind(ISpellDictionaryService)
+    @Bind(SpellDictionaryService)
     add(service: ISpellDictionary, ref: IServiceReference) {
         let language = ref.getProperty<string>('language');
         console.log(`SpellChecker.add(${language})`);
         this.languages.set(language, service);
 
     }
-    @Unbind(ISpellDictionaryService)
+    @Unbind(SpellDictionaryService)
     remove(service: ISpellDictionary, ref: IServiceReference) {
         let language = ref.getProperty<string>('language');
         console.log(`SpellChecker.remove(${language})`);
@@ -96,12 +109,19 @@ export class SpellChecker {
         }
         return false;
     }
+    getSupportLanguages(): string[] {
+        return [...this.languages.keys()];
+    }
 }
 
 
 @Component()
 export class SpellCheckerTest {
-    constructor(private checker: ISpellCheckerService) {
-        console.log('SpellCheckerTest', checker);
+    constructor(private checker: SpellCheckerService) {
+        try {
+
+            console.log('SpellCheckerTest');
+            console.log(`Supported languages: ${checker.getSupportLanguages()}`);
+       } catch(e) { console.log(e); }
     }
 }
