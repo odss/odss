@@ -9,7 +9,6 @@ import {
     IServiceObject,
     IServiceRegistration,
 } from '@odss/common';
-import { ILogger } from '@stool/logging';
 import { Framework } from './framework';
 
 class ServiceObject<S> implements IServiceObject<S> {

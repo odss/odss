@@ -1,7 +1,9 @@
-export const OBJECTCLASS = 'objectclass';
-export const OBJECTCLASS_NAME = 'objectclassname';
-export const SERVICE_ID = 'service_id';
-export const SERVICE_RANKING = 'service_ranking';
+export const OBJECTCLASS = '$objectclass$';
+export const OBJECTCLASS_NAME = '$objectclassname$';
+export const SERVICE_ID = '$service.id$';
+export const SERVICE_PID = '$service.pid$';
+export const SERVICE_FACTORY_PID = '$service.factory.pid$';
+export const SERVICE_RANKING = '$service.ranking$';
 
 export const Bundles = {
     UNINSTALLED: 1,
@@ -66,5 +68,5 @@ export const HandlerTypes = {
 };
 
 export const FACTORY_CONTEXT = 'odss.factory.context';
-export const HandlerService = '@odss/HandlerService';
-export const HandlerFactoryService = '@odss/HandlerFactoryService';
+export const HandlerService = '@odss/common/HandlerService';
+export const HandlerFactoryService = '@odss/common/HandlerFactoryService';

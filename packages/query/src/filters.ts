@@ -10,7 +10,6 @@ function normalizeFilter(filter): IFilter {
     return filter;
 }
 
-
 export abstract class Filter implements IFilter {
     constructor(public readonly opt: string) {}
 

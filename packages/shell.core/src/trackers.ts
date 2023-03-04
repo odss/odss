@@ -58,8 +58,8 @@ export class CommandHandlersTracker extends ServiceTracker {
             ) || [];
         const handlers: ICommand[] = [];
 
-        for (const { method, metadata } of metadataHandlers) {
-            const execute = method.bind(command) as ICommandHandler;
+        for (const { handler, metadata } of metadataHandlers) {
+            const execute = handler.bind(command) as ICommandHandler;
             const cmd = {
                 namespace,
                 ...metadata,

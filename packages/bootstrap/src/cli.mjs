@@ -12,6 +12,7 @@ program
     .version('0.0.1')
     .option('-c, --config <path>', 'set config path', './odss.json')
     .option('-s, --shell', 'Run with shell', false)
+    .option('-d, --dev', 'Run in dev mode', false)
     .option('-n, --npm-install', 'Install missing requirements', false)
     .option('-b, --bundles <bundles>', 'Install bundle', (v, p) => p.concat(v.split(',')), [])
     .option('-p, --properties <properties>', 'Property', (v, p) => p.concat(v), [])
@@ -35,7 +36,7 @@ program.parse(process.argv);
     const logLevel = options.logLevel || 'info';
     logger.setLevel(logLevel);
 
-    const root = await run(process.cwd(), options);
+    let root = await run(process.cwd(), options);
     let shuttingDown = false;
     const gracefulExit = async (...args) => {
         if (!shuttingDown) {
@@ -47,15 +48,19 @@ program.parse(process.argv);
             process.exit(0);
         }
     };
-    process.on('beforeExit', (code) => {
-        console.log('Process beforeExit event with code: ', code);
-    });
+    const reloadAll = async () => {
+        await root.stop();
+        root = await run(process.cwd(), options);
+    };
+    // process.on('beforeExit', (code) => {
+    //     console.log('Process beforeExit event with code: ', code);
+    // });
 
     process.on('exit', (code) => {
         console.log('Process exit event with code: ', code);
         root.stop();
-
     });
     process.on('SIGTERM', gracefulExit); // listen for TERM signal (e.g. kill)
     process.on('SIGINT', gracefulExit); // listen for INT signal (e.g. Ctrl-C)
+    process.on('SIGHUP', reloadAll)
 })();

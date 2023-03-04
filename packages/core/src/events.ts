@@ -45,10 +45,8 @@ function createListeners<T>(callbackName: string): any {
         },
         async fire(event: T) {
             const cbn = callbackName;
-            const run = () => {
-
-            };
-            listeners.filter(info => {})
+            // listeners.filter(info => {})
+            const tasks = [];
             for (const info of listeners) {
                 if (event instanceof ServiceEvent) {
                     if (info[2] && !info[2].match(event.reference.getProperties())) {
@@ -56,16 +54,10 @@ function createListeners<T>(callbackName: string): any {
                     }
                 }
                 const listener = info[LISTENER];
-                try {
-                    if (typeof listener[cbn] === 'function') {
-                        await listener[cbn].call(listener, event);
-                    } else {
-                        await listener(event);
-                    }
-                } catch (e) {
-                    console.error(`Error with listener: ${cbn}`, e);
-                }
+                const task = listener[cbn] ? listener[cbn].call(listener, event) : listener(event);
+                tasks.push(catchError(task, cbn));
             }
+            await Promise.all(tasks);
         },
         clean(bundle: IBundle) {
             for (let i = 0; i < listeners.length; ) {
@@ -80,6 +72,13 @@ function createListeners<T>(callbackName: string): any {
             listeners.length = 0;
         }
     };
+}
+const catchError = async (task: Promise<void>, name: string) => {
+    try {
+        await task;
+    } catch (e) {
+        console.error(`Error with listener: ${name}`, e);
+    }
 }
 
 export default class EventDispatcher {

@@ -11,7 +11,7 @@ import {
 } from '@odss/common';
 
 import { Component } from './component';
-
+import { DependenciesHandlerFactory } from './handlers/dependencies';
 
 const logger = getLogger('@odss/cdi.core');
 
@@ -27,8 +27,6 @@ class ComponentContainer implements IComponentContainer {
     private handlers: IHandler[] = [];
     private isActive: boolean = false;
     private isOpen: boolean = false;
-
-    private status: number = 0;
 
     constructor(private bundle: IBundle, target: any) {
         this.component = new Component(target);
@@ -75,7 +73,7 @@ class ComponentContainer implements IComponentContainer {
         await this.checkLifecycle();
     }
     async checkLifecycle() {
-        if (this.handlers.length) {
+        if (this.isOpen && this.handlers.length) {
             const status = this.handlers.every(handler => handler.isValid());
             if (status && !this.isActive) {
                 this.isActive = true;

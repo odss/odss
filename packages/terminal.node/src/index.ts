@@ -19,12 +19,12 @@ class ShellTracker extends ServiceTracker<IShell> {
     constructor(ctx: IBundleContext, private terminal: TerminalService) {
         super(ctx, ShellService);
     }
-    addingService(shell: IShell) {
+    async addingService(shell: IShell) {
         this.terminal.attach(shell);
     }
-    modifiedService() { }
+    async modifiedService() { }
 
-    removedService(shell: IShell) {
+    async removedService(shell: IShell) {
         this.terminal.detach();
     }
 }

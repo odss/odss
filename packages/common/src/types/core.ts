@@ -1,16 +1,14 @@
 
-export type NamedServiceType =
-    | string
-    | null
-    | (() => void)
-    | {
-          name: string;
-      };
+export type NamedServiceType = any | any[]
+    // | string | string[]
+    // | Function |
+    // | {
+    //       name: string;
+    //   };
 export type ServiceType = any;
 
-export type Properties = {
-    [key: string]: any;
-};
+export type Properties = Record<string, any>;
+
 
 export type Properties2<P> = {
     [Property in keyof P]: P[Property];

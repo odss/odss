@@ -11,16 +11,16 @@ export interface IMetadata {
 export interface MetadataScanKeys<M> {
     name: string;
     metadata: M;
-    method: (...args: any[]) => any;
+    handler: (...args: any[]) => any;
 }
 
 
 function scanMetadata<R>(prototype: any, callback: MetadataScanCallback<R>): R[] {
-    const isMethod = name => typeof prototype[name] === 'function' && name !== 'constructor';
+    const isHandler = name => typeof prototype[name] === 'function' && name !== 'constructor';
     let result: R[] = [];
     while (prototype && prototype !== Object.prototype) {
         const r = Object.getOwnPropertyNames(prototype)
-            .filter(isMethod)
+            .filter(isHandler)
             .map(name => callback(name, prototype))
             .filter((item: R): R => item);
         result = result.concat(r);
@@ -36,23 +36,31 @@ export class Metadata {
                 : prototype;
         return scanMetadata<R>(proto, callback);
     }
-    static scanByKey<I, M = any>(instance: I, prototype: any, key: string): MetadataScanKeys<M>[] {
+    static scanByKey<I, M = any>(instance: I, prototype: any, key: string | string[]): MetadataScanKeys<M>[] {
         return Metadata.scan<I, MetadataScanKeys<M>>(instance, prototype, (name, p) => {
-            const metadata = Reflect.getMetadata(key, p, name);
-            if (metadata) {
+            const keys = Array.isArray(key) ? key : [key];
+            const metadata = keys.reduce((acc, key) => {
+                const meta = Reflect.getMetadata(key, p, name);
+                if (meta) {
+                    acc = {...acc, ...meta};
+                }
+                return acc;
+            }, {}) as M;
+            if (Object.keys(metadata).length) {
                 return {
                     name,
                     metadata,
-                    method: instance[name],
+                    handler: instance[name],
                 };
             }
         });
     }
-    static target(obj: any, name: string | symbol = undefined): Metadata {
-        return new Metadata(obj, name);
+    static target(obj: any, name: string | symbol = undefined): MetadataTarget {
+        return new MetadataTarget(obj, name);
     }
-
-    private constructor(private obj: any, private name: string | symbol = undefined) {}
+}
+class MetadataTarget {
+    constructor(private obj: any, private name: string | symbol = undefined) {}
 
     set<T = any>(key: string, value: T): void {
         Reflect.defineMetadata(key, value, this.obj, this.name);

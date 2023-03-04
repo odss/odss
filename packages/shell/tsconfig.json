@@ -5,7 +5,9 @@
         "moduleResolution": "node",
         "noImplicitAny": false,
         "removeComments": true,
-        "strict": false
+        "strict": false,
+        "declaration": true,
+        "declarationDir": "./types"
     },
     "files": [
         "src/index.ts"

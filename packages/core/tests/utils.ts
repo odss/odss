@@ -1,12 +1,15 @@
 import { assert } from 'chai';
-import { OBJECTCLASS, SERVICE_ID } from '@odss/common';
+import { OBJECTCLASS, SERVICE_FACTORY_PID, SERVICE_ID, SERVICE_PID, SERVICE_RANKING } from '@odss/common';
 import * as $utils from '../src/utils';
 
 describe('@odss/core/utils', () => {
     it('import', () => {
-        assert.ok(OBJECTCLASS === 'objectclass', 'consts.OBJECTCLASS');
-        assert.ok(SERVICE_ID === 'service_id', 'consts.SERVICE_ID');
-        assert.ok(typeof $utils.prepareFilter === 'function', '$utils.prepareFilter');
+        assert.equal(OBJECTCLASS, '$objectclass$', 'consts.OBJECTCLASS');
+        assert.equal(SERVICE_ID, '$service.id$', 'consts.SERVICE_ID');
+        assert.equal(SERVICE_PID, '$service.pid$', 'consts.SERVICE_ID');
+        assert.equal(SERVICE_FACTORY_PID, '$service.factory.pid$', 'consts.SERVICE_ID');
+        assert.equal(SERVICE_RANKING, '$service.ranking$', 'consts.SERVICE_ID');
+        assert.equal(typeof $utils.prepareFilter, 'function', '$utils.prepareFilter');
     });
 
     it('prepare filter from class name', () => {

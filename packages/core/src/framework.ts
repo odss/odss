@@ -190,12 +190,11 @@ export class Framework extends Bundle implements IBundle {
         bundle.setContext(new BundleContext(this, bundle));
         bundle.updateState(Bundles.STARTING);
         await this._fireBundleEvent(Events.STARTING, bundle);
-
         try {
             const activator = this._activators.get(bundle.id);
             await activator.start(bundle.context);
             bundle.updateState(Bundles.ACTIVE);
-            this._fireBundleEvent(Events.STARTED, bundle);
+            await this._fireBundleEvent(Events.STARTED, bundle);
         } catch (e) {
             bundle.unsetContext();
             bundle.updateState(state);
@@ -276,7 +275,7 @@ export class Framework extends Bundle implements IBundle {
         await this.on.bundle.fire(new BundleEvent(type, bundle));
     }
     async _fireServiceEvent(type: number, ref: IServiceReference): Promise<void> {
-        await this.on.service.fite(new ServiceEvent(type, ref));
+        await this.on.service.fire(new ServiceEvent(type, ref));
     }
     async _fireFrameworkEvent(type: number): Promise<void> {
         await this.on.framework.fire(new FrameworkEvent(type, this));

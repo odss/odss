@@ -1,5 +1,5 @@
 test-ci:
-	yarn --no-lockfile
+	npm --no-package-lock
 	make test
 
 local-all:

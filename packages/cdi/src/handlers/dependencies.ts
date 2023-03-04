@@ -9,7 +9,6 @@ import { BaseHandler } from './base';
 import {
     ConstructorDependency,
     ParamDependency,
-    ReferenceDependency,
 } from './dependencies-trackers';
 
 export class DependenciesHandlerFactory implements IHandlerFactory {
@@ -20,10 +19,9 @@ export class DependenciesHandlerFactory implements IHandlerFactory {
     }
 }
 
-class DependenciesHandler extends BaseHandler {
+export class DependenciesHandler extends BaseHandler {
     private constructors: ConstructorDependency[] = [];
     private params: ParamDependency[] = [];
-    private references: ReferenceDependency[] = [];
 
     constructor(private construct: any, private props: any) {
         super();

@@ -5,15 +5,12 @@ const DEFAULT_CONFIG = {
     bundles: [],
 };
 
-export async function boot(
-    { properties, bundles } = DEFAULT_CONFIG,
-    runner = asyncRunner
-): Promise<Framework> {
+export async function boot({ properties, bundles } = DEFAULT_CONFIG, runAsync = true): Promise<Framework> {
     await ready();
 
     const framework = new FrameworkFactory().create(properties || {});
     await framework.start();
-
+    const runner = runAsync ? asyncRunner : asyncRunner;
     await runner(framework, bundles || []);
     return framework;
 }

@@ -1,4 +1,4 @@
-import { link, lstat, promises as fs } from 'fs';
+import { promises as fs } from 'fs';
 import util from 'util';
 import path from 'path';
 import resolve from 'resolve';
@@ -6,11 +6,11 @@ import resolve from 'resolve';
 import { getLogger } from '@stool/logging';
 import { boot, syncRunner } from '@odss/core';
 import { installPackage } from './packages.mjs';
-import { ROOT, SHELL_BUNDLES } from './consts.mjs';
+import { ROOT, SHELL_BUNDLES, DEV_BUNDLES } from './consts.mjs';
 
 const presolve = util.promisify(resolve);
 
-const logger = getLogger('odss.bootstrap.node');
+const logger = getLogger('@odss/bootstrap.node');
 
 const resolver = (cwd, paths, install) => ({
     loader: {
@@ -39,23 +39,30 @@ const resolver = (cwd, paths, install) => ({
     }
 });
 
-export async function run(cwd, { bundles, properties: props, ...options }) {
+export async function run(cwd, { bundles: extraBundles, properties: extraProperties, ...options }) {
     const {
-        dependencies = {},
+        paths = [],
+        bundles = [],
         properties = {},
-        paths = []
-    } = await findConfigFile(cwd);
+    } = await findConfiguration(cwd);
     if (options.shell) {
         paths.push(ROOT);
         bundles.push(...SHELL_BUNDLES);
     }
+    if (options.dev) {
+        if (!paths.includes(ROOT)) {
+            paths.push(ROOT);
+        }
+        bundles.push(...DEV_BUNDLES);
+    }
     const config = {
         properties: {
+            cwd,
             ...resolver(cwd, paths, options.npmInstall),
             ...properties,
-            ...props
+            ...extraProperties
         },
-        bundles: [...Object.keys(dependencies), ...bundles ],
+        bundles: [...bundles, ...extraBundles ],
     };
     return await boot(config, syncRunner);
 }
@@ -78,11 +85,20 @@ function packageFilter({...pkg}) {
 };
 
 const LOADERS = {
-    'package.json' : readJson,
+    // 'odss.js': readConfig,
+    'package.json' : readPackageJson,
 };
 
-async function readJson(filePath) {
-    return JSON.parse(await fs.readFile(filePath));
+async function readPackageJson(filePath) {
+    const pkg = JSON.parse(await fs.readFile(filePath));
+    if (pkg && pkg['odss']) {
+        return pkg['odss'];
+    }
+    throw new Error('Not found key: "odss"');
+}
+
+async function readConfig(filePath) {
+    throw new TypeError('Not implemeneted');
 }
 
 async function fileExists(filePath) {
@@ -92,17 +108,20 @@ async function fileExists(filePath) {
             return true;
         }
     } catch(e) {
-
     }
     return false;
 }
 
-export async function findConfigFile(root) {
+export async function findConfiguration(root) {
     for(const [file, loader] of Object.entries(LOADERS)) {
         const filePath = path.join(root, file);
         if (await fileExists(filePath)) {
-            return await loader(filePath);
+            try {
+                return await loader(filePath);
+            } catch(ex) {
+                throw new Error(`Problem with load config: ${filePath} (${ex})`);
+            }
         }
     }
-    throw Error(`Not found config file [${Object.keys(LOADERS).join(', ')}]`);
+    throw Error(`Not found config file: [${Object.keys(LOADERS).join(', ')}]`);
 }

@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import { Events, ServiceEvent, BundleEvent, FrameworkEvent } from '@odss/common';
+import { Events, ServiceEvent, BundleEvent, FrameworkEvent, OBJECTCLASS } from '@odss/common';
 
 import EventDispatcher from '../src/events';
 
@@ -214,7 +214,7 @@ describe('core/events', () => {
                 bundle: bundle,
                 name: 'test',
                 getProperties() {
-                    return { objectclass: 'filter' };
+                    return { [OBJECTCLASS]: 'filter' };
                 },
             } as any)
         );
@@ -223,7 +223,7 @@ describe('core/events', () => {
                 bundle: bundle,
                 name: 'filter',
                 getProperties() {
-                    return { objectclass: 'filter' };
+                    return { [OBJECTCLASS]: 'filter' };
                 },
             } as any)
         );

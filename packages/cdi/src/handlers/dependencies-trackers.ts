@@ -25,18 +25,18 @@ export class OptionalCardinality implements ICardinality {
 
     constructor(private dependency: IDependency) {}
 
-    addingService(service: any, reference: IServiceReference) {
+    async addingService(service: any, reference: IServiceReference) {
         if (this.ref === null) {
             this.ref = reference;
             this.dependency.addingService(service, reference);
         }
     }
-    modifiedService(service: any, reference: IServiceReference) {
+    async modifiedService(service: any, reference: IServiceReference) {
         if (this.ref === reference) {
             this.dependency.modifiedService(service, reference);
         }
     }
-    removedService(service: any, reference: IServiceReference) {
+    async removedService(service: any, reference: IServiceReference) {
         if (this.ref === reference) {
             this.dependency.removedService(service, reference);
             this.ref = null;
@@ -65,16 +65,16 @@ class MultipleCardinality implements ICardinality {
 
     constructor(private dependency: IDependency) {}
 
-    addingService(service: any, reference: IServiceReference) {
+    async addingService(service: any, reference: IServiceReference) {
         this.counter += 1;
         this.dependency.addingService(service, reference);
     }
 
-    modifiedService(service: any, reference: IServiceReference) {
+    async modifiedService(service: any, reference: IServiceReference) {
         this.dependency.modifiedService(service, reference);
     }
 
-    removedService(service: any, reference: IServiceReference) {
+    async removedService(service: any, reference: IServiceReference) {
         this.dependency.removedService(service, reference);
         this.counter -= 1;
     }
@@ -122,13 +122,13 @@ export class ConstructorDependency implements IDependency {
     close() {
         this.tracker.close();
     }
-    addingService(service: any) {
+    async addingService(service: any) {
         this._service = service;
     }
 
-    modifiedService(service: any) {}
+    async modifiedService(service: any) {}
 
-    removedService(service: any) {
+    async removedService(service: any) {
         this._service = null;
 
     }
@@ -162,14 +162,14 @@ export class ParamDependency implements IDependency {
     close() {
         this.tracker.close();
     }
-    addingService(service: any) {
+    async addingService(service: any) {
         this._service = service;
         this.notifier();
     }
 
-    modifiedService(service: any) {}
+    async modifiedService(service: any) {}
 
-    removedService(service: any) {
+    async removedService(service: any) {
         this._service = null;
         this.notifier();
     }

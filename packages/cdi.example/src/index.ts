@@ -1,5 +1,14 @@
-import { IBundleContext, IServiceReference } from '@odss/common';
-import { Component, Bind, Unbind, Provides, Validate, Invalidate, Property } from '@odss/cdi';
+import {
+    IBundleContext,
+    IServiceReference,
+    Component,
+    Bind,
+    Unbind,
+    Provides,
+    Validate,
+    Invalidate,
+    Property
+} from '@odss/common';
 
 interface ISpellDictionary {
     checkWord(word: string): boolean;

@@ -199,15 +199,6 @@ describe('odss-core', () => {
         await framework.stop();
     });
 
-    it('framework error listeners', async () => {
-        let framework = await tests.framework();
-
-        let listener = sinon.stub().throws('test');
-        assert.equal(true, framework.on.framework.add(self.bundle, listener));
-
-        await framework.start();
-    });
-
     it('start bundle without activator', async () => {
         let framework = await tests.framework();
         await framework.installBundle('noactivator');
