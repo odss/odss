@@ -1,6 +1,6 @@
 {
   "name": "odds",
   "devDependencies": {
-    "lerna": "^3.16.4"
+    "lerna": "^6.5.1"
   }
 }
