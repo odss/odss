@@ -36,7 +36,7 @@ export class Framework extends Bundle implements IBundle {
     constructor(properties: any = {}) {
         super(FRAMEWORK_ID, null, {
             path: '@odss/core',
-            name: '@odss/core'
+            name: '@odss/core',
         });
         this._properties = properties;
         this._bundles.set(this.id, this);

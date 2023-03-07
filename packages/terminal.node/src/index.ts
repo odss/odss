@@ -22,7 +22,7 @@ class ShellTracker extends ServiceTracker<IShell> {
     async addingService(shell: IShell) {
         this.terminal.attach(shell);
     }
-    async modifiedService() { }
+    async modifiedService() {}
 
     async removedService(shell: IShell) {
         this.terminal.detach();

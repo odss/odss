@@ -11,8 +11,8 @@ export class MainUI {
     private disposeStyles: () => void;
     private buttonSubscription: any;
     private dom: {
-        root: HTMLElement,
-        button: HTMLButtonElement,
+        root: HTMLElement;
+        button: HTMLButtonElement;
         container: HTMLElement;
     };
     private listeners: Set<ToggleHandler> = new Set();
@@ -58,12 +58,11 @@ export class MainUI {
         this.buttonSubscription = fromEvent(button, 'click').subscribe(() => {
             active = !active;
             const cls = this.dom.root.classList;
-            active ? cls.add(styles.opened) : cls.remove(styles.opened)
-            for(const listener of this.listeners) {
+            active ? cls.add(styles.opened) : cls.remove(styles.opened);
+            for (const listener of this.listeners) {
                 listener(active);
             }
         });
-
 
         const container = document.createElement('div');
         container.classList.add(styles.container);

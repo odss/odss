@@ -38,8 +38,7 @@ export default class Registry {
     private _styles: any = {};
     private _size = 0;
     private _sid = 0;
-    constructor(public events: any) {
-    }
+    constructor(public events: any) {}
     async registerService(
         bundle: IBundle,
         clasess: any[],
@@ -49,7 +48,7 @@ export default class Registry {
         const sid = (this._sid += 1);
         this._size += 1;
         //prepare properties
-        clasess = getTokenTypes(clasess)
+        clasess = getTokenTypes(clasess);
         // clasess = Array.isArray(clasess) ? clasess : [clasess];
         properties[OBJECTCLASS] = clasess;
         // properties[OBJECTCLASS_NAME] = getTokenTypes(clasess);
@@ -76,7 +75,9 @@ export default class Registry {
             refs.sort(sortReferences);
             this._specs.set(token, refs);
         }
-        await this.events.service.fire(new ServiceEvent(Events.REGISTERED, registration.getReference()));
+        await this.events.service.fire(
+            new ServiceEvent(Events.REGISTERED, registration.getReference())
+        );
         return registration;
     }
     registerStyle(bundle: IBundle, styles: string[]) {
@@ -97,7 +98,9 @@ export default class Registry {
             const info = this._services.get(reference);
             if (info) {
                 const bundle = registration.getBundle();
-                await this.events.service.fire(new ServiceEvent(Events.UNREGISTERED, info.reference));
+                await this.events.service.fire(
+                    new ServiceEvent(Events.UNREGISTERED, info.reference)
+                );
                 if (info.using.size) {
                     throw new Error(
                         'Service: "' +

@@ -1,4 +1,3 @@
-
 import * as consts from './consts';
 import { IFilter, ICompositeFilter, QueryObject } from './types';
 import {

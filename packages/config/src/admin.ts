@@ -7,7 +7,7 @@ import {
     IConfigManaged,
     IConfigManagedFactory,
     Properties,
-} from "@odss/common";
+} from '@odss/common';
 
 type TPID = string;
 interface IConfigDirectory {
@@ -18,10 +18,13 @@ interface IConfigDirectory {
 class ConfigDirectory implements IConfigDirectory {
     private configurations: Map<TPID, IConfiguration> = new Map();
     private fatories: Map<string, Set<IConfiguration>> = new Map();
-    constructor(private admin: ConfigAdmin) {
-
-    }
-    async add(pid: string, properties: Properties, storage: IConfigStorage, factoryPid: TPID = null): Promise<IConfiguration> {
+    constructor(private admin: ConfigAdmin) {}
+    async add(
+        pid: string,
+        properties: Properties,
+        storage: IConfigStorage,
+        factoryPid: TPID = null
+    ): Promise<IConfiguration> {
         if (this.configurations.has(pid)) {
             throw new Error(`Already exists configuration: ${pid}`);
         }
@@ -75,7 +78,7 @@ class Configuration implements IConfiguration {
         private admin: ConfigAdmin,
         private storage: IConfigStorage,
         private pid: TPID,
-        private factoryPid: TPID = '',
+        private factoryPid: TPID = ''
     ) {
         this.pid = pid;
         this.factoryPid = factoryPid;
@@ -137,9 +140,7 @@ export class ConfigAdmin implements IConfigAdmin {
     private factories: Set<IConfigManagedFactory> = new Set();
 
     private directory: ConfigDirectory = new ConfigDirectory(this);
-    constructor() {
-
-    }
+    constructor() {}
     async updated(configuration: IConfiguration, notify: boolean = false): Promise<void> {
         await this.update(configuration);
     }
@@ -147,11 +148,11 @@ export class ConfigAdmin implements IConfigAdmin {
         const pid = configuration.getPid();
         const factoryPid = configuration.getFactoryPid();
         if (factoryPid) {
-            const factories = this.getMatchedFactories(factoryPid)
+            const factories = this.getMatchedFactories(factoryPid);
             // await
             this.notifyFactoriesRemove(factories, pid);
         } else {
-            const services = this.getMatchedServices(factoryPid)
+            const services = this.getMatchedServices(factoryPid);
             // await
             this.notifyServices(services, null);
         }
@@ -159,7 +160,7 @@ export class ConfigAdmin implements IConfigAdmin {
     async addStorage(storage: IConfigStorage) {
         this.storages.push(storage);
         const pids = await storage.getPids();
-        await this.notifyPids(pids)
+        await this.notifyPids(pids);
     }
     removeStorage(storage: IConfigStorage) {
         const index = this.storages.indexOf(storage);
@@ -183,7 +184,7 @@ export class ConfigAdmin implements IConfigAdmin {
         this.factories.delete(factory);
     }
     private async notifyPids(pids: TPID[]): Promise<void> {
-        for(const pid of pids) {
+        for (const pid of pids) {
             const configuration = await this.getConfiguration(pid);
             try {
                 await this.update(configuration);
@@ -197,11 +198,11 @@ export class ConfigAdmin implements IConfigAdmin {
         const factoryPid = configuration.getFactoryPid();
         const properties = configuration.getProperties();
         if (factoryPid) {
-            const factories = this.getMatchedFactories(factoryPid)
+            const factories = this.getMatchedFactories(factoryPid);
             // await
             this.notifyFactories(factories, pid, properties);
         } else {
-            const services = this.getMatchedServices(factoryPid)
+            const services = this.getMatchedServices(factoryPid);
             // await
             this.notifyServices(services, properties);
         }
@@ -217,25 +218,29 @@ export class ConfigAdmin implements IConfigAdmin {
         for (const configuration of configurations) {
             try {
                 factory.updated(configuration.getPid(), configuration.getProperties());
-            }catch(e) {
+            } catch (e) {
                 console.error(e);
             }
         }
     }
-    private async notifyFactories(factories: IConfigManagedFactory[], pid: TPID, properties: Properties) {
-        for(const factory of factories) {
+    private async notifyFactories(
+        factories: IConfigManagedFactory[],
+        pid: TPID,
+        properties: Properties
+    ) {
+        for (const factory of factories) {
             try {
                 await factory.updated(pid, properties);
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
             }
         }
     }
     private async notifyFactoriesRemove(factories: IConfigManagedFactory[], pid: TPID) {
-        for(const factory of factories) {
+        for (const factory of factories) {
             try {
                 await factory.deleted(pid);
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
             }
         }
@@ -244,15 +249,15 @@ export class ConfigAdmin implements IConfigAdmin {
         const configuration = await this.getConfiguration(pid);
         try {
             await service.updated(configuration.getProperties());
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     }
     private async notifyServices(services: IConfigManaged[], properties: Properties) {
-        for(const service of services) {
+        for (const service of services) {
             try {
                 await service.updated(properties);
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
             }
         }
@@ -262,7 +267,7 @@ export class ConfigAdmin implements IConfigAdmin {
         if (configuration) {
             return configuration;
         }
-        for(const storage of this.storages) {
+        for (const storage of this.storages) {
             if (await storage.exists(pid)) {
                 const properties = await storage.load(pid);
                 const factoryPid = properties[SERVICE_FACTORY_PID];
@@ -282,5 +287,5 @@ export class ConfigAdmin implements IConfigAdmin {
 
 const nextPid = (() => {
     let id = 0;
-    return () => id+=1;
+    return () => (id += 1);
 })();

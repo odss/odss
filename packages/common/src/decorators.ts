@@ -17,7 +17,6 @@ declare type MethodDecorator = <T>(target: Object, propertyKey: string | symbol,
 declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) => void;
 */
 
-
 export type ProvideHandlerType = {
     tokens: any[];
     properties: any;

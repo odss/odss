@@ -70,7 +70,7 @@ function createListeners<T>(callbackName: string): any {
         },
         reset() {
             listeners.length = 0;
-        }
+        },
     };
 }
 const catchError = async (task: Promise<void>, name: string) => {
@@ -79,7 +79,7 @@ const catchError = async (task: Promise<void>, name: string) => {
     } catch (e) {
         console.error(`Error with listener: ${name}`, e);
     }
-}
+};
 
 export default class EventDispatcher {
     public framework: any;
@@ -111,5 +111,4 @@ export default class EventDispatcher {
         this.bundle.reset();
         this.service.reset();
     }
-
 }

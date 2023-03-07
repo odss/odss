@@ -1,15 +1,7 @@
-import {
-    IFactoryContext,
-    IHandler,
-    IHandlerFactory,
-    HandlerTypes,
-} from '@odss/common';
+import { IFactoryContext, IHandler, IHandlerFactory, HandlerTypes } from '@odss/common';
 
 import { BaseHandler } from './base';
-import {
-    ConstructorDependency,
-    ParamDependency,
-} from './dependencies-trackers';
+import { ConstructorDependency, ParamDependency } from './dependencies-trackers';
 
 export class DependenciesHandlerFactory implements IHandlerFactory {
     getHandlers(factoryContext: IFactoryContext): IHandler[] {

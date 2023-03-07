@@ -1,10 +1,5 @@
-import {
-    IBundleTracker,
-    IBundleContext,
-} from '@odss/common';
-import {
-    HandlerFactoryService,
-} from '@odss/common';
+import { IBundleTracker, IBundleContext } from '@odss/common';
+import { HandlerFactoryService } from '@odss/common';
 
 import { ActiveBundleTracker, HandlersTracker } from './trackers';
 import { CdiService } from './service';

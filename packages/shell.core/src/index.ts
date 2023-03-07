@@ -1,8 +1,4 @@
-import {
-    IBundleContext,
-    ShellService,
-    ShellCommandsService,
-} from '@odss/common';
+import { IBundleContext, ShellService, ShellCommandsService } from '@odss/common';
 import { Shell } from '@odss/shell';
 
 import { BasicCommands } from './commands';

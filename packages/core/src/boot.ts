@@ -5,7 +5,10 @@ const DEFAULT_CONFIG = {
     bundles: [],
 };
 
-export async function boot({ properties, bundles } = DEFAULT_CONFIG, runAsync = true): Promise<Framework> {
+export async function boot(
+    { properties, bundles } = DEFAULT_CONFIG,
+    runAsync = true
+): Promise<Framework> {
     await ready();
 
     const framework = new FrameworkFactory().create(properties || {});

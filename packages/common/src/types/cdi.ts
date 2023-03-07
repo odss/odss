@@ -1,4 +1,4 @@
-import { IBundle, IBundleContext } from "./core";
+import { IBundle, IBundleContext } from './core';
 
 export declare class IComponent {
     readonly target: any;

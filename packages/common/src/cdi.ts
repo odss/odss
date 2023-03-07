@@ -1,4 +1,4 @@
-import { FACTORY_CONTEXT} from './consts';
+import { FACTORY_CONTEXT } from './consts';
 import { IFactoryContext } from './types/cdi';
 import { Metadata } from './metadata';
 

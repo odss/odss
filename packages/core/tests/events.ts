@@ -230,7 +230,6 @@ describe('core/events', () => {
         assert.equal(2, spy.callCount);
     });
     it('should notify listener with filter: *', async () => {
-
         const spy = sinon.spy();
 
         //catch all - *

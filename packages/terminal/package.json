@@ -18,7 +18,7 @@
     "build": "micropack",
     "build:dev": "micropack --dev",
     "lint": "eslint src/*",
-    "format": "prettier src/ tests --write",
+    "format": "prettier src/ --write",
     "prepare": "npm run build"
   },
   "dependencies": {

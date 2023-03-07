@@ -1,14 +1,12 @@
-
-export type NamedServiceType = any | any[]
-    // | string | string[]
-    // | Function |
-    // | {
-    //       name: string;
-    //   };
+export type NamedServiceType = any | any[];
+// | string | string[]
+// | Function |
+// | {
+//       name: string;
+//   };
 export type ServiceType = any;
 
 export type Properties = Record<string, any>;
-
 
 export type Properties2<P> = {
     [Property in keyof P]: P[Property];
@@ -49,7 +47,7 @@ export interface IDisposable {
 }
 
 export interface IFramework extends IBundle {
-    getProperty<T = any>(name: string, defaultValue?: T): T;
+    getProperty<T>(name: string, defaultValue?: T): T;
     getProperties<P extends Properties>(): P;
     hasBundle(bundle: IBundle): boolean;
     getBundle(bundleId: number): IBundle;
@@ -115,7 +113,7 @@ export interface IServiceObject<S> {
 
 export interface IBundleContext {
     installBundle(name: string, autostart: boolean): Promise<IBundle>;
-    registerService<S extends any>(
+    registerService<S>(
         name: NamedServiceType,
         service: S,
         properties?: Properties
@@ -123,12 +121,12 @@ export interface IBundleContext {
     getServiceReference(name?: NamedServiceType, filter?: FilterType): IServiceReference;
     getServiceReferences(name?: NamedServiceType, filter?: FilterType): IServiceReference[];
     // getBundleServiceReferences(name: any, filter?: any): IServiceReference[];
-    getService<S extends any>(reference: IServiceReference): S;
-    getServiceObject<S extends any>(reference: IServiceReference): IServiceObject<S>;
+    getService<S>(reference: IServiceReference): S;
+    getServiceObject<S>(reference: IServiceReference): IServiceObject<S>;
     ungetService(reference: IServiceReference): void;
     getBundle(id?: number): IBundle;
     getBundles(): IBundle[];
-    getProperty<T extends any>(name: string, defaultValue?: T): T;
+    getProperty<T>(name: string, defaultValue?: T): T;
     getProperties<P extends Properties>(): P;
     addServiceListener(listener: IServiceListener, name: any, filter: FilterType): IDisposable;
     addBundleListener(listener: IBundleListener): IDisposable;

@@ -82,7 +82,6 @@ describe('Metadata', () => {
             };
         }
 
-
         class Test {
             @decorArray('value1')
             method1() {}

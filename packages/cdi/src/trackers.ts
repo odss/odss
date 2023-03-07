@@ -1,10 +1,4 @@
-import {
-    IBundle,
-    IBundleContext,
-    ServiceTracker,
-    BundleTracker,
-    Bundles,
-} from '@odss/common';
+import { IBundle, IBundleContext, ServiceTracker, BundleTracker, Bundles } from '@odss/common';
 import { hasFactoryContext, HandlerFactoryService, IHandlerFactory } from '@odss/common';
 
 export class HandlersTracker extends ServiceTracker<IHandlerFactory> {

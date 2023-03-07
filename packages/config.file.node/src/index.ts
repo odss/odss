@@ -8,7 +8,5 @@ export class Activator {
         const dir = ctx.getProperty('config_dir', path.join(process.cwd(), 'config'));
         ctx.registerService(ConfigStorageService, new JsonConfigStorage(dir));
     }
-    async stop(ctx: IBundleContext) {
-
-    }
+    async stop(ctx: IBundleContext) {}
 }

@@ -17,7 +17,8 @@ import { toDisposable } from './utils';
 import { ServiceEvent, BundleEvent } from './events';
 
 export class ServiceTracker<S = any>
-    implements IServiceTrackerListener<S>, IServiceTrackerCustomizer<S> {
+    implements IServiceTrackerListener<S>, IServiceTrackerCustomizer<S>
+{
     private _tracked?: ServiceTracked<S>;
     private _listenerDispose?: IDisposable;
 

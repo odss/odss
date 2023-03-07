@@ -53,7 +53,8 @@ export class CommandHandlersTracker extends ServiceTracker {
 
         const metadataHandlers =
             Metadata.scanByKey<ICommands, ICommandOptions>(
-                command, null,
+                command,
+                null,
                 MetadataTypes.SHELL_COMMANDS_HANDLER
             ) || [];
         const handlers: ICommand[] = [];

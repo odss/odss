@@ -130,7 +130,6 @@ export class ConstructorDependency implements IDependency {
 
     async removedService(service: any) {
         this._service = null;
-
     }
     get service() {
         return this._service;

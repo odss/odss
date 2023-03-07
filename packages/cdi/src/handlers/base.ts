@@ -9,14 +9,14 @@ export class BaseHandler implements IHandler {
     async setup(container: IComponentContainer): Promise<void> {
         this.container = container;
     }
-    async open(): Promise<void> {};
+    async open(): Promise<void> {}
     async close(): Promise<void> {
         this.container = null;
     }
-    async preValidate(): Promise<void> {};
-    async validate(): Promise<void> {};
-    async postValidate(): Promise<void> {};
-    async preInvalidate(): Promise<void> {};
-    async invalidate(): Promise<void> {};
-    async postInvalidate(): Promise<void> {};
+    async preValidate(): Promise<void> {}
+    async validate(): Promise<void> {}
+    async postValidate(): Promise<void> {}
+    async preInvalidate(): Promise<void> {}
+    async invalidate(): Promise<void> {}
+    async postInvalidate(): Promise<void> {}
 }

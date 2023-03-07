@@ -69,7 +69,11 @@ export default class BundleContext implements IBundleContext {
     ungetService(reference: IServiceReference): void {
         this.framework.registry.unget(this.bundle, reference);
     }
-    async registerService(name: any, service: any, properties: any = {}): Promise<IServiceRegistration> {
+    async registerService(
+        name: any,
+        service: any,
+        properties: any = {}
+    ): Promise<IServiceRegistration> {
         return this.framework.registry.registerService(this.bundle, name, service, properties);
     }
     // onService(listener: IServiceListener, name: any, filter = ''): void {

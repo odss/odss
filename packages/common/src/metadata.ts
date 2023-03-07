@@ -14,7 +14,6 @@ export interface MetadataScanKeys<M> {
     handler: (...args: any[]) => any;
 }
 
-
 function scanMetadata<R>(prototype: any, callback: MetadataScanCallback<R>): R[] {
     const isHandler = name => typeof prototype[name] === 'function' && name !== 'constructor';
     let result: R[] = [];

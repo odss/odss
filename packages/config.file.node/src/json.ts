@@ -4,15 +4,13 @@ import path from 'path';
 import { IBundleContext, IConfigStorage, Properties } from '@odss/common';
 
 export class JsonConfigStorage implements IConfigStorage {
-    constructor(private dir: string) {
-
-    }
+    constructor(private dir: string) {}
     async exists(pid: string): Promise<boolean> {
         const filePath = this.getFilePath(pid);
         try {
             const stat = await fs.stat(filePath);
             return stat.isFile();
-        } catch(e) {
+        } catch (e) {
             console.log(`Not found file: ${filePath}`);
         }
         return false;

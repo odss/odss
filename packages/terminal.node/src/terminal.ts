@@ -1,13 +1,11 @@
 import * as readline from 'readline';
 import { IShell } from '@odss/common';
 
-export class TerminalService  {
+export class TerminalService {
     private shell?: IShell;
     private rl?: readline.Interface;
 
-    constructor() {
-
-    }
+    constructor() {}
     attach(shell: IShell) {
         this.shell = shell;
     }
@@ -24,7 +22,7 @@ export class TerminalService  {
         }
         this.shell = undefined;
     }
-    private async createInterface(){
+    private async createInterface() {
         this.rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -32,10 +30,9 @@ export class TerminalService  {
                 try {
                     const hits = this.shell ? await this.shell.complete(line) : [];
                     cb(null, [hits, line]);
-                } catch(ex) {
+                } catch (ex) {
                     console.log({ ex });
                     // cb(e, []);
-
                 }
             },
             prompt: 'odss:shell> ',
@@ -55,7 +52,7 @@ export class TerminalService  {
 
         this.rl.on('SIGINT', () => {
             if (this.shell) {
-                this.shell.execute("exit");
+                this.shell.execute('exit');
             }
         });
 
@@ -71,7 +68,7 @@ export class TerminalService  {
                 try {
                     const result = await this.shell.execute(line);
                     console.log(result);
-                } catch(ex) {
+                } catch (ex) {
                     console.log(ex);
                 }
             } else {

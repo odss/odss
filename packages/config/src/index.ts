@@ -1,7 +1,11 @@
-import { IBundleContext, ConfigAdminService } from "@odss/common";
+import { IBundleContext, ConfigAdminService } from '@odss/common';
 
 import { ConfigAdmin } from './admin';
-import { ConfigManagedFactoryTracker, ConfigManagedTracker, ConfigStorageTracker } from './trackers';
+import {
+    ConfigManagedFactoryTracker,
+    ConfigManagedTracker,
+    ConfigStorageTracker,
+} from './trackers';
 
 export class Activator {
     start(ctx: IBundleContext) {
@@ -14,7 +18,5 @@ export class Activator {
         t3.open();
         ctx.registerService(ConfigAdminService, admin);
     }
-    stop() {
-
-    }
+    stop() {}
 }

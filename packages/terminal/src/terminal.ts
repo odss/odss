@@ -3,15 +3,14 @@ import LocalEchoController from './vendors/local-echo';
 import { Terminal } from './vendors/xterm';
 import { MainUI } from './ui';
 
-export class TerminalService  {
+export class TerminalService {
     private shell?: IShell;
     private xterm: any;
     private controller: any;
     private ui: MainUI = new MainUI();
     private toDispose: (() => void)[] = [];
 
-    constructor() {
-    }
+    constructor() {}
     attach(shell: IShell) {
         this.shell = shell;
         this.ui.activate();
@@ -36,9 +35,7 @@ export class TerminalService  {
                 return this.shell?.complete(tokens.join(' ')) || [];
             })
         );
-        this.toDispose.push(
-            this.ui.onToggle(status => this.toggle(status))
-        )
+        this.toDispose.push(this.ui.onToggle(status => this.toggle(status)));
         this.toDispose.push(() => {
             this.controller.abortRead();
             this.controller.dispose();
@@ -47,7 +44,7 @@ export class TerminalService  {
         });
     }
     stop() {
-        for(const dispose of this.toDispose) {
+        for (const dispose of this.toDispose) {
             dispose();
         }
         this.shell = null;
@@ -60,19 +57,19 @@ export class TerminalService  {
         }
     }
 
-    private async runCommandLoop(){
-        while(true) {
+    private async runCommandLoop() {
+        while (true) {
             let line = '';
             try {
                 line = await this.controller.read('odss> ');
-            } catch(err) {
+            } catch (err) {
                 console.log(err);
                 break;
             }
             try {
                 const result = await this.shell?.execute(line);
                 this.controller.println(result);
-            } catch(err) {
+            } catch (err) {
                 this.controller.println(err);
             }
         }

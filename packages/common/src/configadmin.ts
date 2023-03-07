@@ -5,7 +5,7 @@ import {
     IConfigAdmin,
     IConfiguration,
     IConfigDirectory,
-    IConfigStorage
+    IConfigStorage,
 } from './types';
 
 export class ConfigManagedService implements IConfigManaged {

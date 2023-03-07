@@ -252,7 +252,7 @@ describe('odss.core.tracker.BundleTracker', () => {
     });
 
     it('notify listener on close tracker', async () => {
-        let tracker = new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener)
+        let tracker = new BundleTracker(scope.ctx, Bundles.ACTIVE, scope.listener);
         await tracker.open();
         await tracker.close();
         assert.equal(

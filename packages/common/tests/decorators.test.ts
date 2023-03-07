@@ -176,7 +176,7 @@ describe('@Modified()', () => {
 
     it('should create modified metadata', () => {
         const info = getFactoryContext(Test).get(HandlerTypes.MODIFIED_DEPENDENCY);
-        assert.deepEqual(info, [{ key: 'modifiedMethod', token: "Service" }]);
+        assert.deepEqual(info, [{ key: 'modifiedMethod', token: 'Service' }]);
     });
 });
 

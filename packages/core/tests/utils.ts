@@ -1,5 +1,11 @@
 import { assert } from 'chai';
-import { OBJECTCLASS, SERVICE_FACTORY_PID, SERVICE_ID, SERVICE_PID, SERVICE_RANKING } from '@odss/common';
+import {
+    OBJECTCLASS,
+    SERVICE_FACTORY_PID,
+    SERVICE_ID,
+    SERVICE_PID,
+    SERVICE_RANKING,
+} from '@odss/common';
 import * as $utils from '../src/utils';
 
 describe('@odss/core/utils', () => {

@@ -1,6 +1,5 @@
 import { IBundleContext, ConfigManagedService, SERVICE_PID } from '@odss/common';
 
-
 class PrinterService {
     private format: string = 'short';
     print() {
@@ -19,7 +18,7 @@ export class Activator {
     async start(ctx: IBundleContext) {
         const service = new PrinterService();
         ctx.registerService(ConfigManagedService, service, {
-            [SERVICE_PID]: 'printer.service'
+            [SERVICE_PID]: 'printer.service',
         });
         const next = () => {
             service.print();

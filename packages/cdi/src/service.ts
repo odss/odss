@@ -61,7 +61,7 @@ class ComponentContainer implements IComponentContainer {
     }
     async removeHandlers(handlers: IHandler[]) {
         this.handlers = this.handlers.filter(h => !handlers.includes(h));
-        for(const handler of handlers) {
+        for (const handler of handlers) {
             await handler.close();
         }
     }

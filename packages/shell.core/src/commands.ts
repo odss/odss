@@ -1,30 +1,37 @@
-import { IShell, IBundleContext, SERVICE_RANKING, OBJECTCLASS, SERVICE_ID, ShellCommandsService, ShellService } from '@odss/common';
+import {
+    IShell,
+    IBundleContext,
+    SERVICE_RANKING,
+    OBJECTCLASS,
+    SERVICE_ID,
+    ShellCommandsService,
+    ShellService,
+} from '@odss/common';
 import { Command, Commands } from '@odss/shell';
 
 const STATUSES = {
-    1:  'UNINSTALLED',
-    2:  'INSTALLED',
-    4:  'RESOLVED',
-    8:  'STARTING',
+    1: 'UNINSTALLED',
+    2: 'INSTALLED',
+    4: 'RESOLVED',
+    8: 'STARTING',
     16: 'STOPPING',
     32: 'ACTIVE',
 };
 
 @Commands()
 export class BasicCommands {
-
     constructor(private ctx: IBundleContext, protected shell: IShell) {}
 
     @Command({
-        name: "properties",
-        description: "Show all properties",
+        name: 'properties',
+        description: 'Show all properties',
     })
     properties(args: string[]) {
         return this.ctx?.getProperties() || {};
     }
     @Command({
-        name: "property",
-        description: "Show property value",
+        name: 'property',
+        description: 'Show property value',
     })
     property(args: string[]) {
         return this.ctx?.getProperty(args[0], null);
@@ -122,7 +129,7 @@ export class BasicCommands {
                 bundle.id,
                 bundle.version,
                 STATUSES[bundle.state] || 'Unknown',
-                bundle.name
+                bundle.name,
             ]);
         }
         return makeAsciiTable('Bundles', header, records);
@@ -159,7 +166,7 @@ export class BasicCommands {
     serviceList(): string {
         const bundles = this.ctx?.getBundles() || [];
         const records: string[][] = [];
-        for(const bundle of bundles) {
+        for (const bundle of bundles) {
             const refs = bundle.getRegisteredServices();
             const lines = refs.map(ref => [
                 ref.getProperty(SERVICE_ID),
@@ -177,9 +184,10 @@ export class BasicCommands {
     })
     serviceDetail(args: string[]): string {
         const id = args.shift();
-        const refs = this.ctx?.getServiceReferences(null, {
-            [SERVICE_ID]: parseInt(id as string, 10),
-        }) || [];
+        const refs =
+            this.ctx?.getServiceReferences(null, {
+                [SERVICE_ID]: parseInt(id as string, 10),
+            }) || [];
         const ref = refs[0];
         const props = ref.getProperties();
         const clasess = props[OBJECTCLASS];
