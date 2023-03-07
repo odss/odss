@@ -53,9 +53,9 @@ describe('@Inject()', () => {
         const info = getFactoryContext(Test).get(HandlerTypes.CONSTRUCTOR_DEPENDENCY);
 
         assert.deepEqual(info, [
-            { index: 4, token: ArrowService, filter: null },
-            { index: 3, token: FuncService, filter: null },
-            { index: 2, token: Service, filter: null },
+            { index: 4, token: 'ArrowService', filter: null },
+            { index: 3, token: 'FuncService', filter: null },
+            { index: 2, token: 'Service', filter: null },
             { index: 1, token: 'bar', filter: null },
             { index: 0, token: 'foo', filter: null },
         ]);
@@ -65,8 +65,8 @@ describe('@Inject()', () => {
 
         assert.deepEqual(info, [
             { key: 'param1', token: 'foo', filter: { key: 'value' } },
-            { key: 'param2', token: String, filter: null },
-            { key: 'param3', token: Service, filter: '(key=value)' },
+            { key: 'param2', token: 'String', filter: null },
+            { key: 'param3', token: 'Service', filter: '(key=value)' },
         ]);
     });
 });
@@ -80,7 +80,7 @@ describe('@Provides()', () => {
 
         it('should create provide metadata', () => {
             const info = getFactoryContext(Test).get(HandlerTypes.PROVIDES);
-            assert.deepEqual(info, [{ tokens: [Service], properties: {} }]);
+            assert.deepEqual(info, [{ tokens: ['Service'], properties: {} }]);
         });
     });
     describe('many tokens', () => {
@@ -91,7 +91,7 @@ describe('@Provides()', () => {
 
         it('should create provide metadata', () => {
             const info = getFactoryContext(Test).get(HandlerTypes.PROVIDES);
-            assert.deepEqual(info, [{ tokens: [Service, 'foo.bar.Service'], properties: {} }]);
+            assert.deepEqual(info, [{ tokens: ['Service', 'foo.bar.Service'], properties: {} }]);
         });
     });
     describe('with properties', () => {
@@ -104,7 +104,7 @@ describe('@Provides()', () => {
             const info = getFactoryContext(Test).get(HandlerTypes.PROVIDES);
             assert.deepEqual(info, [
                 {
-                    tokens: [Service, 'foo.bar.Service'],
+                    tokens: ['Service', 'foo.bar.Service'],
                     properties: { foo: 'bar' },
                 },
             ]);
@@ -148,7 +148,7 @@ describe('@Bind()', () => {
 
     it('should create bind metadata', () => {
         const info = getFactoryContext(Test).get(HandlerTypes.BIND_DEPENDENCY);
-        assert.deepEqual(info, [{ key: 'addService', token: Service, cardinality: '0..n' }]);
+        assert.deepEqual(info, [{ key: 'addService', token: 'Service', cardinality: '0..n' }]);
     });
 });
 
@@ -162,7 +162,7 @@ describe('@Unbind()', () => {
 
     it('should create unbind metadata', () => {
         const info = getFactoryContext(Test).get(HandlerTypes.UNBIND_DEPENDENCY);
-        assert.deepEqual(info, [{ key: 'removeService', token: Service }]);
+        assert.deepEqual(info, [{ key: 'removeService', token: 'Service' }]);
     });
 });
 
@@ -176,7 +176,7 @@ describe('@Modified()', () => {
 
     it('should create modified metadata', () => {
         const info = getFactoryContext(Test).get(HandlerTypes.MODIFIED_DEPENDENCY);
-        assert.deepEqual(info, [{ key: 'modifiedMethod', token: Service }]);
+        assert.deepEqual(info, [{ key: 'modifiedMethod', token: "Service" }]);
     });
 });
 

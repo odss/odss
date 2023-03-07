@@ -15,8 +15,8 @@
     }
   },
   "scripts": {
-    "build": "micropack --css-module",
-    "build:dev": "micropack --css-module --dev",
+    "build": "micropack",
+    "build:dev": "micropack --dev",
     "lint": "eslint src/*",
     "format": "prettier src/ tests --write",
     "prepare": "npm run build"

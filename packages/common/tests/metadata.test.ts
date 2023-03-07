@@ -62,22 +62,32 @@ describe('Metadata', () => {
     });
 
     describe('::scanByKey()', () => {
-        function decor(...values: string[]) {
+        function decorArray(name: string) {
             return (
                 target: any,
                 key: string | symbol,
                 descriptor: TypedPropertyDescriptor<any>
             ) => {
-                debugger;
-                Reflect.defineMetadata('__decor__', values, target, key);
+                Reflect.defineMetadata('__decor__', [name], target, key);
             };
         }
 
+        function decorObject(name: string) {
+            return (
+                target: any,
+                key: string | symbol,
+                descriptor: TypedPropertyDescriptor<any>
+            ) => {
+                Reflect.defineMetadata('__decor__', { name }, target, key);
+            };
+        }
+
+
         class Test {
-            @decor('value1')
+            @decorArray('value1')
             method1() {}
 
-            @decor('value2')
+            @decorObject('value2')
             method2() {}
         }
 
@@ -86,8 +96,8 @@ describe('Metadata', () => {
             debugger;
             const info = Metadata.scanByKey<Test, string[]>(test, null, '__decor__');
             assert.deepEqual(info, [
-                { name: 'method1', method: test.method1, metadata: ['value1'] },
-                { name: 'method2', method: test.method2, metadata: ['value2'] },
+                { name: 'method1', handler: test.method1, metadata: ['value1'] },
+                { name: 'method2', handler: test.method2, metadata: { name: 'value2' } },
             ]);
         });
     });

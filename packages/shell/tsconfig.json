@@ -7,7 +7,8 @@
         "removeComments": true,
         "strict": false,
         "declaration": true,
-        "declarationDir": "./types"
+        "declarationDir": "./types",
+        "experimentalDecorators": true
     },
     "files": [
         "src/index.ts"
@@ -17,6 +18,6 @@
         "dist/*"
     ],
     "ts-node": {
-        "transpileOnly": true
+        "transpileOnly": false
     }
 }

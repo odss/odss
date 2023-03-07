@@ -1,5 +1,6 @@
 import { IShell } from '@odss/common';
-import { LocalEchoController } from './declarations';
+import LocalEchoController from './vendors/local-echo';
+import { Terminal } from './vendors/xterm';
 import { MainUI } from './ui';
 
 export class TerminalService  {
@@ -10,12 +11,6 @@ export class TerminalService  {
     private toDispose: (() => void)[] = [];
 
     constructor() {
-        if (!globalThis.LocalEchoController) {
-            throw Error('Missing xterm addon: LocalEchoController');
-        }
-        if (!globalThis.Terminal) {
-            throw Error('Missing xterm: Terminal');
-        }
     }
     attach(shell: IShell) {
         this.shell = shell;
@@ -28,10 +23,10 @@ export class TerminalService  {
     }
     start() {
         this.ui.start();
-        this.xterm = new globalThis.Terminal({
+        this.xterm = new Terminal({
             fontSize: '20px',
         });
-        this.controller = new globalThis.LocalEchoController();
+        this.controller = new LocalEchoController();
         this.xterm.loadAddon(this.controller);
         this.xterm.open(this.ui.getContainer());
         this.runCommandLoop();

@@ -10,7 +10,6 @@
   "scripts": {
     "build": "micropack",
     "dev": "npm run build -- --watch",
-    "test": "mocha --require ts-node/register tests/*.ts",
     "karma": "karma start --single-run",
     "lint": "eslint src/*",
     "format": "prettier src/ tests --write",

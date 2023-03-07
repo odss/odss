@@ -1,6 +1,7 @@
 import { fromEvent } from '@stool/dom';
 import { importStyles } from './styles';
-import styles, { stylesheet } from './ui.css';
+import { stylesheet as xterm } from './vendors/xterm.css';
+import styles, { stylesheet as ui } from './ui.module.css';
 
 interface ToggleHandler {
     (status: boolean): void;
@@ -17,7 +18,7 @@ export class MainUI {
     private listeners: Set<ToggleHandler> = new Set();
 
     start(): void {
-        this.disposeStyles = importStyles(stylesheet);
+        this.disposeStyles = importStyles([ui, xterm]);
         this.create();
         document.body.appendChild(this.dom.root);
     }

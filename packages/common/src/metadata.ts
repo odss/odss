@@ -36,17 +36,10 @@ export class Metadata {
                 : prototype;
         return scanMetadata<R>(proto, callback);
     }
-    static scanByKey<I, M = any>(instance: I, prototype: any, key: string | string[]): MetadataScanKeys<M>[] {
+    static scanByKey<I, M = any>(instance: I, prototype: any, key: string): MetadataScanKeys<M>[] {
         return Metadata.scan<I, MetadataScanKeys<M>>(instance, prototype, (name, p) => {
-            const keys = Array.isArray(key) ? key : [key];
-            const metadata = keys.reduce((acc, key) => {
-                const meta = Reflect.getMetadata(key, p, name);
-                if (meta) {
-                    acc = {...acc, ...meta};
-                }
-                return acc;
-            }, {}) as M;
-            if (Object.keys(metadata).length) {
+            const metadata = Reflect.getMetadata(key, p, name);
+            if (metadata) {
                 return {
                     name,
                     metadata,

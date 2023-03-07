@@ -3,18 +3,10 @@
       "target": "esnext",
       "module": "CommonJS",
       "moduleResolution": "node",
-      "noImplicitAny": false,
-      "removeComments": true,
-      "strict": false,
-      "outDir": "./dist"
+      "declaration": true,
+      "declarationDir": "./types"
   },
-  "files": [
-      "src/index.ts"
-  ],
-  "exclude": [
-      "node_modules",
-      "dist/*"
-  ],
+  "files": [ "src/index.ts" ],
   "ts-node": {
       "transpileOnly": true
   }

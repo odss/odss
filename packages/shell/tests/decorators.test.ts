@@ -60,13 +60,13 @@ describe('@Command()', () => {
             metadata: {
                 name: "install",
             },
-            method: instance.installCommand,
+            handler: instance.installCommand,
             name: 'installCommand',
         }, {
             metadata: {
                 name: "uninstall",
             },
-            method: instance.uninstallCommand,
+            handler: instance.uninstallCommand,
             name: 'uninstallCommand',
         }], meta);
 
