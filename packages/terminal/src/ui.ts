@@ -1,6 +1,6 @@
 import { fromEvent } from '@stool/dom';
 import { importStyles } from './styles';
-import { stylesheet as xterm } from './vendors/xterm.css';
+import { stylesheet as xterm } from '../vendors/xterm.css';
 import styles, { stylesheet as ui } from './ui.module.css';
 
 interface ToggleHandler {

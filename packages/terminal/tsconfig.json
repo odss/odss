@@ -4,12 +4,11 @@
         "module": "commonjs",
         "jsx": "react-jsx",
         "jsxImportSource": "preact",
-        "declaration": true,
-        "declarationDir": "./types",
+        "allowJs": true,
         "moduleResolution": "node"
     },
     "exclude": [
         "node_modules",
-        "dist/*"
+        "dist"
     ]
 }
