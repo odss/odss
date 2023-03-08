@@ -137,7 +137,7 @@ export interface IBundleContext {
 }
 
 export interface IServiceReference {
-    getProperty<T extends any>(name: string, defaultValue?: T): T;
+    getProperty<T = any>(name: string, defaultValue?: T): T;
     getProperties<P extends Properties>(): P;
     getPropertyKeys(): string[];
     usingBundles(): IBundle[];

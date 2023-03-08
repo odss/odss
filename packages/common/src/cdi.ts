@@ -15,7 +15,7 @@ export function hasFactoryContext(target: any): boolean {
 }
 
 class FactoryContext implements IFactoryContext {
-    public name: string = '';
+    public name = '';
     private _handlers: Map<string, any> = new Map();
 
     public set<T = any>(id: string, handler: T): void {

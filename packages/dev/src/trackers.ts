@@ -1,13 +1,10 @@
-import Path from 'path';
 import { promises as fs } from 'fs';
+import * as Path from 'path';
 import { spawn } from 'child_process';
-import chokidar from 'chokidar';
-
-
+import * as chokidar from 'chokidar';
 import {
     IBundle,
     IBundleContext,
-    ServiceTracker,
     BundleTracker,
     Bundles,
 } from '@odss/common';
@@ -18,11 +15,9 @@ async function readJsonFile(filePath: string): any {
 }
 
 class Runner {
-    private processing: boolean = false;
+    private processing = false;
     private queue: string[] = [];
-    constructor() {
 
-    }
     add(path: string) {
         if (!this.queue.includes(path)) {
             this.queue.push(path);
@@ -79,8 +74,8 @@ export class ActiveBundleTracker extends BundleTracker {
     private runner: Runner = new Runner();
     constructor(private ctx: IBundleContext) {
         super(ctx, Bundles.ACTIVE);
-        const cwd = ctx.getProperty('cwd');
-        this.watcher = chokidar.watch();
+        const cwd = ctx.getProperty<string>('cwd');
+        this.watcher = chokidar.watch(cwd);
     }
     async open() {
         await super.open();
@@ -94,7 +89,7 @@ export class ActiveBundleTracker extends BundleTracker {
         await this.watcher.close();
     }
     async addingBundle(bundle: IBundle): Promise<void> {
-        const { name, path } = bundle.module
+        const { path } = bundle.module
         const sourcePath = await findSourceDir(path);
         if (sourcePath) {
             console.log(`Add to watch: ${sourcePath}`);
@@ -103,7 +98,7 @@ export class ActiveBundleTracker extends BundleTracker {
     }
     // modifiedBundle(bundle: IBundle): void {}
     async removedBundle(bundle: IBundle): Promise<void> {
-        const { name, path } = bundle.module
+        const { path } = bundle.module
         const sourcePath = await findSourceDir(path);
         if (sourcePath) {
             console.log(`Remove from watch: ${sourcePath}`);
@@ -137,7 +132,7 @@ async function findRootPath(filePath) {
             await fs.stat(packagesPath);
             return root;
         } catch(e) {
-
+            console.log(e);
         }
     }
 }

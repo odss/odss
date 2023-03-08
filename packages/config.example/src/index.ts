@@ -1,7 +1,7 @@
 import { IBundleContext, ConfigManagedService, SERVICE_PID } from '@odss/common';
 
 class PrinterService {
-    private format: string = 'short';
+    private format = 'short';
     print() {
         console.log(`Printing...${this.format}`);
     }

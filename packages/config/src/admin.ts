@@ -72,7 +72,7 @@ class ConfigDirectory implements IConfigDirectory {
 
 class Configuration implements IConfiguration {
     private properties: Properties = null;
-    private _isRemove: boolean = false;
+    private _isRemove = false;
 
     constructor(
         private admin: ConfigAdmin,
@@ -141,7 +141,7 @@ export class ConfigAdmin implements IConfigAdmin {
 
     private directory: ConfigDirectory = new ConfigDirectory(this);
     constructor() {}
-    async updated(configuration: IConfiguration, notify: boolean = false): Promise<void> {
+    async updated(configuration: IConfiguration, notify = false): Promise<void> {
         await this.update(configuration);
     }
     async removed(configuration: IConfiguration): Promise<void> {

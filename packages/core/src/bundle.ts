@@ -3,7 +3,7 @@ import { Framework } from './framework';
 
 export default class Bundle implements IBundle {
     public readonly module: IModule = null;
-    private _id: number = 0;
+    private _id = 0;
     private _state: number = Bundles.INSTALLED;
     private _ctx?: IBundleContext = null;
     private _framework?: Framework = null;

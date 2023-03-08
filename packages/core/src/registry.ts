@@ -97,7 +97,6 @@ export default class Registry {
         if (reference) {
             const info = this._services.get(reference);
             if (info) {
-                const bundle = registration.getBundle();
                 await this.events.service.fire(
                     new ServiceEvent(Events.UNREGISTERED, info.reference)
                 );
@@ -262,7 +261,7 @@ class ServiceReference implements IServiceReference {
         this.checkSortValue();
     }
     getProperty<T = any>(name: string, defaultProperty: T = null): T {
-        if (this._properties.hasOwnProperty(name)) {
+        if (typeof this._properties[name] !== 'undefined') {
             return this._properties[name];
         }
         if (defaultProperty !== null) {

@@ -33,7 +33,7 @@ export class Framework extends Bundle implements IBundle {
     public on: EventDispatcher;
     public registry: Registry;
 
-    constructor(properties: any = {}) {
+    constructor(properties: Record<string, unknown> = {}) {
         super(FRAMEWORK_ID, null, {
             path: '@odss/core',
             name: '@odss/core',
@@ -47,8 +47,8 @@ export class Framework extends Bundle implements IBundle {
     private _nextSid() {
         return (this._SID += 1);
     }
-    getProperty(name: string, defaultProperty: any = null): any {
-        if (this._properties.hasOwnProperty(name)) {
+    getProperty<T = any>(name: string, defaultProperty: T = null): T {
+        if (typeof this._properties[name] !== 'undefined') {
             return this._properties[name];
         }
         if (defaultProperty !== null) {
@@ -316,8 +316,4 @@ export class FrameworkFactory {
     create(properties: any = {}): Framework {
         return new Framework(properties);
     }
-}
-
-function sleep() {
-    return Promise.resolve();
 }
