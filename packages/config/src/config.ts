@@ -17,7 +17,11 @@ export class Config implements IConfig {
         if (!properties[SERVICE_PID]) {
             throw Error(`Missing PID`);
         }
-        return new Config(manager, storage, properties, properties[SERVICE_PID]);
+        const pid = properties[SERVICE_PID];
+        const factoryPid = properties[SERVICE_FACTORY_PID];
+        delete properties[SERVICE_PID];
+        delete properties[SERVICE_FACTORY_PID];
+        return new Config(manager, storage, properties, pid, factoryPid);
     }
     static async fromStore(
         manager: ConfigManager,
@@ -30,7 +34,10 @@ export class Config implements IConfig {
                 `Loaded PID(${properties[SERVICE_PID]}) doesn't match requested PID(${pid})`
             );
         }
-        return new Config(manager, storage, properties, pid);
+        const factoryPid = properties[SERVICE_FACTORY_PID];
+        delete properties[SERVICE_PID];
+        delete properties[SERVICE_FACTORY_PID];
+        return new Config(manager, storage, properties, pid, factoryPid);
     }
     static async createNew(
         manager: ConfigManager,
@@ -38,37 +45,35 @@ export class Config implements IConfig {
         pid: string,
         factoryPid: string = ''
     ): Promise<Config> {
-        const config = new Config(manager, storage, null, pid, factoryPid);
+        const config = new Config(manager, storage, {}, pid, factoryPid);
         if (!factoryPid) {
             await config.store();
         }
         return config;
     }
-    private properties: Properties;
-    private _isNew: boolean;
+    private empty: boolean;
 
     private constructor(
         private manager: ConfigManager,
         private storage: IConfigStorage,
-        properties: Properties | null,
+        private properties: Properties,
         private pid: string,
         private factoryPid: string = ''
     ) {
-        this._isNew = properties === null;
-        properties = properties || {};
-        this.properties = {
-            ...properties,
-            [SERVICE_PID]: pid,
-        };
-        if (factoryPid) {
-            this.properties[SERVICE_FACTORY_PID] = factoryPid;
-        }
+        this.empty = Object.keys(properties).length === 0;
     }
     isNew(): boolean {
-        return this._isNew;
+        return this.empty;
     }
-    getProperties<T extends Properties>(): T {
-        return JSON.parse(JSON.stringify(this.properties));
+    getProperties<T extends Properties>(extended: boolean = false): T {
+        const properties = { ...this.properties };
+        if (extended) {
+            properties[SERVICE_PID] = this.pid;
+            if (this.factoryPid) {
+                properties[SERVICE_FACTORY_PID] = this.factoryPid;
+            }
+        }
+        return properties as T;
     }
     getPid(): string {
         return this.pid;
@@ -77,15 +82,11 @@ export class Config implements IConfig {
         return this.factoryPid || '';
     }
     async update(properties?: Properties): Promise<void> {
-        this.properties = {
-            ...properties,
-            [SERVICE_PID]: this.pid,
-        };
-        if (this.factoryPid) {
-            this.properties[SERVICE_FACTORY_PID] = this.factoryPid;
-        }
-        this._isNew = false;
-        await this.storage.store(this.pid, this.properties);
+        delete properties[SERVICE_PID];
+        delete properties[SERVICE_FACTORY_PID];
+        this.properties = properties;
+        this.empty = false;
+        await this.store();
         await this.manager.updated(this);
     }
     async reload(): Promise<void> {
@@ -96,6 +97,8 @@ export class Config implements IConfig {
                     `Loaded PID(${properties[SERVICE_PID]}) doesn't match requested PID(${this.pid})`
                 );
             }
+            delete properties[SERVICE_PID];
+            delete properties[SERVICE_FACTORY_PID];
             this.properties = properties;
         }
         await this.manager.reloaded(this);
@@ -108,6 +111,6 @@ export class Config implements IConfig {
         this.storage = null;
     }
     private async store(): Promise<void> {
-        await this.storage.store(this.getPid(), this.properties);
+        await this.storage.store(this.pid, this.getProperties(true));
     }
 }

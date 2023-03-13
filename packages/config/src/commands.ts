@@ -20,7 +20,7 @@ export class AdminConfigCommands {
     async get(args: string[]) {
         const pid: string = args.shift();
         const config = await this.admin.getConfig(pid);
-        const props = Object.entries(config.getProperties());
+        const props = Object.entries(config.getProperties(true));
         return props.map(([name, value]) => `${name} = ${value}`).join('\n');
     }
 
@@ -55,7 +55,7 @@ export class AdminConfigCommands {
         const item: string = args.shift();
         const [name, value] = item.split('=');
         const config = await this.admin.getConfig(pid);
-        await config.update({ ...config.getProperties(), [name]: value });
+        await config.update({ ...config.getProperties(true), [name]: value });
         return 'Updated';
     }
 
@@ -67,7 +67,7 @@ export class AdminConfigCommands {
         const fid: string = args.shift();
         const pid: string = args.shift();
         const config = await this.admin.createFactoryConfig(fid, pid);
-        const props = Object.entries(config.getProperties());
+        const props = Object.entries(config.getProperties(true));
         return props.map(([name, value]) => `${name} = ${value}`).join('\n');
     }
 }

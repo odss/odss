@@ -52,7 +52,7 @@ export class ConfigManager {
         this.managedFactories.delete(pid);
     }
 
-    async listConfigs(/*filter: string*/): Promise<IConfig[]> {
+    async listConfigs(filter: string = ''): Promise<IConfig[]> {
         const data = await this.storage.loadAll();
         for (const properties of data) {
             const config = Config.fromProperties(this, this.storage, properties);

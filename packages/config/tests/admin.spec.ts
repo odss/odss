@@ -5,15 +5,7 @@ import { ConfigAdmin } from '../src/admin';
 import { ConfigManager } from '../src/manager';
 import { MemoryConfigStorage } from '../src/memory-storage';
 
-describe('new ConfigAdmin()', function() {
-    const adminFactory = () => {
-        const storage = new MemoryConfigStorage();
-        const admin = new ConfigAdmin(new ConfigManager(storage));
-        return {
-            storage,
-            admin,
-        };
-    }
+describe('new ConfigAdmin()', function () {
     it('should create new config', async () => {
         const storage = new MemoryConfigStorage();
         const spyStorage = spy(storage);
@@ -25,16 +17,17 @@ describe('new ConfigAdmin()', function() {
         assert.isTrue(config === config2);
         assert.equal(config.getPid(), 'pid');
         assert.equal(config.getFactoryPid(), '');
-        assert.deepEqual(config.getProperties(), {
+        assert.deepEqual(config.getProperties(), {});
+        assert.deepEqual(config.getProperties(true), {
             [SERVICE_PID]: 'pid',
         });
 
         assert.deepEqual(await storage.keys(), ['pid']);
         assert.deepEqual(await storage.load('pid'), {
-            [SERVICE_PID]: 'pid'
+            [SERVICE_PID]: 'pid',
         });
         assert.equal(spyStorage.store.callCount, 1);
-        assert.deepEqual(spyStorage.store.firstCall.args, ['pid', {[SERVICE_PID]: 'pid'}]);
+        assert.deepEqual(spyStorage.store.firstCall.args, ['pid', { [SERVICE_PID]: 'pid' }]);
     });
     it('should load config from storage', async () => {
         const storage = new MemoryConfigStorage();
@@ -50,8 +43,7 @@ describe('new ConfigAdmin()', function() {
         assert.equal(config.getPid(), 'pid');
         assert.equal(config.getFactoryPid(), '');
         assert.deepEqual(config.getProperties(), {
-            [SERVICE_PID]: 'pid',
-            foo: 'bar'
+            foo: 'bar',
         });
         assert.equal(spyStorage.store.callCount, 0);
     });
@@ -66,22 +58,21 @@ describe('new ConfigAdmin()', function() {
         try {
             await admin.getConfig('pid');
             assert.fail();
-        } catch(err) {
+        } catch (err) {
             assert.instanceOf(err, Error);
-            assert.equal(err.message, 'Loaded PID(incorrect-pid) doesn\'t match requested PID(pid)')
+            assert.equal(err.message, "Loaded PID(incorrect-pid) doesn't match requested PID(pid)");
         }
     });
     it('should update config from storage', async () => {
         const storage = new MemoryConfigStorage();
         const admin = new ConfigAdmin(new ConfigManager(storage));
         const config = await admin.getConfig('pid');
-        await storage.store('pid', { ...config.getProperties(), foo: 'bar' });
+        await storage.store('pid', { ...config.getProperties(true), foo: 'bar' });
 
         await config.reload();
 
         const props = config.getProperties();
         assert.deepEqual(props, {
-            [SERVICE_PID]: 'pid',
             foo: 'bar',
         });
     });
@@ -89,15 +80,14 @@ describe('new ConfigAdmin()', function() {
         const storage = new MemoryConfigStorage();
         const admin = new ConfigAdmin(new ConfigManager(storage));
         const config = await admin.getConfig('pid');
-        await storage.store('pid', { ...config.getProperties(), foo: 'bar' });
+        await storage.store('pid', { ...config.getProperties(true), foo: 'bar' });
 
         await config.update({
-            [SERVICE_PID]: 'other-pid', // should be omited and replaced by correct one
-            foo: 'other-bar'
+            [SERVICE_PID]: 'other-pid', // should be omited
+            foo: 'other-bar',
         });
 
-
-        const props = config.getProperties();
+        const props = config.getProperties(true);
         assert.deepEqual(props, {
             [SERVICE_PID]: 'pid',
             foo: 'other-bar',
@@ -113,19 +103,20 @@ describe('new ConfigAdmin()', function() {
 
         assert.isFalse(await storage.exists('pid'));
     });
-    it ('should create factory config', async () => {
+    it('should create factory config', async () => {
         const storage = new MemoryConfigStorage();
         const admin = new ConfigAdmin(new ConfigManager(storage));
         const config = await admin.createFactoryConfig('factory-pid', 'pid');
 
         assert.equal(config.getPid(), 'factory-pid:pid');
         assert.equal(config.getFactoryPid(), 'factory-pid');
-        assert.deepEqual(config.getProperties(), {
+        assert.deepEqual(config.getProperties(), {});
+        assert.deepEqual(config.getProperties(true), {
             [SERVICE_PID]: 'factory-pid:pid',
             [SERVICE_FACTORY_PID]: 'factory-pid',
         });
     });
-    it ('should create factory config', async () => {
+    it('should update factory config', async () => {
         const storage = new MemoryConfigStorage();
         const admin = new ConfigAdmin(new ConfigManager(storage));
         const config = await admin.createFactoryConfig('factory-pid', 'pid');
@@ -133,22 +124,20 @@ describe('new ConfigAdmin()', function() {
         assert.deepEqual(await storage.keys(), []);
 
         await config.update({
-            foo: 'bar'
+            foo: 'bar',
         });
 
         assert.deepEqual(config.getProperties(), {
-            [SERVICE_FACTORY_PID]: "factory-pid",
-            [SERVICE_PID]: "factory-pid:pid",
-            "foo": "bar"
+            foo: 'bar',
         });
         assert.deepEqual(await storage.load('factory-pid:pid'), {
-            [SERVICE_FACTORY_PID]: "factory-pid",
-            [SERVICE_PID]: "factory-pid:pid",
-            "foo": "bar"
+            [SERVICE_FACTORY_PID]: 'factory-pid',
+            [SERVICE_PID]: 'factory-pid:pid',
+            foo: 'bar',
         });
     });
 
-    it ('should return list of configs', async () => {
+    it('should return list of configs', async () => {
         const storage = new MemoryConfigStorage();
         const admin = new ConfigAdmin(new ConfigManager(storage));
         const config1 = await admin.getConfig('pid1');
@@ -161,5 +150,4 @@ describe('new ConfigAdmin()', function() {
         assert.deepEqual(configs[1].getPid(), 'pid2');
         assert.deepEqual(configs[2].getPid(), 'pid3');
     });
-
 });
