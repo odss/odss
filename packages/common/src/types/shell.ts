@@ -1,3 +1,4 @@
+
 export interface ICommandOptions {
     readonly name: string;
     readonly namespace?: string;
@@ -24,15 +25,17 @@ export interface ICommandHandlerMetadata {
 export interface ICommandsMetadata {
     namespace: string;
 }
-export interface IShell {
-    hasCommand(name: string): boolean;
-    addCommand(cmd: ICommand): void;
-    removeCommand(cmd: ICommand): void;
+export interface ICommandRegistry {
+    hasCommand(id: string): void;
+    addCommand(command: ICommand): void;
+    removeCommand(command: ICommand): void;
     getCommands(): ICommand[];
     getCommandsName(): string[];
-    getCommand(name: string): ICommand;
-    getCommandUsage(name: string): string;
-    getCommandDescription(name: string): string;
+    getCommand(id: string): ICommand;
+    getCommandUsage(id: string): string;
+    getCommandDescription(id: string): string;
+}
+export interface IShell {
     execute(line: string): Promise<string>;
     complete(line: string): Promise<string[]>;
 }

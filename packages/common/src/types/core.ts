@@ -46,6 +46,8 @@ export interface IDisposable {
     dispose(): void;
 }
 
+export type IDisposableLike = () => {} | IDisposable | undefined;
+
 export interface IFramework extends IBundle {
     getProperty<T>(name: string, defaultValue?: T): T;
     getProperties<P extends Properties>(): P;

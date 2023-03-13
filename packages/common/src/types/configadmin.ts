@@ -11,9 +11,9 @@ export interface IConfigStorage {
 }
 
 export interface IConfig {
-    getProperties<T extends Properties>(extended?: boolean): T;
     getPid(): string;
     getFactoryPid(): string;
+    getProperties<T extends Properties>(extended?: boolean): T;
     update(properties?: Properties): Promise<void>;
     reload(): Promise<void>;
     remove(): Promise<void>;
@@ -26,10 +26,10 @@ export interface IConfigAdmin {
 }
 
 export interface IConfigManaged {
-    updated(properties?: Properties);
+    updated(properties?: Properties): Promise<void> | void;
 }
 
 export interface IConfigManagedFactory {
-    updated(pid: string, properties: Properties);
-    deleted(pid: string);
+    updated(pid: string, properties: Properties): Promise<void> | void;
+    deleted(pid: string): Promise<void> | void;
 }

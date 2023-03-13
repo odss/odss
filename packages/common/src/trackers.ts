@@ -58,7 +58,8 @@ export class ServiceTracker<S = any>
         const service = this._ctx.getService<S>(reference);
         if (this._listener) {
             if (typeof this._listener === 'function') {
-                this._listenerDispose = toDisposable(await this._listener(service, reference));
+                const result = await this._listener(service, reference);
+                this._listenerDispose = toDisposable(result);
             } else {
                 await this._listener.addingService(service, reference);
             }
@@ -73,7 +74,7 @@ export class ServiceTracker<S = any>
     async removed(reference: IServiceReference, service: S): Promise<S> {
         if (this._listener) {
             if (typeof this._listener === 'function') {
-                if (this._listenerDispose) {
+                if (this._listenerDispose && this._listenerDispose.dispose) {
                     this._listenerDispose.dispose();
                 }
             } else {

@@ -9,15 +9,6 @@ module.exports = function(config) {
         preprocessors: {
             "**/*.ts": ["karma-typescript"]
         },
-        karmaTypescriptConfig: {
-            compilerOptions: {
-                module: "commonjs",
-                baseUrl: ".",
-                paths: {
-                    "@odss/common": ["src/index"]
-                }
-            },
-        },
         // reporters: ['progress'],
         reporters: ["progress", "karma-typescript"],
         // web server port
@@ -27,6 +18,6 @@ module.exports = function(config) {
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_WARN,
         autoWatch: true,
-        browsers: ['Chrome', 'Firefox']
+        browsers: ['Chrome']
     });
 };

@@ -60,19 +60,15 @@ function transformUnderline(name) {
     return name.replace(/_/g, '.');
 }
 
-export function toDisposable(dispose: IDisposable | (() => void) | undefined): IDisposable {
+export function toDisposable(dispose: IDisposable): IDisposable {
     if (typeof dispose === 'undefined') {
         return {
-            dispose() {
-                // do nothing.
-            },
+            dispose() {},
         };
     }
     if (typeof dispose === 'function') {
         return {
-            dispose() {
-                dispose();
-            },
+            dispose,
         };
     }
     return dispose;
