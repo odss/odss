@@ -1,7 +1,13 @@
-import { IConfigStorage, IBundleContext, ConfigAdminService, IServiceRegistration, ShellCommandsService } from "@odss/common";
+import {
+    IConfigStorage,
+    IBundleContext,
+    ConfigAdminService,
+    IServiceRegistration,
+    ShellCommandsService,
+} from '@odss/common';
 import { ConfigManager } from './manager';
-import { ConfigAdmin } from "./admin";
-import { ConfigManagedFactoryTracker, ConfigManagedTracker } from "./trackers";
+import { ConfigAdmin } from './admin';
+import { ConfigManagedFactoryTracker, ConfigManagedTracker } from './trackers';
 import { AdminConfigCommands } from './commands';
 
 export class Supervisor {
@@ -10,11 +16,8 @@ export class Supervisor {
     private trackersFactories: ConfigManagedFactoryTracker;
     private trackersServices: ConfigManagedTracker;
 
-    constructor(private ctx: IBundleContext) {
-
-    }
+    constructor(private ctx: IBundleContext) {}
     async setStorage(storage: IConfigStorage): Promise<void> {
-
         this.manager = new ConfigManager(storage);
         await this.manager.open();
 

@@ -9,25 +9,40 @@ import {
 import { ConfigManager } from './manager';
 
 export class Config implements IConfig {
-    static fromProperties(manager: ConfigManager, storage: IConfigStorage, properties: Properties): Config {
+    static fromProperties(
+        manager: ConfigManager,
+        storage: IConfigStorage,
+        properties: Properties
+    ): Config {
         if (!properties[SERVICE_PID]) {
             throw Error(`Missing PID`);
         }
         return new Config(manager, storage, properties, properties[SERVICE_PID]);
     }
-    static async fromStore(manager: ConfigManager, storage: IConfigStorage, pid: string): Promise<Config> {
+    static async fromStore(
+        manager: ConfigManager,
+        storage: IConfigStorage,
+        pid: string
+    ): Promise<Config> {
         const properties = await storage.load(pid);
         if (properties[SERVICE_PID] !== pid) {
-            throw Error(`Loaded PID(${properties[SERVICE_PID]}) doesn't match requested PID(${pid})`);
+            throw Error(
+                `Loaded PID(${properties[SERVICE_PID]}) doesn't match requested PID(${pid})`
+            );
         }
         return new Config(manager, storage, properties, pid);
     }
-    static async createNew(manager: ConfigManager, storage: IConfigStorage, pid: string, factoryPid: string = ''): Promise<Config> {
+    static async createNew(
+        manager: ConfigManager,
+        storage: IConfigStorage,
+        pid: string,
+        factoryPid: string = ''
+    ): Promise<Config> {
         const config = new Config(manager, storage, null, pid, factoryPid);
         if (!factoryPid) {
             await config.store();
         }
-        return config
+        return config;
     }
     private properties: Properties;
     private _isNew: boolean;
@@ -37,7 +52,7 @@ export class Config implements IConfig {
         private storage: IConfigStorage,
         properties: Properties | null,
         private pid: string,
-        private factoryPid: string = '',
+        private factoryPid: string = ''
     ) {
         this._isNew = properties === null;
         properties = properties || {};
@@ -74,10 +89,12 @@ export class Config implements IConfig {
         await this.manager.updated(this);
     }
     async reload(): Promise<void> {
-        if(await this.storage.exists(this.pid)) {
+        if (await this.storage.exists(this.pid)) {
             const properties = await this.storage.load(this.pid);
             if (properties[SERVICE_PID] !== this.pid) {
-                throw Error(`Loaded PID(${properties[SERVICE_PID]}) doesn't match requested PID(${this.pid})`);
+                throw Error(
+                    `Loaded PID(${properties[SERVICE_PID]}) doesn't match requested PID(${this.pid})`
+                );
             }
             this.properties = properties;
         }

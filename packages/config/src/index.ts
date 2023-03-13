@@ -1,4 +1,9 @@
-import { IServiceRegistration, IBundleContext, ConfigStorageService, IConfigManaged, Properties, SERVICE_RANKING } from '@odss/common';
+import {
+    IServiceRegistration,
+    IBundleContext,
+    ConfigStorageService,
+    SERVICE_RANKING,
+} from '@odss/common';
 import { ConfigStorageTracker } from './trackers';
 import { MemoryConfigStorage } from './memory-storage';
 import { LocalConfigStorage } from './local-storage';
@@ -13,22 +18,19 @@ export class Activator {
         await this.tracker.open();
         if (LocalConfigStorage.hasFeature()) {
             this.regs.push(
-                await ctx.registerService(
-                    ConfigStorageService,
-                    new LocalConfigStorage(),
-                    { name: 'local-storage', [SERVICE_RANKING]: -100 }
-                )
+                await ctx.registerService(ConfigStorageService, new LocalConfigStorage(), {
+                    name: 'local-storage',
+                    [SERVICE_RANKING]: -100,
+                })
             );
         } else {
             this.regs.push(
-                await ctx.registerService(
-                    ConfigStorageService,
-                    new MemoryConfigStorage(),
-                    { name: 'memory', [SERVICE_RANKING]: -100 }
-                )
+                await ctx.registerService(ConfigStorageService, new MemoryConfigStorage(), {
+                    name: 'memory',
+                    [SERVICE_RANKING]: -100,
+                })
             );
         }
-
     }
     async stop() {
         await this.tracker.close();

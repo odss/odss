@@ -22,5 +22,3 @@ export class MemoryConfigStorage implements IConfigStorage {
         return [...this.storage.values()];
     }
 }
-
-

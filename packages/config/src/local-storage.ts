@@ -1,7 +1,6 @@
 import { IConfigStorage, Properties } from '@odss/common';
 
 export class LocalConfigStorage implements IConfigStorage {
-
     static hasFeature(): boolean {
         return !!globalThis.localStorage;
     }
@@ -12,14 +11,14 @@ export class LocalConfigStorage implements IConfigStorage {
     }
 
     async exists(pid: string): Promise<boolean> {
-        return !! localStorage.getItem(this.getKey(pid));
+        return !!localStorage.getItem(this.getKey(pid));
     }
     async load(pid: string): Promise<Properties> {
         const data = localStorage.getItem(this.getKey(pid));
         if (data) {
             try {
                 return JSON.parse(data);
-            } catch(err) {
+            } catch (err) {
                 console.warn(err);
             }
         }
@@ -34,10 +33,10 @@ export class LocalConfigStorage implements IConfigStorage {
     async keys(): Promise<string[]> {
         const size = localStorage.length;
         const pids: string[] = [];
-        for(let i = 0; i < size; i+=1) {
+        for (let i = 0; i < size; i += 1) {
             const pid = localStorage.key(i);
             if (pid?.startsWith(this.key)) {
-                pids.push(pid.substring(this.key.length+1));
+                pids.push(pid.substring(this.key.length + 1));
             }
         }
         return pids;

@@ -1,5 +1,5 @@
-import { IConfigStorage, IConfig, IConfigManagedFactory, IConfigManaged, Properties } from "@odss/common";
-import { Config } from "./config";
+import { IConfigStorage, IConfig, IConfigManagedFactory, IConfigManaged } from '@odss/common';
+import { Config } from './config';
 
 export class ConfigManager {
     private configs: Map<string, Config> = new Map();
@@ -32,6 +32,9 @@ export class ConfigManager {
         }
     }
     removeService(pid: string, service: IConfigManaged) {
+        if (this.managedServices.get(pid) !== service) {
+            throw new Error(`Not match PID(${pid}) to ConfigManagedService`);
+        }
         this.managedServices.delete(pid);
     }
     async addFactoryService(fid: string, service: IConfigManagedFactory) {
@@ -43,12 +46,15 @@ export class ConfigManager {
         await this.notifyFactories([service], configs);
     }
     removeFactoryService(pid: string, service: IConfigManagedFactory) {
+        if (this.managedFactories.get(pid) !== service) {
+            throw new Error(`Not match PID(${pid}) to ConfigManagedFactoryService`);
+        }
         this.managedFactories.delete(pid);
     }
 
-    async listConfigs(filter: string): Promise<IConfig[]> {
+    async listConfigs(/*filter: string*/): Promise<IConfig[]> {
         const data = await this.storage.loadAll();
-        for(const properties of data) {
+        for (const properties of data) {
             const config = Config.fromProperties(this, this.storage, properties);
             if (!this.configs.has(config.getPid())) {
                 this.configs.set(config.getPid(), config);
@@ -146,11 +152,8 @@ export class ConfigManager {
     private getMatchedFactories(factoryPid: string): IConfigManagedFactory[] {
         return this.managedFactories.has(factoryPid) ? [this.managedFactories.get(factoryPid)] : [];
     }
-    private async notifyFactories(
-        factories: IConfigManagedFactory[],
-        configs: Config[],
-    ) {
-        for(const config of configs) {
+    private async notifyFactories(factories: IConfigManagedFactory[], configs: Config[]) {
+        for (const config of configs) {
             if (config.isNew()) {
                 continue;
             }
@@ -166,7 +169,7 @@ export class ConfigManager {
         }
     }
     private async notifyFactoriesRemove(factories: IConfigManagedFactory[], configs: Config[]) {
-        for(const config of configs) {
+        for (const config of configs) {
             if (config.isNew()) {
                 continue;
             }

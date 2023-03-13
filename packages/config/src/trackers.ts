@@ -23,17 +23,17 @@ export class ConfigManagedTracker extends ServiceTracker {
         if (pid) {
             await this.manager.addService(pid, service);
         } else {
-            console.warn('Missing PID in registered ConfigManagedService', service)
+            console.warn('Missing PID in registered ConfigManagedService', service);
         }
     }
-    async modifiedService(): Promise<void> {}
+    // async modifiedService(): Promise<void> {}
 
     async removedService(service: IConfigManaged, ref: IServiceReference): Promise<void> {
         const pid = ref.getProperty<string>(SERVICE_PID);
         if (pid) {
             await this.manager.removeService(pid, service);
         } else {
-            console.warn('Missing PID in unregistered ConfigManagedService', service)
+            console.warn('Missing PID in unregistered ConfigManagedService', service);
         }
     }
 }
@@ -47,17 +47,17 @@ export class ConfigManagedFactoryTracker extends ServiceTracker {
         if (pid) {
             await this.manager.addFactoryService(pid, service);
         } else {
-            console.warn('Missing PID in registered ConfigManagedFactoryService', service)
+            console.warn('Missing PID in registered ConfigManagedFactoryService', service);
         }
     }
-    async modifiedService(): Promise<void> {}
+    // async modifiedService(): Promise<void> {}
 
     async removedService(service: IConfigManagedFactory, ref: IServiceReference): Promise<void> {
         const pid = ref.getProperty<string>(SERVICE_PID);
         if (pid) {
             await this.manager.removeFactoryService(pid, service);
         } else {
-            console.warn('Missing PID in unregistered ConfigManagedFactoryService', service)
+            console.warn('Missing PID in unregistered ConfigManagedFactoryService', service);
         }
     }
 }
@@ -77,7 +77,10 @@ export class ConfigStorageTracker extends ServiceTracker<IConfigStorage> {
         await this.checkStorage();
     }
 
-    async removedService(service: ConfigStorageService, reference: IServiceReference): Promise<void> {
+    async removedService(
+        service: ConfigStorageService,
+        reference: IServiceReference
+    ): Promise<void> {
         this.storages.delete(reference);
         await this.checkStorage();
     }

@@ -1,7 +1,6 @@
 import { Command, Commands } from '@odss/shell';
 import { ConfigAdmin } from './admin';
 
-
 @Commands('cm')
 export class AdminConfigCommands {
     constructor(private admin: ConfigAdmin) {}
@@ -10,7 +9,7 @@ export class AdminConfigCommands {
         name: 'cm:list',
         description: 'Show admin config list',
     })
-    async list(args: string[]) {
+    async list() {
         const configs = await this.admin.listConfigs();
         return configs.map(config => `PID=${config.getPid()}`).join('\n');
     }
@@ -19,7 +18,7 @@ export class AdminConfigCommands {
         description: 'Show admin config details',
     })
     async get(args: string[]) {
-        let pid: string = args.shift();
+        const pid: string = args.shift();
         const config = await this.admin.getConfig(pid);
         const props = Object.entries(config.getProperties());
         return props.map(([name, value]) => `${name} = ${value}`).join('\n');
@@ -30,19 +29,18 @@ export class AdminConfigCommands {
         description: 'Clean admin config',
     })
     async clean(args: string[]) {
-        let pid: string = args.shift();
+        const pid: string = args.shift();
         const config = await this.admin.getConfig(pid);
         await config.update({});
         return 'Removed';
     }
-
 
     @Command({
         name: 'cm:del',
         description: 'Delete admin config',
     })
     async delete(args: string[]) {
-        let pid: string = args.shift();
+        const pid: string = args.shift();
         const config = await this.admin.getConfig(pid);
         await config.remove();
         return 'Removed';
@@ -71,6 +69,5 @@ export class AdminConfigCommands {
         const config = await this.admin.createFactoryConfig(fid, pid);
         const props = Object.entries(config.getProperties());
         return props.map(([name, value]) => `${name} = ${value}`).join('\n');
-
     }
-};
+}
