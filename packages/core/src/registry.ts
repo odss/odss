@@ -293,10 +293,16 @@ class ServiceReference implements IServiceReference {
         }
         return false;
     }
+    /**
+     * Compare references
+     *
+     * @see SERVICE_RANKING in https://docs.osgi.org/javadoc/r4v43/core/org/osgi/framework/Constants.html
+     */
     compare(ref: ServiceReference): number {
+
         const [rank1, id1] = this._sortValue;
         const [rank2, id2] = ref._sortValue;
-        return rank1 - rank2 || id1 - id2;
+        return rank1 === rank2 ? id1 - id2 : rank2 - rank1;
     }
     private _computeSortValue(): [number, number] {
         return [this._properties[SERVICE_RANKING], this._id];
