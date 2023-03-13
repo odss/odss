@@ -29,7 +29,6 @@ export class TerminalService {
         this.xterm.loadAddon(this.controller);
         this.xterm.open(this.ui.getContainer());
         this.runCommandLoop();
-
         this.toDispose.push(
             this.controller.addAutocompleteHandler((index, tokens, args) => {
                 return this.shell?.complete(tokens.join(' ')) || [];
@@ -70,7 +69,7 @@ export class TerminalService {
                 const result = await this.shell?.execute(line);
                 this.controller.println(result);
             } catch (err) {
-                this.controller.println(err);
+                this.controller?.println(err);
             }
         }
     }

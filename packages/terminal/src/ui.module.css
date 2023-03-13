@@ -1,10 +1,14 @@
 .terminal {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
+    z-index: 100;
 }
 .button {
-    padding: 8px;
+    border: solid 1px #888;
+    color: #555;
+    background: #fff;
+    padding: 6px;
     position: absolute;
     bottom: 100%;
     right: 0;
