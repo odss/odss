@@ -1,3 +1,4 @@
+import { SERVICE_FACTORY_PID, SERVICE_PID } from '../consts';
 import { Properties } from './core';
 
 export interface IConfigStorage {
@@ -10,7 +11,7 @@ export interface IConfigStorage {
 }
 
 export interface IConfig {
-    getProperties<T extends Properties>(): T;
+    getProperties<T extends Properties>(extended?: boolean): T;
     getPid(): string;
     getFactoryPid(): string;
     update(properties?: Properties): Promise<void>;
