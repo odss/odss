@@ -196,7 +196,7 @@ describe('odss-framework.service', () => {
             [SERVICE_RANKING]: 20,
         });
         let reg2 = await self.registry.registerService(self.bundle, 'spec', 'service2', {
-            [SERVICE_RANKING]: 10,
+            [SERVICE_RANKING]: 40,
         });
 
         const refs = self.registry.findReferences('spec');

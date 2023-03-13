@@ -28,11 +28,11 @@ describe('@odss/core/tracker.getService()', () => {
     it('register/unregister service', async () => {
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
-            addingService() {
+            async addingService() {
                 counter |= 1;
             },
-            modifiedService() {},
-            removedService() {
+            async modifiedService() {},
+            async removedService() {
                 counter |= 2;
             },
         });
@@ -114,11 +114,11 @@ describe('@odss/core/tracker.getService()', () => {
     it('stop tracker', async () => {
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
-            addingService() {
+            async addingService() {
                 counter |= 1;
             },
-            modifiedService() {},
-            removedService() {
+            async modifiedService() {},
+            async removedService() {
                 counter |= 2;
             },
         });
@@ -134,11 +134,11 @@ describe('@odss/core/tracker.getService()', () => {
         scope.ctx.registerService('test.tracker', 'test');
         let counter = 0;
         let tracker = new ServiceTracker(scope.ctx, 'test.tracker', {
-            addingService: function (/* reference */) {
+            async addingService() {
                 counter++;
             },
-            modifiedService() {},
-            removedService() {},
+            async modifiedService() {},
+            async removedService() {},
         });
 
         await tracker.open();

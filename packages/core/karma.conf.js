@@ -1,22 +1,20 @@
 module.exports = function(config) {
     config.set({
-        basePath: '',
+        basePath: './',
         frameworks: ['karma-typescript', 'mocha'],
         files: [
             "tests/**/*.ts",
             "src/**/*.ts"
         ],
         preprocessors: {
-            "**/*.ts": ["karma-typescript"]
+            "src/**/*.ts": ["karma-typescript"],
+            "tests/**/*.ts": ["karma-typescript"],
         },
         karmaTypescriptConfig: {
-            coverageOptions: {
-                instrumentation: false,
-            },
-            compilerOptions: {
-                target: "ESNext",
-                module: "commonjs",
-            },
+            "compilerOptions": {
+                "target": "ESNext",
+                "module": "CommonJS",
+            }
         },
         // reporters: ['progress'],
         reporters: ["progress", "karma-typescript"],
@@ -26,7 +24,7 @@ module.exports = function(config) {
 
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_WARN,
-        autoWatch: true,
-        browsers: ['Chrome', 'Firefox']
+        autoWatch: false,
+        browsers: ['ChromeHeadless'],
     });
 };

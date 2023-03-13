@@ -297,19 +297,23 @@ export class Framework extends Bundle implements IBundle {
     }
 }
 
-function getActivator(config: IModule): IActivator {
-    if (Object.prototype.hasOwnProperty.call(config, 'Activator')) {
-        return new config.Activator();
+function getActivator(module: IModule): IActivator {
+    if (Object.prototype.hasOwnProperty.call(module, 'Activator')) {
+        return new module.Activator();
     }
-    const fn = () => {
-        // do nothing
-    };
-    const start = config.start || fn;
-    const stop = config.stop || fn;
+    const fn = async (ctx: BundleContext) => {};
+    if (module.activate) {
+        return {
+            start: async (ctx: BundleContext) => {
+                this.stop = (await module.activate(ctx)) || fn;
+            },
+            stop: fn,
+        };
+    }
     return {
-        start,
-        stop,
-    } as IActivator;
+        start: fn,
+        stop: fn,
+    };
 }
 
 export class FrameworkFactory {
