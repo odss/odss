@@ -1,22 +1,39 @@
-import { IBundleContext, ConfigAdminService } from '@odss/common';
-
-import { ConfigAdmin } from './admin';
-import {
-    ConfigManagedFactoryTracker,
-    ConfigManagedTracker,
-    ConfigStorageTracker,
-} from './trackers';
+import { IServiceRegistration, IBundleContext, ConfigStorageService, IConfigManaged, Properties, SERVICE_RANKING } from '@odss/common';
+import { ConfigStorageTracker } from './trackers';
+import { MemoryConfigStorage } from './memory-storage';
+import { LocalConfigStorage } from './local-storage';
+import { Supervisor } from './supervisor';
 
 export class Activator {
-    start(ctx: IBundleContext) {
-        const admin = new ConfigAdmin();
-        const t1 = new ConfigManagedFactoryTracker(ctx, admin);
-        const t2 = new ConfigManagedTracker(ctx, admin);
-        const t3 = new ConfigStorageTracker(ctx, admin);
-        t1.open();
-        t2.open();
-        t3.open();
-        ctx.registerService(ConfigAdminService, admin);
+    private regs: IServiceRegistration[] = [];
+    private tracker: ConfigStorageTracker;
+
+    async start(ctx: IBundleContext) {
+        this.tracker = new ConfigStorageTracker(ctx, new Supervisor(ctx));
+        await this.tracker.open();
+        if (LocalConfigStorage.hasFeature()) {
+            this.regs.push(
+                await ctx.registerService(
+                    ConfigStorageService,
+                    new LocalConfigStorage(),
+                    { name: 'local-storage', [SERVICE_RANKING]: -100 }
+                )
+            );
+        } else {
+            this.regs.push(
+                await ctx.registerService(
+                    ConfigStorageService,
+                    new MemoryConfigStorage(),
+                    { name: 'memory', [SERVICE_RANKING]: -100 }
+                )
+            );
+        }
+
     }
-    stop() {}
+    async stop() {
+        await this.tracker.close();
+        for (const reg of this.regs) {
+            await reg.unregister();
+        }
+    }
 }
