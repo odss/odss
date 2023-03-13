@@ -27,7 +27,6 @@ describe('/parser/incorrect', () => {
     });
     it('should catch empty: ()', () => {
         assert.throws(function () {
-            debugger;
             squery('()');
         });
         //}, 'Empty query.');
