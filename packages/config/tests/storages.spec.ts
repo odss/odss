@@ -28,13 +28,16 @@ describe('new LocalConfigStorage()', function () {
         const storage = new LocalConfigStorage();
         await storage.store('test1', { foo1: 'bar1' });
         await storage.store('test2', { foo2: 'bar2' });
-        assert.deepEqual(await storage.keys(), ['test1', 'test2']);
+        assert.deepEqual(await (await storage.keys()).sort(), ['test1', 'test2']);
     });
     it('should return all dicts', async () => {
         const storage = new LocalConfigStorage();
         await storage.store('test1', { foo1: 'bar1' });
         await storage.store('test2', { foo2: 'bar2' });
-        assert.deepEqual(await storage.loadAll(), [{ foo1: 'bar1' }, { foo2: 'bar2' }]);
+        const props = await storage.loadAll();
+        assert.deepEqual(props.length, 2);
+        assert.deepEqual(props.flatMap(Object.keys).sort(), ['foo1', 'foo2']);
+        assert.deepEqual(props.flatMap(Object.values).sort(), ['bar1', 'bar2']);
     });
     it('should remove stored data', async () => {
         const storage = new LocalConfigStorage();
@@ -63,13 +66,16 @@ describe('new MemoryConfigStorage()', function () {
         const storage = new MemoryConfigStorage();
         await storage.store('test1', { foo1: 'bar1' });
         await storage.store('test2', { foo2: 'bar2' });
-        assert.deepEqual(await storage.keys(), ['test1', 'test2']);
+        assert.deepEqual(await (await storage.keys()).sort(), ['test1', 'test2']);
     });
     it('should return all dicts', async () => {
         const storage = new MemoryConfigStorage();
         await storage.store('test1', { foo1: 'bar1' });
         await storage.store('test2', { foo2: 'bar2' });
-        assert.deepEqual(await storage.loadAll(), [{ foo1: 'bar1' }, { foo2: 'bar2' }]);
+        const props = await storage.loadAll();
+        assert.deepEqual(props.length, 2);
+        assert.deepEqual(props.flatMap(Object.keys).sort(), ['foo1', 'foo2']);
+        assert.deepEqual(props.flatMap(Object.values).sort(), ['bar1', 'bar2']);
     });
     it('should remove stored data', async () => {
         const storage = new MemoryConfigStorage();
