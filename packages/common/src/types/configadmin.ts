@@ -5,11 +5,12 @@ export interface IConfigStorage {
     load(pid: string): Promise<Properties>;
     store(pid: string, properties: Properties): Promise<void>;
     remove(pid: string): Promise<void>;
-    getPids(): Promise<string[]>;
+    keys(): Promise<string[]>;
+    loadAll(): Promise<Properties[]>;
 }
 
-export interface IConfiguration {
-    getProperties(): Properties;
+export interface IConfig {
+    getProperties<T extends Properties>(): T;
     getPid(): string;
     getFactoryPid(): string;
     update(properties?: Properties): Promise<void>;
@@ -17,16 +18,10 @@ export interface IConfiguration {
     remove(): Promise<void>;
 }
 
-export interface IConfigDirectory {
-    remove(pid: string): Promise<void>;
-    add(pid: string, properties: Properties): Promise<IConfiguration>;
-    update(pid: string, properties: Properties): Promise<void>;
-}
-
 export interface IConfigAdmin {
-    getConfiguration(pid: string): Promise<IConfiguration>;
-    createFactoryConfiguration(factoryPid: string): Promise<IConfiguration>;
-    listConfigurations(filter: string): IConfiguration[];
+    getConfig(pid: string): Promise<IConfig>;
+    createFactoryConfig(factoryPid: string, name?: string): Promise<IConfig>;
+    listConfigs(filter: string): Promise<IConfig[]>;
 }
 
 export interface IConfigManaged {

@@ -141,6 +141,7 @@ export interface IServiceReference {
     getProperties<P extends Properties>(): P;
     getPropertyKeys(): string[];
     usingBundles(): IBundle[];
+    compare(ref: IServiceReference): number;
 }
 
 export interface IServiceRegistration {

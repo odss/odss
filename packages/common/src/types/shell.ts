@@ -4,15 +4,18 @@ export interface ICommandOptions {
     readonly alias?: string | string[];
     readonly description?: string;
 }
-
 export interface ICommandHandler {
     (args: string[]): Promise<string> | string | undefined;
 }
 export interface ICommands {
     [key: string]: ICommandHandler;
 }
+export interface ICommandComplete {
+    (line: string): Promise<string[]> | string[];
+}
 export interface ICommand extends ICommandOptions {
     execute: ICommandHandler;
+    complete?: ICommandComplete,
 }
 export interface ICommandHandlerMetadata {
     key: string;
