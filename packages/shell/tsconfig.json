@@ -3,9 +3,6 @@
         "target": "esnext",
         "module": "CommonJS",
         "moduleResolution": "node",
-        "noImplicitAny": false,
-        "removeComments": true,
-        "strict": false,
         "declaration": true,
         "declarationDir": "./types",
         "experimentalDecorators": true

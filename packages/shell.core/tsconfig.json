@@ -1,15 +1,9 @@
 {
     "compilerOptions": {
-        "allowJs": true,
         "target": "esnext",
-        "module": "ESNext",
+        "module": "CommonJS",
         "moduleResolution": "node",
-        "noImplicitAny": false,
-        "removeComments": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "strict": true,
-        "outDir": "./dist/"
+        "experimentalDecorators": true
     },
     "files": [
         "src/index.ts"
@@ -19,6 +13,7 @@
         "dist/*"
     ],
     "ts-node": {
+        "swc": true,
         "transpileOnly": true
     }
 }
