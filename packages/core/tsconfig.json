@@ -2,14 +2,15 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "CommonJS",
-        "moduleResolution": "node",
         "declaration": true,
         "declarationDir": "./types"
     },
-    "files": [
-        "src/index.ts"
+    "include": [
+        "./src/*.ts",
+        "./tests/*.ts"
     ],
     "ts-node": {
+        "swc": true,
         "transpileOnly": true
     }
 }
