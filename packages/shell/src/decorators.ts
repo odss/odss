@@ -1,10 +1,10 @@
-import { ShellCommandsService, ICommandOptions, Metadata, getTokenType } from '@odss/common';
+import { ICommandOptions, Metadata } from '@odss/common';
 import { MetadataTypes } from './consts';
 
 export function Command(options: string | ICommandOptions) /*: MethodDecorator */ {
     if (typeof options === 'string') {
         options = {
-            name: options,
+            id: options,
         } as ICommandOptions;
     }
     return (target: any, key: string) => {
@@ -12,11 +12,11 @@ export function Command(options: string | ICommandOptions) /*: MethodDecorator *
     };
 }
 interface CommandsMetadata {
-    namespace: string;
+    prefix: string;
 }
 
-export function Commands(namespace = 'default'): ClassDecorator {
+export function Commands(prefix = ''): ClassDecorator {
     return (target: any) => {
-        Metadata.target(target).set<CommandsMetadata>(MetadataTypes.SHELL_COMMAND, { namespace });
+        Metadata.target(target).set<CommandsMetadata>(MetadataTypes.SHELL_COMMANDS, { prefix });
     };
 }

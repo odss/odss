@@ -1,13 +1,14 @@
 import {
-    IShell,
     IBundleContext,
     SERVICE_RANKING,
     OBJECTCLASS,
     SERVICE_ID,
-    ShellCommandsService,
-    ShellService,
+    ICommand,
+    ICommandComplete,
+    ICommandHandler,
 } from '@odss/common';
 import { Command, Commands } from '@odss/shell';
+import { CommandsRegistry } from './registry';
 
 const STATUSES = {
     1: 'UNINSTALLED',
@@ -20,26 +21,28 @@ const STATUSES = {
 
 @Commands()
 export class BasicCommands {
-    constructor(private ctx: IBundleContext, protected shell: IShell) {}
+    constructor(private ctx: IBundleContext, private registry: CommandsRegistry) {}
 
     @Command({
-        name: 'properties',
+        id: 'properties',
         description: 'Show all properties',
     })
     properties(args: string[]) {
         return this.ctx?.getProperties() || {};
     }
+
     @Command({
-        name: 'property',
+        id: 'property',
         description: 'Show property value',
     })
     property(args: string[]) {
         return this.ctx?.getProperty(args[0], null);
     }
+
     @Command({
-        name: 'install',
+        id: 'install',
         description: 'Install bundle',
-        // man: 'install <bundle.name> (--autostart, -a)',
+        help: 'install <bundle.name> (--autostart, -a)',
     })
     async install(args: string[]): Promise<string> {
         const autostart = args.length === 2 ? args[1] === '-a' || args[1] === '--autostart' : false;
@@ -50,7 +53,11 @@ export class BasicCommands {
         return `Not found bundle id=${args[0]}`;
     }
 
-    @Command('reload')
+    @Command({
+        id: 'reload',
+        description: 'Reload bundle',
+        help: 'reload <bundle.id>',
+    })
     async reload(args: string[]): Promise<string> {
         if (args.length) {
             let sid: string | number = args.shift() || '';
@@ -64,7 +71,11 @@ export class BasicCommands {
         }
     }
 
-    @Command('uninstall')
+    @Command({
+        id: 'uninstall',
+        description: 'Uninstall bundle',
+        help: 'uninstall <bundle.id>',
+    })
     async uninstall(args: string[]): Promise<string> {
         // description: 'Uninstall bundle',
         // man: 'uninstall <bundle.id>',
@@ -83,7 +94,11 @@ export class BasicCommands {
         return `Not found bundle id=${sid}`;
     }
 
-    @Command('start')
+    @Command({
+        id: 'start',
+        description: 'Start installed bundle',
+        help: 'start <bundle.id>',
+    })
     async start(args: string[]): Promise<string> {
         // man: 'start <bundle.id>',
         // description: 'Start bundle',
@@ -99,7 +114,11 @@ export class BasicCommands {
         return `Not found bundle id=${sid}`;
     }
 
-    @Command('stop')
+    @Command({
+        id: 'stop',
+        description: 'Stop running bundle',
+        help: 'stop <bundle.id>',
+    })
     async stop(args: string[]): Promise<string> {
         // description: 'Stop bundle',
         // man: 'stop <bundle.id>',
@@ -117,7 +136,7 @@ export class BasicCommands {
         throw Error('Not found param: <bundle_id>');
     }
     @Command({
-        name: 'bl',
+        id: 'bl',
         description: 'List all installed bundles',
     })
     list(): string {
@@ -134,8 +153,11 @@ export class BasicCommands {
         }
         return makeAsciiTable('Bundles', header, records);
     }
+
     @Command({
-        name: 'bd',
+        id: 'bd',
+        description: 'Show bundle details',
+        help: 'db <bundle.id>',
     })
     bundleDetails(args: string[]): string {
         let sid: string | number = args.shift() || '';
@@ -160,8 +182,10 @@ export class BasicCommands {
         bundle.getServicesInUse().map(ref => buff.push(`     ${ref}`));
         return buff.join('\n');
     }
+
     @Command({
-        name: 'sl',
+        id: 'sl',
+        description: 'List all installed services',
     })
     serviceList(): string {
         const bundles = this.ctx?.getBundles() || [];
@@ -179,8 +203,11 @@ export class BasicCommands {
         const header = ['ID', 'Bundle', 'Service', 'Ranking'];
         return makeAsciiTable('Services', header, records);
     }
+
     @Command({
-        name: 'sd',
+        id: 'sd',
+        description: 'Show service details',
+        help: 'sd <service.id>',
     })
     serviceDetail(args: string[]): string {
         const id = args.shift();
@@ -199,7 +226,7 @@ export class BasicCommands {
         ];
         const toValue = val => {
             if (Array.isArray(val)) {
-                return val.map(toValue).join(' | ');
+                return val.map(toValue).join(' │ ');
             }
             return typeof val === 'function' || val.name ? val.name : val;
         };
@@ -214,51 +241,50 @@ export class BasicCommands {
     }
 
     @Command({
-        name: 'exit',
+        id: 'exit',
+        description: 'Shoutdown all application',
         alias: ['quit', 'shutdown'],
     })
     async exit(): Promise<string> {
         setTimeout(() => (this.ctx as any).framework.stop());
         return 'Stoping';
     }
+}
 
-    @Command({
-        name: 'help',
-        description: 'Show help for command',
-        alias: ['?'],
-    })
-    async help(args: string[]): Promise<string> {
-        if (args.length === 1) {
-            const name = args[0];
-            for (const cmd of this.shell.getCommands()) {
-                if (cmd.name === name) {
-                    return cmd.name;
-                    // return cmd.config.id + ' - ' + cmd.config.description + '\nUsage: \n  >\n';
-                }
-            }
+export class HelpCommand implements ICommand {
+    public readonly id = 'help';
+    public readonly description = 'Show help for command';
+    public readonly help = 'help <command>';
+
+    public readonly alias: ['?'];
+
+    constructor(private registry: CommandsRegistry) {}
+
+    async execute(args: string[]): Promise<string> {
+        if (args.length !== 0) {
+            const result = this.registry.resolve(args.join(' '));
+            if (result) {
+                return `Used: ${result.name} - ${result.command.help || ''}\n${result.command.description || ''}`;
+            };
             return 'Use: help <command>';
         }
-        return 'Comands: ' + this.shell.getCommandsName();
+        const commands = [...this.registry.getCommands().entries()].sort((a,b) => {
+            if (a[0] === b[0]) return 0;
+            return a[0] > b[0] ? 1 : -1;
+        });
+        const cmds = commands.map(([name, cmd]) => {
+            if (cmd) {
+                return `${name} - ${cmd.description || ''}`;
+            }
+            return `${name} [command]`;
+        }).join('\n');
+
+        return `Used: [command]\n\nCommands:\n${cmds}\n`;
     }
-    // async complete(args: string[]): Promise<string[]> {
-    //     if (args.length === 0) {
-    //         return this.shell.getCommandsName();
-    //     }
-    //     if (args.length === 1) {
-    //         const id: string = args[0];
-    //         const cids: string[] = this.shell.getCommandsName();
-    //         const founded: string[] = [];
-    //         let cid: string;
-    //         for (let i = 0; i < cids.length; i++) {
-    //             cid = cids[i];
-    //             if (cid.indexOf(id) === 0) {
-    //                 founded.push(cid);
-    //             }
-    //         }
-    //         return founded;
-    //     }
-    //     return [];
-    // }
+
+    async complete(args: string[]) {
+        return [...this.registry.getCommands().keys()];
+    }
 }
 
 const makeAsciiTable = (title, headers, records) => {
@@ -297,7 +323,7 @@ const makeAsciiTable = (title, headers, records) => {
             const space = ' '.repeat(Math.ceil(w));
             return `${value}${space}`;
         });
-        return `| ${b.join(' | ')} |`;
+        return `│ ${b.join(' │ ')} │`;
     };
     const sheader = sformat(headers);
     const buff = [title];

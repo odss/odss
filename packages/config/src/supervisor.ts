@@ -3,7 +3,7 @@ import {
     IBundleContext,
     ConfigAdminService,
     IServiceRegistration,
-    ShellCommandsService,
+    CommandsService,
 } from '@odss/common';
 import { ConfigManager } from './manager';
 import { ConfigAdmin } from './admin';
@@ -27,7 +27,7 @@ export class Supervisor {
         this.trackersServices = new ConfigManagedTracker(this.ctx, this.manager);
         await this.trackersFactories.open();
         await this.trackersServices.open();
-        this.ctx.registerService(ShellCommandsService, new AdminConfigCommands(admin));
+        this.ctx.registerService(CommandsService, new AdminConfigCommands(admin));
     }
     async unsetStorage(): Promise<void> {
         await this.trackersServices?.close();

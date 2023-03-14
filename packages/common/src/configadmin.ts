@@ -58,4 +58,3 @@ export class ConfigStorageService implements IConfigStorage {
         throw new Error('Method not implemented.');
     }
 }
-

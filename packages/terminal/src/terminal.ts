@@ -1,17 +1,17 @@
-import { IShell } from '@odss/common';
+import { ICommandShell } from '@odss/common';
 import LocalEchoController from '../vendors/local-echo.js';
 import { Terminal } from '../vendors/xterm.js';
 import { MainUI } from './ui';
 
 export class TerminalService {
-    private shell?: IShell;
+    private shell?: ICommandShell;
     private xterm: any;
     private controller: any;
     private ui: MainUI = new MainUI();
     private toDispose: (() => void)[] = [];
 
     constructor() {}
-    attach(shell: IShell) {
+    attach(shell: ICommandShell) {
         this.shell = shell;
         this.ui.activate();
     }

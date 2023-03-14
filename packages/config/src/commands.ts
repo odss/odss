@@ -6,7 +6,7 @@ export class AdminConfigCommands {
     constructor(private admin: ConfigAdmin) {}
 
     @Command({
-        name: 'cm:list',
+        id: 'list',
         description: 'Show admin config list',
     })
     async list() {
@@ -14,7 +14,7 @@ export class AdminConfigCommands {
         return configs.map(config => `PID=${config.getPid()}`).join('\n');
     }
     @Command({
-        name: 'cm:get',
+        id: 'get',
         description: 'Show admin config details',
     })
     async get(args: string[]) {
@@ -25,7 +25,7 @@ export class AdminConfigCommands {
     }
 
     @Command({
-        name: 'cm:clean',
+        id: 'clean',
         description: 'Clean admin config',
     })
     async clean(args: string[]) {
@@ -36,7 +36,7 @@ export class AdminConfigCommands {
     }
 
     @Command({
-        name: 'cm:del',
+        id: 'del',
         description: 'Delete admin config',
     })
     async delete(args: string[]) {
@@ -47,7 +47,7 @@ export class AdminConfigCommands {
     }
 
     @Command({
-        name: 'cm:set',
+        id: 'set',
         description: 'Set value in admin config',
     })
     async set(args: string[]) {
@@ -60,7 +60,7 @@ export class AdminConfigCommands {
     }
 
     @Command({
-        name: 'cm:factory',
+        id: 'factory',
         description: 'Create factory config',
     })
     async factory(args: string[]) {

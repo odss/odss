@@ -3,54 +3,51 @@ import {
     ICommand,
     ICommands,
     ICommandHandler,
-    IShell,
     Metadata,
     ServiceTracker,
-    ShellCommandService,
-    ShellCommandsService,
+    CommandService,
+    CommandsService,
     ICommandOptions,
 } from '@odss/common';
 
 import { MetadataTypes } from '@odss/shell';
+import { CommandsRegistry } from './registry';
 
 export class CommandsTracker extends ServiceTracker {
-    constructor(ctx: IBundleContext, private shell: IShell) {
-        super(ctx, ShellCommandService);
+    constructor(ctx: IBundleContext, private registry: CommandsRegistry) {
+        super(ctx, CommandService);
     }
 
     async addingService(command: ICommand): Promise<void> {
-        await this.shell.addCommand(command);
+        this.registry.addCommand(command);
     }
     async modifiedService(): Promise<void> {}
 
     async removedService(command: ICommand): Promise<void> {
-        await this.shell.removeCommand(command);
+        this.registry.removeCommand(command);
     }
 }
 
 export class CommandHandlersTracker extends ServiceTracker {
-    private _handlers: Map<ICommands, ICommand[]> = new Map();
+    private _handlers: WeakMap<ICommands, ICommand[]> = new WeakMap();
 
-    constructor(ctx: IBundleContext, private shell: IShell) {
-        super(ctx, ShellCommandsService);
+    constructor(ctx: IBundleContext, private registry: CommandsRegistry) {
+        super(ctx, CommandsService);
     }
 
     async addingService(command: ICommands): Promise<void> {
-        // throw new Error(`kaboom`);
-        await this.bindCommands(command);
+        this.bindCommands(command);
     }
     async modifiedService(): Promise<void> {}
 
     async removedService(command: ICommands): Promise<void> {
-        await this.unbindCommands(command);
+        this.unbindCommands(command);
     }
     bindCommands(command: ICommands): void {
         if (this._handlers.has(command)) {
             throw new Error(`Command: ${command.constructor.name} is already registered`);
         }
-        const { namespace } =
-            Metadata.target(command.constructor).get(MetadataTypes.SHELL_COMMANDS) || [];
-
+        const { prefix } = Metadata.target(command.constructor).get(MetadataTypes.SHELL_COMMANDS) || [];
         const metadataHandlers =
             Metadata.scanByKey<ICommands, ICommandOptions>(
                 command,
@@ -59,14 +56,14 @@ export class CommandHandlersTracker extends ServiceTracker {
             ) || [];
         const handlers: ICommand[] = [];
 
-        for (const { handler, metadata } of metadataHandlers) {
+        for (const { handler, metadata: { id, ...props } } of metadataHandlers) {
             const execute = handler.bind(command) as ICommandHandler;
             const cmd = {
-                namespace,
-                ...metadata,
+                ...props,
+                id: prefix ? `${prefix}/${id}` : id,
                 execute,
             };
-            this.shell.addCommand(cmd);
+            this.registry.addCommand(cmd);
             handlers.push(cmd);
         }
         this._handlers.set(command, handlers);
@@ -74,7 +71,7 @@ export class CommandHandlersTracker extends ServiceTracker {
     unbindCommands(command: ICommands): void {
         const cmds = this._handlers.get(command) || [];
         for (const cmd of cmds) {
-            this.shell.removeCommand(cmd);
+            this.registry.removeCommand(cmd);
         }
         this._handlers.delete(command);
     }

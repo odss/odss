@@ -1,12 +1,12 @@
 import * as readline from 'readline';
-import { IShell } from '@odss/common';
+import { ICommandShell } from '@odss/common';
 
 export class TerminalService {
-    private shell?: IShell;
+    private shell?: ICommandShell;
     private rl?: readline.Interface;
 
     constructor() {}
-    attach(shell: IShell) {
+    attach(shell: ICommandShell) {
         this.shell = shell;
     }
     detach() {
