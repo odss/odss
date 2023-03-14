@@ -15,7 +15,7 @@ describe('@Command()', () => {
 
     it('should create command metadata', () => {
         // const commands = new BasicCommands();
-        const main = Metadata.target(BasicCommands).get(MetadataTypes.SHELL_COMMAND);
+        const main = Metadata.target(BasicCommands).get(MetadataTypes.SHELL_COMMANDS);
         assert.deepEqual(main, {
             prefix: '',
         });

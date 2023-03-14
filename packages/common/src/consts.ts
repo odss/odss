@@ -43,9 +43,6 @@ export const MetadataTypes = {
     UPDATE_DEPENDENCY: 'odss.handler.update',
     INVALIDATE_METHOD: 'odss.handler.invalidate.method',
     VALIDATE_METHOD: 'odss.handler.validate.method',
-    SHELL_COMMAND: 'odss.shell.command',
-    SHELL_COMMANDS: 'odss.shell.commands',
-    SHELL_COMMANDS_HANDLER: 'odss.shell.commands.handler',
 };
 
 export const HandlerTypes = {

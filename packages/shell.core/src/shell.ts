@@ -1,9 +1,9 @@
-import { ICommandShell, ICommand } from '@odss/common';
+import { IShell, ICommand } from '@odss/common';
 
 import { Completer } from './completer';
 import { CommandsRegistry } from './registry';
 
-export class Shell implements ICommandShell {
+export class Shell implements IShell {
     private completer: Completer;
 
     constructor(private registry: CommandsRegistry) {

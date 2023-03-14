@@ -1,4 +1,4 @@
-import { CommandShellService, ICommandShell, IBundleContext, ServiceTracker } from '@odss/common';
+import { ShellService, IShell, IBundleContext, ServiceTracker } from '@odss/common';
 
 import { TerminalService } from './terminal';
 
@@ -15,18 +15,18 @@ export class Activator {
     }
 }
 
-class ShellTracker extends ServiceTracker<ICommandShell> {
+class ShellTracker extends ServiceTracker<IShell> {
     constructor(ctx: IBundleContext, private terminal: TerminalService) {
-        super(ctx, CommandShellService);
+        super(ctx, ShellService);
     }
 
-    async addingService(shell: ICommandShell) {
+    async addingService(shell: IShell) {
         this.terminal.attach(shell);
     }
 
     async modifiedService() {}
 
-    async removedService(shell: ICommandShell) {
+    async removedService(shell: IShell) {
         this.terminal.detach();
     }
 }

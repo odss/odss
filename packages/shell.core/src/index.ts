@@ -1,4 +1,4 @@
-import { IBundleContext, CommandShellService, CommandsService, CommandService } from '@odss/common';
+import { IBundleContext, ShellService, CommandsService, CommandService } from '@odss/common';
 
 import { BasicCommands, HelpCommand } from './basic-commands';
 import { CommandsTracker, CommandHandlersTracker } from './trackers';
@@ -16,7 +16,7 @@ export class Activator {
         //create and register all core commands
         ctx.registerService(CommandsService, new BasicCommands(ctx, this.registry));
         ctx.registerService(CommandService, new HelpCommand(this.registry));
-        ctx.registerService(CommandShellService, this.shell);
+        ctx.registerService(ShellService, this.shell);
 
         new CommandsTracker(ctx, this.registry).open();
         new CommandHandlersTracker(ctx, this.registry).open();

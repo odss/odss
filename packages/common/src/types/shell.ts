@@ -25,7 +25,7 @@ export interface ICommandsMetadata {
     prefix: string;
 }
 
-export interface ICommandShell {
+export interface IShell {
     execute(line: string): Promise<string>;
     complete(line: string): Promise<string[]>;
 }
@@ -42,7 +42,7 @@ export class CommandsService implements ICommands {
     [key: string]: ICommandHandler;
 }
 
-export class CommandShellService implements ICommandShell {
+export class ShellService implements IShell {
     static NAMESPACE = '@odss/common';
 
     execute(): Promise<string> {
