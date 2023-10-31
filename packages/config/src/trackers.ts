@@ -65,10 +65,10 @@ export class ConfigManagedFactoryTracker extends ServiceTracker {
 export class ConfigStorageTracker extends ServiceTracker<IConfigStorage> {
     private storages: Map<IServiceReference, IConfigStorage> = new Map();
     private active: IServiceReference = null;
+
     constructor(ctx: IBundleContext, private supervisor: Supervisor) {
         super(ctx, ConfigStorageService);
     }
-
     async addingService(service: IConfigStorage, reference: IServiceReference): Promise<void> {
         this.storages.set(reference, service);
         await this.checkStorage();
@@ -76,7 +76,6 @@ export class ConfigStorageTracker extends ServiceTracker<IConfigStorage> {
     async modifiedService(): Promise<void> {
         await this.checkStorage();
     }
-
     async removedService(
         service: ConfigStorageService,
         reference: IServiceReference

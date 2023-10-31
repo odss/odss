@@ -249,7 +249,6 @@ describe('new ConfigManager()', function () {
 
             const config = await admin.createFactoryConfig('fid1', 'pid1');
             await config.update({}); // not new
-            debugger;
             await config.remove();
 
             assert.equal(serivce.updated.callCount, 1);
