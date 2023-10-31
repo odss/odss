@@ -7,6 +7,7 @@ export class CommandNode {
     constructor(public readonly name: string, public readonly command?: ICommand) {}
 
     add(path: string[], command: ICommand) {
+        path = [...path];
         const name = path.shift();
         if (path.length === 0) {
             if (this.children.has(name)) {
@@ -22,6 +23,7 @@ export class CommandNode {
         }
     }
     remove(path: string[]) {
+        path = [...path];
         const name = path.shift();
         if (path.length === 0) {
             if (!this.children.has(name)) {
@@ -37,10 +39,11 @@ export class CommandNode {
         }
     }
     find(path: string[]) {
-        const name = path.shift();
-        if (name.length === 0) {
+        path = [...path];
+        if (path.length === 0) {
             return this;
         }
+        const name = path.shift();
         if (path.length === 0) {
             return this.children.get(name);
         }
@@ -60,7 +63,7 @@ export class CommandNode {
     values() {
         return [...this.children.values()].map(node => node.command);
     }
-    entries() {
+    entries(): Map<string, ICommand> {
         return new Map(
             Array.from(this.children.entries())
                 .map(([name, node]) => [name, node.command])

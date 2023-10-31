@@ -4,11 +4,11 @@ import {
     OBJECTCLASS,
     SERVICE_ID,
     ICommand,
-    ICommandComplete,
-    ICommandHandler,
+    IBundle,
 } from '@odss/common';
 import { Command, Commands } from '@odss/shell';
 import { CommandsRegistry } from './registry';
+
 
 const STATUSES = {
     1: 'UNINSTALLED',
@@ -60,11 +60,8 @@ export class BasicCommands {
     })
     async reload(args: string[]): Promise<string> {
         if (args.length) {
-            let sid: string | number = args.shift() || '';
-            if (!/([^0-9])/.test(sid)) {
-                sid = parseInt(sid, 10);
-            }
-            await this.ctx?.getBundle(sid as any).reload();
+            let sid: string = args.shift() || '';
+            await this.findBundle(sid).reload();
             return 'Bundle reloaded';
         } else {
             throw new Error('Expected bundle: "id" or "name"');
@@ -79,14 +76,8 @@ export class BasicCommands {
     async uninstall(args: string[]): Promise<string> {
         // description: 'Uninstall bundle',
         // man: 'uninstall <bundle.id>',
-        let sid: string | number = args.shift() || '';
-        if (!/([^0-9])/.test(sid)) {
-            sid = parseInt(sid, 10);
-        }
-        if (!sid) {
-            throw new Error('Incorrect bundle id');
-        }
-        const bundle = this.ctx?.getBundle(sid as any);
+        let sid: string = args.shift() || '';
+        let bundle = this.findBundle(sid);
         if (bundle) {
             await bundle.uninstall();
             return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') unistalled';
@@ -102,11 +93,8 @@ export class BasicCommands {
     async start(args: string[]): Promise<string> {
         // man: 'start <bundle.id>',
         // description: 'Start bundle',
-        let sid: string | number = args.shift() || '';
-        if (!/([^0-9])/.test(sid)) {
-            sid = parseInt(sid, 10);
-        }
-        const bundle = this.ctx?.getBundle(sid as any);
+        const sid: string = args.shift() || '';
+        const bundle = this.findBundle(sid);
         if (bundle) {
             await bundle.start();
             return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') started';
@@ -124,10 +112,7 @@ export class BasicCommands {
         // man: 'stop <bundle.id>',
         if (args.length) {
             let bid: string | number = args.shift() || '';
-            if (!/([^0-9])/.test(bid)) {
-                bid = parseInt(bid, 10);
-            }
-            const bundle = this.ctx?.getBundle(bid as any);
+            const bundle = this.findBundle(bid);
             if (bundle) {
                 await bundle.stop();
                 return 'Bundle(id=' + bundle.id + ' name=' + bundle.name + ') stopped';
@@ -249,6 +234,15 @@ export class BasicCommands {
         setTimeout(() => (this.ctx as any).framework.stop());
         return 'Stoping';
     }
+    private findBundle(identifier: string): IBundle {
+        if (!/([^0-9])/.test(identifier)) {
+            const sid = parseInt(identifier, 10);
+            return this.ctx?.getBundleById(sid);
+        } else if (identifier) {
+            return this.ctx?.getBundleByName(identifier);
+        }
+        throw new Error("Not found bundle");
+    }
 }
 
 export class HelpCommand implements ICommand {
@@ -264,7 +258,7 @@ export class HelpCommand implements ICommand {
         if (args.length !== 0) {
             const result = this.registry.resolve(args.join(' '));
             if (result) {
-                return `Used: ${result.name} - ${result.command.help || ''}\n${result.command.description || ''}`;
+                return `Used: ${result.node.name} - ${result.command.help || ''}\n${result.command.description || ''}`;
             };
             return 'Use: help <command>';
         }

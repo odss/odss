@@ -1,5 +1,4 @@
 import { ShellService, IShell, IBundleContext, ServiceTracker } from '@odss/common';
-
 import { TerminalService } from './terminal';
 
 export class Activator {

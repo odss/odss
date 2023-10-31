@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "micropack",
-    "build:dev2": "micropack --dev",
+    "build:dev": "micropack --dev",
     "lint": "eslint src/*",
     "format": "prettier src/ tests/ --write",
     "test": "npm run test:mocha",
@@ -31,7 +31,7 @@
     "@odss/shell": "1.0.0"
   },
   "devDependencies": {
-    "@stool/micropack": "0.4.0",
+    "@stool/micropack": "0.6.0",
     "@types/chai": "4.3.4",
     "@types/mocha": "10.0.1",
     "@types/node": "18.15.1",

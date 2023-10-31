@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { CommandNode } from '../src/tree';
 
 
-describe('new CommandsRegistry()', () => {
+describe('commands tree', () => {
     function Command(id): [string[], any] {
         return [id.split('/'), { id, execute(){ return ''; } }];
     }
