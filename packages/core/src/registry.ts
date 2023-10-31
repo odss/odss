@@ -32,9 +32,9 @@ const sortReferences = (ref1, ref2) => {
 };
 
 export default class Registry {
-    private _services: Map<ServiceReference, TServiceInfo> = new Map();
-    private _specs: Map<string, ServiceReference[]> = new Map();
-    private _registrations: WeakMap<ServiceRegistration, ServiceReference> = new WeakMap();
+    private _services: Map<IServiceReference, TServiceInfo> = new Map();
+    private _registrations: WeakMap<ServiceRegistration, IServiceReference> = new WeakMap();
+    private _specs: Map<string, IServiceReference[]> = new Map();
     private _styles: any = {};
     private _size = 0;
     private _sid = 0;
@@ -128,18 +128,15 @@ export default class Registry {
         return false;
     }
 
-    async unregisterAll(bundle): Promise<void> {
+    async unregisterAll(bundle: IBundle): Promise<void> {
         const bid = bundle.id;
         for (const info of this._services.values()) {
             if (info.bid === bid) {
                 await this.unregister(info.registration);
             }
         }
-        // if(this._styles[bid]){
-        //     this._styles[bid]();
-        // }
     }
-    find(bundle, reference) {
+    find(bundle: IBundle, reference: ServiceReference): any | null {
         const info = this._services.get(reference);
         if (info) {
             info.using.add(bundle.id);
@@ -148,7 +145,7 @@ export default class Registry {
         }
         return null;
     }
-    unget(bundle, reference) {
+    unget(bundle: IBundle, reference: ServiceReference): void {
         const info = this._services.get(reference);
         if (info) {
             info.using.delete(bundle.id);
@@ -156,7 +153,7 @@ export default class Registry {
         reference.unusedBy(bundle);
     }
 
-    ungetAll(bundle) {
+    ungetAll(bundle): void {
         const bid = bundle.id;
         for (const info of this._services.values()) {
             if (info.using.has(bid)) {
@@ -215,8 +212,8 @@ export default class Registry {
         }
         return buff;
     }
-    findBundleReferences(bundle) {
-        const buff = [];
+    findBundleReferences(bundle): IServiceReference[] {
+        const buff: IServiceReference[] = [];
         const bundleId = bundle.id;
         for (const info of this._services.values()) {
             if (info.bid === bundleId) {
@@ -225,8 +222,8 @@ export default class Registry {
         }
         return buff;
     }
-    findBundleReferencesInUse(bundle) {
-        const buff = [];
+    findBundleReferencesInUse(bundle): IServiceReference[] {
+        const buff: IServiceReference[] = [];
         const bundleId = bundle.id;
         for (const info of this._services.values()) {
             if (info.using.has(bundleId)) {
@@ -236,7 +233,7 @@ export default class Registry {
         return buff;
     }
 
-    size() {
+    size(): number {
         return this._size;
     }
     async updateProperties(registration: ServiceRegistration, oldProps: Properties): Promise<void> {

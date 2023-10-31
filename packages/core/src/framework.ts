@@ -1,15 +1,21 @@
 import { getLogger } from '@stool/logging';
 
 import {
-    ILoader,
+    IActivator,
     IBundle,
+    ILoader,
+    IFramework,
+    IServiceReference,
+    IServiceListener,
+    IBundleListener,
+    IFrameworkListener,
+    IDisposable,
+    NamedServiceType,
     Events,
     Bundles,
     FrameworkEvent,
     ServiceEvent,
     BundleEvent,
-    IActivator,
-    IServiceReference,
     Properties,
     IModule,
 } from '@odss/common';
@@ -23,7 +29,7 @@ const FRAMEWORK_ID = 0;
 
 const logger = getLogger('@odss/core');
 
-export class Framework extends Bundle implements IBundle {
+export class Framework extends Bundle implements IFramework {
     private _SID = 0;
     private _loader: ILoader;
     private _bundles: Map<number, Bundle> = new Map();
@@ -56,7 +62,7 @@ export class Framework extends Bundle implements IBundle {
         }
         return null;
     }
-    getProperties(): Properties {
+    getProperties<P extends Properties>(): P {
         return { ...this._properties };
     }
     useLoader(loader: ILoader): void {
@@ -69,35 +75,33 @@ export class Framework extends Bundle implements IBundle {
         }
         return this._loader;
     }
-    hasBundle(bundleId: number | string): boolean {
-        if (typeof bundleId === 'number') {
-            if (this._bundles.has(bundleId)) {
+    hasBundle(identifier: number | string): boolean {
+        if (typeof identifier === 'number') {
+            if (this._bundles.has(identifier)) {
                 return true;
             }
-        } else if (typeof bundleId === 'string') {
+        } else if (typeof identifier === 'string') {
             for (const bundle of this._bundles.values()) {
-                if (bundle.name === bundleId) {
+                if (bundle.name === identifier) {
                     return true;
                 }
             }
         }
         return false;
     }
-    getBundle(identifier: number | string): IBundle {
-        if (typeof identifier === 'number') {
-            if (this._bundles.has(identifier)) {
-                return this._bundles.get(identifier);
-            }
-            throw new Error('Not found: Bundle(id=' + identifier + ')');
-        } else if (typeof identifier === 'string') {
-            for (const bundle of this._bundles.values()) {
-                if (bundle.name === identifier) {
-                    return bundle;
-                }
-            }
-            throw new Error('Not found: Bundle(name=' + identifier + ')');
+    getBundleById(id: number): IBundle {
+        if (this._bundles.has(id)) {
+            return this._bundles.get(id);
         }
-        throw new Error('Incorect bundle identifier: ' + identifier);
+        throw new Error(`Not found: Bundle(id=${id}`);
+    }
+    getBundleByName(name: string): IBundle {
+        for (const bundle of this._bundles.values()) {
+            if (bundle.name === name) {
+                return bundle;
+            }
+        }
+        throw new Error(`Not found: Bundle(name=${name}`);
     }
     getBundles(): IBundle[] {
         return [...this._bundles.values()];
@@ -205,6 +209,7 @@ export class Framework extends Bundle implements IBundle {
         }
         return true;
     }
+
     async stopBundle(bundle: Bundle): Promise<boolean> {
         if (bundle.id === FRAMEWORK_ID) {
             throw new Error('Cannot stop framework bundle: ' + bundle.name);
@@ -281,7 +286,7 @@ export class Framework extends Bundle implements IBundle {
         await this.on.framework.fire(new FrameworkEvent(type, this));
     }
     getService(bundle: IBundle, reference: IServiceReference): any {
-        return this.registry.find(bundle, reference);
+        return this.registry.find(bundle, reference as any);
     }
     getRegisteredServices(): IServiceReference[] {
         return [];
@@ -295,6 +300,30 @@ export class Framework extends Bundle implements IBundle {
     getBundelServicesInUse(bundle: IBundle): IServiceReference[] {
         return this.registry.findBundleReferencesInUse(bundle);
     }
+
+    addServiceListener(
+        bundle: IBundle,
+        listener: IServiceListener,
+        name: NamedServiceType,
+        filter: string
+    ): IDisposable {
+        return this.on.service.add(bundle, listener, name, filter);
+    }
+    addBundleListener(bundle: IBundle, listener: IBundleListener): IDisposable {
+        return this.on.bundle.add(bundle, listener);
+    };
+    addFrameworkListener(bundle: IBundle, listener: IFrameworkListener): IDisposable {
+        return this.on.framework.add(bundle, listener);
+    }
+    removeServiceListener(bundle: IBundle, listener: IServiceListener): void {
+        this.on.service.remove(bundle, listener);
+    }
+    removeBundleListener(bundle: IBundle, listener: IBundleListener): void {
+        this.on.bundle.remove(bundle, listener);
+    };
+    removeFrameworkListener(bundle: IBundle, listener: IFrameworkListener): void {
+        this.on.framework.remove(bundle, listener);
+    }
 }
 
 function getActivator(module: IModule): IActivator {
@@ -303,12 +332,13 @@ function getActivator(module: IModule): IActivator {
     }
     const fn = async (ctx: BundleContext) => {};
     if (module.activate) {
-        return {
-            start: async (ctx: BundleContext) => {
-                this.stop = (await module.activate(ctx)) || fn;
+        const activator = {
+            start: async function(ctx: BundleContext) {
+                activator.stop = (await module.activate(ctx)) || fn;
             },
             stop: fn,
         };
+        return activator;
     }
     return {
         start: fn,

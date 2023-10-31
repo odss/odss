@@ -4,11 +4,18 @@ import {
     IServiceReference,
     IServiceListener,
     IBundleListener,
+    IFramework,
     IFrameworkListener,
     IDisposable,
     IServiceObject,
     IServiceRegistration,
+    NamedServiceType,
+    IServiceTrackerListenerType,
+    FilterType,
+    IServiceTrackerListener,
+    ServiceTracker,
 } from '@odss/common';
+
 import { Framework } from './framework';
 
 class ServiceObject<S> implements IServiceObject<S> {
@@ -25,13 +32,9 @@ class ServiceObject<S> implements IServiceObject<S> {
 }
 
 export default class BundleContext implements IBundleContext {
-    public readonly framework: Framework;
-    public readonly bundle: IBundle;
     public readonly on: any;
 
-    constructor(framework: Framework, bundle: IBundle) {
-        this.framework = framework;
-        this.bundle = bundle;
+    constructor(private framework: Framework, private bundle: IBundle) {
         this.on = createEvents(framework, bundle);
         Object.freeze(this);
     }
@@ -42,8 +45,17 @@ export default class BundleContext implements IBundleContext {
     getProperties(): any {
         return this.framework.getProperties();
     }
-    getBundle(bundleId: number): IBundle {
-        return this.framework.getBundle(bundleId);
+    getBundle(): IBundle {
+        return this.bundle;
+    }
+    getBundleById(id: number): IBundle {
+        return this.framework.getBundleById(id);
+    }
+    getBundleByName(name: string): IBundle {
+        return this.framework.getBundleByName(name);
+    }
+    getFramework(): IFramework {
+        return this.framework;
     }
     getBundles(): IBundle[] {
         return this.framework.getBundles();
@@ -102,6 +114,13 @@ export default class BundleContext implements IBundleContext {
     }
     removeFrameworkListener(listener: IFrameworkListener): void {
         return this.framework.on.framework.remove(this.bundle, listener);
+    }
+    createServiceTracker<S = any>(
+        name: NamedServiceType,
+        listener: IServiceTrackerListenerType<S> = null,
+        filter: FilterType = ''
+    ): IServiceTrackerListener<S> {
+        return new ServiceTracker(this, name, listener, filter);
     }
 }
 

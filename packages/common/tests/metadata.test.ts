@@ -92,7 +92,6 @@ describe('Metadata', () => {
 
         it('should find all methods', () => {
             const test = new Test();
-            debugger;
             const info = Metadata.scanByKey<Test, string[]>(test, null, '__decor__');
             assert.deepEqual(info, [
                 { name: 'method1', handler: test.method1, metadata: ['value1'] },

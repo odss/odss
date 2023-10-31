@@ -40,7 +40,7 @@ describe('odss-core', () => {
     it('get unexists bundle', async () => {
         let framework = await tests.framework();
         assert.throws(() => {
-            framework.getBundle(1);
+            framework.getBundleById(1);
         });
     });
 
@@ -80,8 +80,8 @@ describe('odss-core', () => {
         await framework.installBundle('test1', false);
         await framework.installBundle('test2', false);
 
-        let bundle1 = framework.getBundle('test1');
-        let bundle2 = framework.getBundle('test2');
+        let bundle1 = framework.getBundleByName('test1');
+        let bundle2 = framework.getBundleByName('test2');
 
         assert.equal(Bundles.INSTALLED, bundle1.state, 'bundle1 === INSTALLED');
         assert.equal(Bundles.INSTALLED, bundle2.state, 'bundle2 === INSTALLED');
@@ -176,7 +176,7 @@ describe('odss-core', () => {
         assert.equal(true, framework.on.bundle.add(self.bundle, listener));
 
         let bundle2 = await framework.installBundle('spy');
-        let bundle = framework.getBundle('spy');
+        let bundle = framework.getBundleByName('spy');
 
         assert.equal(Events.INSTALLED, events[0].type);
 

@@ -4,7 +4,7 @@ import { prepareFilter } from './utils';
 const BUNDLE = 0;
 const LISTENER = 1;
 
-function createListeners<T>(callbackName: string): any {
+function createListeners<T>(callbackName: string) {
     const listeners: any[] = [];
 
     return {

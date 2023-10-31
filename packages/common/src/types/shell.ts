@@ -5,7 +5,7 @@ export interface ICommandOptions {
     readonly help?: string;
 }
 export interface ICommandHandler {
-    (args: string[]): Promise<string> | string | undefined;
+    (args: string[]): Promise<any> | any | undefined;
 }
 export interface ICommands {
     [key: string]: ICommandHandler;

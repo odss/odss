@@ -162,14 +162,14 @@ let tests = {
         namespace = namespace || 'def';
         let framework = await this.framework(autoStart);
         await framework.installBundle(namespace, autoStart);
-        return framework.getBundle(namespace);
+        return framework.getBundleByName(namespace);
     },
     factory: async function () {
         let framework = await this.framework();
         return {
             bundle: async function (namespace, autoStart = false) {
                 await framework.installBundle(namespace, autoStart);
-                return framework.getBundle(namespace);
+                return framework.getBundleByName(namespace);
             },
             framework: async function (noStart = false) {
                 if (!noStart) {
