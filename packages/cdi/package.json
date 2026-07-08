@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@odss/common": "1.0.0",
-    "@stool/logging": "3.2.0"
+    "@stool/logging": "3.2.2"
   },
   "devDependencies": {
     "@stool/micropack": "0.6.0",

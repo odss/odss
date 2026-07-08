@@ -27,7 +27,7 @@ export class BasicCommands {
         id: 'properties',
         description: 'Show all properties',
     })
-    properties(args: string[]) {
+    properties2(args: string[]) {
         return this.ctx?.getProperties() || {};
     }
 
@@ -74,8 +74,6 @@ export class BasicCommands {
         help: 'uninstall <bundle.id>',
     })
     async uninstall(args: string[]): Promise<string> {
-        // description: 'Uninstall bundle',
-        // man: 'uninstall <bundle.id>',
         let sid: string = args.shift() || '';
         let bundle = this.findBundle(sid);
         if (bundle) {
@@ -146,10 +144,7 @@ export class BasicCommands {
     })
     bundleDetails(args: string[]): string {
         let sid: string | number = args.shift() || '';
-        if (!/([^0-9])/.test(sid)) {
-            sid = parseInt(sid, 10);
-        }
-        const bundle = this.ctx?.getBundle(sid as any);
+        const bundle = this.findBundle(sid);
         if (!bundle) {
             return `Not found bundle id=${sid}`;
         }
@@ -235,7 +230,7 @@ export class BasicCommands {
         return 'Stoping';
     }
     private findBundle(identifier: string): IBundle {
-        if (!/([^0-9])/.test(identifier)) {
+        if (!/^([^0-9])$/.test(identifier)) {
             const sid = parseInt(identifier, 10);
             return this.ctx?.getBundleById(sid);
         } else if (identifier) {

@@ -78,7 +78,8 @@ export interface IFramework extends IBundle {
     getProperty<T = any>(name: string, defaultValue?: T): T;
     getProperties<P extends Properties>(): P;
     hasBundle(identifier: number | string): boolean;
-    getBundle(identifier: number | string): IBundle;
+    getBundleById(id: number): IBundle;
+    getBundleByName(name: string): IBundle;
     getBundles(): Array<IBundle>;
     installBundle(name: string, autostart: boolean): Promise<IBundle>;
     uninstallBundle(bundle: IBundle): Promise<boolean>;
@@ -108,9 +109,9 @@ export interface IEventListeners<T = any, E = any> {
     clean(bundle: E): void;
 }
 export interface IServiceObject<S> {
-    getService(): S;
-    ungetService(): void;
-    getServiceReference(): IServiceReference;
+    get service(): S;
+    get reference(): IServiceReference;
+    unget(): void;
 }
 
 export interface IBundleContext {
@@ -124,8 +125,8 @@ export interface IBundleContext {
     getServiceReferences(name?: NamedServiceType, filter?: FilterType): IServiceReference[];
     // getBundleServiceReferences(name: any, filter?: any): IServiceReference[];
     getService<S>(reference: IServiceReference): S;
-    getServiceObject<S>(reference: IServiceReference): IServiceObject<S>;
     ungetService(reference: IServiceReference): void;
+    getServiceObject<S>(reference: IServiceReference): IServiceObject<S>;
     getBundle(): IBundle;
     getBundleById(id: number): IBundle;
     getBundleByName(name: string): IBundle;
@@ -138,11 +139,6 @@ export interface IBundleContext {
     removeServiceListener(listener: IServiceListener): void;
     removeBundleListener(listener: IBundleListener): void;
     removeFrameworkListener(listener: IFrameworkListener): void;
-    createServiceTracker<S>(
-        name: NamedServiceType,
-        listener?: IServiceTrackerListenerType<S>,
-        filter?: FilterType
-    ): IServiceTrackerListener<S>;
 }
 
 export interface IServiceReference {
@@ -203,7 +199,7 @@ export interface IServiceTracker<TService extends ServiceType> {
     open(): Promise<void>;
     close(): Promise<void>;
     size(): number;
-    bundles(): IBundle[];
+    //bundles(): IBundle[];
     getReference(): IServiceReference;
     getReferences(): IServiceReference[];
     getService(): TService;

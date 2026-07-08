@@ -104,7 +104,7 @@ export class Framework extends Bundle implements IFramework {
         throw new Error(`Not found: Bundle(name=${name}`);
     }
     getBundles(): IBundle[] {
-        return [...this._bundles.values()];
+        return [...this._bundles.values()].sort((b1, b2) => b1.id - b2.id);
     }
     async start(): Promise<void> {
         if (this.state === Bundles.ACTIVE || this.state === Bundles.STARTING) {
@@ -162,11 +162,15 @@ export class Framework extends Bundle implements IFramework {
     }
 
     async installBundle(name: string, autostart = true): Promise<IBundle> {
+        if (this.hasBundle(name)) {
+            throw Error(`Bundle: ${name} is already installed`);
+        }
         logger.debug(`Install bundle ${name} (autostart=${autostart})`);
+        const id = this._nextSid();
         const module = await this.getLoader().loadBundle(name);
-        const bundle = new Bundle(this._nextSid(), this, module);
-        this._bundles.set(bundle.id, bundle);
-        this._activators.set(bundle.id, getActivator(module));
+        const bundle = new Bundle(id, this, module);
+        this._bundles.set(id, bundle);
+        this._activators.set(id, getActivator(module));
         await this._fireBundleEvent(Events.INSTALLED, bundle);
         if (autostart) {
             await bundle.start();
@@ -330,7 +334,7 @@ function getActivator(module: IModule): IActivator {
     if (Object.prototype.hasOwnProperty.call(module, 'Activator')) {
         return new module.Activator();
     }
-    const fn = async (ctx: BundleContext) => {};
+    const fn = async () => {};
     if (module.activate) {
         const activator = {
             start: async function(ctx: BundleContext) {

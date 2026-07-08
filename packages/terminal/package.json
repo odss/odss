@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@odss/common": "1.0.0",
-    "@stool/dom": "^2.6.0"
+    "@stool/core": "3.1.1"
   },
   "devDependencies": {
     "@stool/micropack": "0.6.0",

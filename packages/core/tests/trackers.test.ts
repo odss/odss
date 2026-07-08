@@ -152,7 +152,8 @@ describe('@odss/core/tracker.getService()', () => {
         await scope.ctx.registerService('test.tracker', 'test1');
         await scope.ctx.registerService('test.tracker', 'test2');
 
-        let tracker = await new ServiceTracker(scope.ctx, 'test.tracker').open();
+        let tracker = new ServiceTracker(scope.ctx, 'test.tracker');
+        await tracker.open();
         assert.equal(tracker.size(), 2, 'Found 2 services');
         let ref = tracker.getReference();
         assert.equal(ref.getProperty(OBJECTCLASS), 'test.tracker');
@@ -162,7 +163,8 @@ describe('@odss/core/tracker.getService()', () => {
         await scope.ctx.registerService('test.tracker', 'test1');
         await scope.ctx.registerService('test.tracker', 'test2');
 
-        let tracker = await new ServiceTracker(scope.ctx, 'test.tracker').open();
+        let tracker = new ServiceTracker(scope.ctx, 'test.tracker');
+        await tracker.open();
         assert.equal(tracker.size(), 2, 'Found 2 services');
 
         let refs = tracker.getReferences();

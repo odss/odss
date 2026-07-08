@@ -39,7 +39,7 @@ const resolver = (cwd, paths, install) => ({
     }
 });
 
-export async function run(cwd, { bundles: extraBundles, properties: extraProperties, ...options }) {
+export async function run({ cwd, bundles: extraBundles, properties: extraProperties, ...options }) {
     const {
         paths = [],
         bundles = [],
@@ -123,5 +123,5 @@ export async function findConfiguration(root) {
             }
         }
     }
-    throw Error(`Not found config file: [${Object.keys(LOADERS).join(', ')}]`);
+    throw Error(`Not found config file: [root=${root} ${Object.keys(LOADERS).join(', ')}]`);
 }

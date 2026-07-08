@@ -1,10 +1,10 @@
 import { CommandsService, IBundleContext } from '@odss/common';
 
-import { Config, State } from './types';
-import { IStorage, LocalStorage, RemoteStorage } from './storage';
+import { State } from './types';
+import { LocalStorage, RemoteStorage } from './storage';
 import { DevCommands } from './commands';
 import { CONFIG_PREFIX, CONFIG_DEFAULT_NAME } from './consts';
-
+import { ConfigController } from './config';
 
 export const activate = async (ctx: IBundleContext) => {
     const state = {
@@ -17,7 +17,11 @@ export const activate = async (ctx: IBundleContext) => {
     const app = await config.getCurrentApp();
     if (app) {
         for(const bundle of app.bundles) {
-            ctx.installBundle(bundle, true);
+            try {
+                await ctx.installBundle(bundle, true);
+            } catch(err) {
+                console.log(err)
+            }
         }
     }
     const disposeable = [
@@ -33,40 +37,6 @@ export const activate = async (ctx: IBundleContext) => {
             dispose();
         }
     };
-}
-
-class ConfigController {
-    constructor(private remoteStorage: IStorage, private localStorage: IStorage) {
-
-    }
-    async getCurrentApp() {
-        const config = await this.remoteStorage.load<Config>('config');
-        const defaultApp = await this.localStorage.load<string>('defaultApp');
-        const name = this.findConfigName(defaultApp, config);
-        return config.apps[name];
-    }
-    async setCurrentApp(name: string) {
-        await this.localStorage.write('defaultApp', name);
-    }
-    async getCurrentAppName() {
-        const config = await this.remoteStorage.load<Config>('config');
-        const defaultApp = await this.localStorage.load<string>('defaultApp');
-        return this.findConfigName(defaultApp, config);
-    }
-    async getAvailableApps() {
-        const config = await this.remoteStorage.load<Config>('config');
-        return Object.keys(config.apps);
-    }
-    async selectApp(name: string) {
-        const prev = await this.getCurrentApp();
-        await this.localStorage.save<string>('defaultApp', name);
-        const current = await this.getCurrentApp();
-        return { prev, current }
-    }
-    private findConfigName(defaultApp: string, config: Config): string {
-        const m = location.search.match(/\$app=([a-z\.]+)/i);
-        return m ? m[1] : defaultApp || config.defaultApp || CONFIG_DEFAULT_NAME;
-    }
 }
 
 function connectToDevServer(state: State) {

@@ -21,6 +21,7 @@ class GenericLoader implements ILoader {
     }
 
     getUrl(path) {
+        return path;
         const time = new Date().getTime();
         const sign = path.includes('?') ? '&' : '?';
         return [path, sign, time].join('');

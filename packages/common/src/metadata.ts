@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import 'reflect-metadata/lite';
 
 export interface MetadataScanCallback<R> {
     (name: string, prototype: any): R;

@@ -4,9 +4,10 @@
   "description": "Odss Core",
   "license": "MIT",
   "source": "src/index.ts",
-  "main": "dist/odss.core.js",
-  "module": "dist/odss.core.mjs",
+  "main": "./dist/odss.core.js",
+  "module": "./dist/odss.core.mjs",
   "types": "dist/types/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "browser": "./dist/odss.core.mjs",
@@ -19,36 +20,31 @@
     "build:dev": "micropack --include @odss/query --dev",
     "lint": "eslint src/*",
     "format": "prettier src/ tests/ --write",
-    "test": "npm run test:mocha",
-    "test:mocha": "mocha --require ts-node/register tests/*.test.ts",
-    "test:karma": "karma start --single-run",
-    "test:cov": "nyc npm run test:mocha",
-    "test:cov:html": "nyc --reporter=html npm run test:mocha",
+    "test": "vitest run",
+    "test:dev": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:cov:html": "vitest run --coverage --reporter text-summary --reporter html",
     "prepare": "npm run build"
   },
   "dependencies": {
     "@odss/common": "1.0.0",
     "@odss/query": "1.0.0",
-    "@stool/logging": "^3.2.0"
+    "@stool/logging": "^3.2.2"
   },
   "devDependencies": {
     "@stool/micropack": "0.6.0",
     "@types/chai": "4.3.4",
-    "@types/mocha": "10.0.1",
     "@types/node": "18.15.1",
     "@typescript-eslint/eslint-plugin": "5.54.1",
+    "@vitest/coverage-v8": "^1.6.0",
     "chai": "^4.3.7",
     "eslint": "8.36.0",
-    "karma": "6.4.1",
-    "karma-chrome-launcher": "3.1.1",
-    "karma-firefox-launcher": "^2.1.2",
-    "karma-mocha": "2.0.1",
-    "karma-typescript": "5.5.3",
-    "mocha": "10.2.0",
+    "jsdom": "^23.0.0",
     "prettier": "2.8.4",
     "sinon": "15.0.2",
-    "ts-node": "10.9.1",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "vite": "^5.0.0",
+    "vitest": "^1.6.0"
   },
   "files": [
     "README.md",

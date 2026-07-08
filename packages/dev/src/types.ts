@@ -1,8 +1,8 @@
 export type Config = {
   defaultApp: string,
-  apps: Record<string, App>;
+  apps: Record<string, ConfigApp>;
 }
-type App = {
+export type ConfigApp = {
   bundles: string[],
 }
 export type State = {

@@ -1,17 +1,15 @@
 import { IBundleContext } from '@odss/common';
 import { Command, Commands } from '@odss/shell';
 
-import { IStorage } from './storage';
-import { CONFIG_DEFAULT_NAME } from './consts';
-import { Config } from './types';
+import { ConfigController } from './config';
 
-@Commands('dev')
+@Commands('apps')
 export class DevCommands {
     private initBundles: string[];
 
     constructor(
         private ctx: IBundleContext,
-        private config: any 
+        private config: ConfigController
     ) {
         this.initBundles = this.getCurrentBundles();
         console.log({ bundles: this.initBundles })
@@ -21,21 +19,19 @@ export class DevCommands {
         return this.ctx.getBundles().map(bundle => bundle.name);
     }
 
-    private getNewBundles(): string[] {
-        const current = this.ctx.getBundles().map(bundle => bundle.name);
-        return current.filter(name => !this.initBundles.includes(name));
-    }
-
     @Command({
-        id: 'apps/current',
+        id: 'current',
         description: 'Show current app',
     })
     async current() {
-        return this.config.getCurrentAppName();
+        return { 
+            name: await this.config.getCurrentAppName(),
+            config: await this.config.getCurrentApp(),
+        };
     }
 
     @Command({
-        id: 'apps/list',
+        id: 'list',
         description: 'Show available configs',
     })
     async list() {
@@ -43,7 +39,7 @@ export class DevCommands {
     }
 
     @Command({
-        id: 'apps/use',
+        id: 'use',
         description: 'Show selected configs',
     })
     async use(args: string[]) {
@@ -63,12 +59,13 @@ export class DevCommands {
     }
 
     @Command({
-        id: 'save',
-        description: 'Save current config',
+        id: 'add',
+        description: 'Add current config',
     })
-    async save(args) {
-        const name = args.length === 1 ? args[0] : CONFIG_DEFAULT_NAME;
-        const bundles = this.getNewBundles();
-        return this.config.saveApp(name, { bundles });
+    async add(args: string[]) {
+        const name = args[0];
+        const app = await this.config.getCurrentApp();
+        app.bundles.push(name);
+        this.config.updateCurrentApp(app)
     }
 }

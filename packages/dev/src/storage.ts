@@ -5,8 +5,8 @@ const DEFAULT = {
 }
 
 export interface IStorage {
-  load<T>(name: string): Promise<T>;
-  save<T>(name: string, payload: T): Promise<void>;
+  read<T>(name: string): Promise<T>;
+  write<T>(name: string, payload: T): Promise<void>;
   remove(name: string): Promise<void>;
 
 }
@@ -16,10 +16,10 @@ export class RemoteStorage implements IStorage {
     private url = `http://${location.host}/-/storage`
   ) {
   }
-  async load<Response>(name: string): Promise<Response> {
+  async read<Response>(name: string): Promise<Response> {
     return this.request<null, Response>('read', name);
   }
-  async save<Payload>(name: string, payload: Payload): Promise<void> {
+  async write<Payload>(name: string, payload: Payload): Promise<void> {
     return this.request<Payload>('write', name, payload);
   }
   async remove(name: string): Promise<void> {
@@ -44,7 +44,7 @@ export class RemoteStorage implements IStorage {
 export class LocalStorage implements IStorage {
   constructor(private prefix: string) {}
 
-  async load<Response>(name: string): Promise<Response> {
+  async read<Response>(name: string): Promise<Response> {
     const key = `${this.prefix}${name}`;
     const payload = localStorage.getItem(key);
     if (payload) {
@@ -56,7 +56,7 @@ export class LocalStorage implements IStorage {
     }
     return '' as Response;
   }
-  async save<Payload>(name: string, payload: Payload): Promise<void> {
+  async write<Payload>(name: string, payload: Payload): Promise<void> {
     const key = `${this.prefix}${name}`;
     const data = JSON.stringify(payload);
     localStorage.setItem(key, data);

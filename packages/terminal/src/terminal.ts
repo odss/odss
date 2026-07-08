@@ -55,7 +55,6 @@ export class TerminalService {
             this.xterm.focus();
         }
     }
-
     private async runCommandLoop() {
         while (true) {
             let line = '';

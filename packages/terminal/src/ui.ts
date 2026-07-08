@@ -1,4 +1,4 @@
-import { fromEvent } from '@stool/dom';
+import { DOM } from '@stool/core';
 import { importStyles } from './styles';
 import { stylesheet as xterm } from '../vendors/xterm.css';
 import styles, { stylesheet as ui } from './ui.module.css';
@@ -55,7 +55,7 @@ export class MainUI {
         button.disabled = true;
         root.appendChild(button);
         let active = false;
-        this.buttonSubscription = fromEvent(button, 'click').subscribe(() => {
+        this.buttonSubscription = DOM.fromEvent(button, 'click').subscribe(() => {
             active = !active;
             const cls = this.dom.root.classList;
             active ? cls.add(styles.opened) : cls.remove(styles.opened);

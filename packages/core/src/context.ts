@@ -9,11 +9,13 @@ import {
     IDisposable,
     IServiceObject,
     IServiceRegistration,
-    NamedServiceType,
-    IServiceTrackerListenerType,
+    IServiceTracker,
     FilterType,
-    IServiceTrackerListener,
     ServiceTracker,
+    
+    NamedServiceType,
+    IServiceTrackerListener,
+    IServiceTrackerListenerType,
 } from '@odss/common';
 
 import { Framework } from './framework';
@@ -35,8 +37,6 @@ export default class BundleContext implements IBundleContext {
     public readonly on: any;
 
     constructor(private framework: Framework, private bundle: IBundle) {
-        this.on = createEvents(framework, bundle);
-        Object.freeze(this);
     }
 
     getProperty(name: string, def: any = null): any {
@@ -115,14 +115,26 @@ export default class BundleContext implements IBundleContext {
     removeFrameworkListener(listener: IFrameworkListener): void {
         return this.framework.on.framework.remove(this.bundle, listener);
     }
-    createServiceTracker<S = any>(
+    async _trackService<S = any>(service: S, resolve: (service: S, reference: IServiceReference) => Promise<() => Promise<void>>, filter?: FilterType): Promise<() => void> {
+        return ServiceTracker.trackService(this, service, resolve, filter);
+    }
+    async _trackServices<S extends readonly any[]>(
+        deps: S,
+        factory: (services: S) => Promise<() => void>
+    ): Promise<() => void> {
+        return ServiceTracker.trackServices(this, deps, factory);
+    }
+    async _createServiceTracker<S = any>(
         name: NamedServiceType,
         listener: IServiceTrackerListenerType<S> = null,
         filter: FilterType = ''
-    ): IServiceTrackerListener<S> {
-        return new ServiceTracker(this, name, listener, filter);
+    ): Promise<IServiceTracker<S>> {
+        const tracker = new ServiceTracker<S>(this, name, listener, filter);
+        await tracker.open();
+        return tracker;
     }
 }
+type ExtractArrayElementType<T extends readonly any[]> = T extends readonly (infer U)[] ? U : never;
 
 function createEvents(framework: Framework, bundle: IBundle) {
     return Object.freeze({

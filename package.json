@@ -1,6 +1,7 @@
 {
   "name": "odds",
-  "devDependencies": {
-    "lerna": "^6.5.1"
-  }
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
 }

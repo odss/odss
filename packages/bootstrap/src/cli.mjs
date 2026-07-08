@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-import Commander from 'commander';
+import { program } from 'commander';
 import { ConsoleHandler, getLogger, SimpleFormater } from '@stool/logging';
 
 import { run } from './node.mjs';
 
 const FORCE_TIMEOUT = 8*1000;
 
-const program = new Commander.Command();
 program
     .version('0.0.1')
     .option('-c, --config <path>', 'set config path', './odss.json')
+    .option('--cwd <cwd>', "Set current path", process.cwd())
     .option('-s, --shell', 'Run with shell', false)
     .option('-d, --dev', 'Run in dev mode', false)
     .option('-n, --npm-install', 'Install missing requirements', false)
@@ -35,8 +35,8 @@ program.parse(process.argv);
     logger.addHandler(handler);
     const logLevel = options.logLevel || 'info';
     logger.setLevel(logLevel);
-
-    let root = await run(process.cwd(), options);
+    
+    let root = await run(options);
     let shuttingDown = false;
     const gracefulExit = async (...args) => {
         if (!shuttingDown) {
@@ -50,7 +50,7 @@ program.parse(process.argv);
     };
     const reloadAll = async () => {
         await root.stop();
-        root = await run(process.cwd(), options);
+        root = await run(options);
     };
     // process.on('beforeExit', (code) => {
     //     console.log('Process beforeExit event with code: ', code);
